@@ -1,2 +1,3 @@
 CXX_STD = CXX11 
-PKG_CPPFLAGS += -I ../inst/include/snipsnop
+PKG_CPPFLAGS += -I ../inst/include/snipsnop -O0
+CXX11FLAGS += -O0 -Wall

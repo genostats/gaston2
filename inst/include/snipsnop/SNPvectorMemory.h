@@ -5,6 +5,12 @@
 
 #ifndef _snpvectormemory_
 #define _snpvectormemory_
+/**
+ * @brief A class derived from SNPvector abstract class 
+ * 
+ * keeps SNP data in memory and 
+ * @emoji cry
+ */
 class SNPvectorMemory : public SNPvector {
   private:
   std::vector<uint8_t> data_;
@@ -25,7 +31,15 @@ class SNPvectorMemory : public SNPvector {
   size_t nbInds() {
     return nbInds_;
   }
-  // pointer to the first char
+
+  /**
+   * @brief A function pointing to the first character of the SNP 
+   * @example 
+   * 01101100
+   * ^ here 
+   * 
+   * @return uint8_t* 
+   */
   uint8_t * data() {
     return &data_[0];
   } 

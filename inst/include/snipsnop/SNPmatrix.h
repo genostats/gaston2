@@ -6,9 +6,13 @@
 #ifndef _snpmatrix_
 #define _snpmatrix_
 
-// not much yet here 
-// and not a very good idea to leave SNPs public
-// --> will change
+/**
+ * @brief A class keeping in a vector pointers to SNPvectors
+ * (either SNPvectorDisk or SNPvectorMemory)
+ * 
+ * and not a very good idea to leave SNPs public
+ * --> will change
+ */
 class SNPmatrix {
   public:
 
@@ -23,6 +27,14 @@ class SNPmatrix {
     SNPs.pop_back();
   }
 
+  /**
+   * @brief A member function testing whether the SNP at index 
+   * is a SNPVectorDisk or a SNPVectorMemory
+   * 
+   * @param index 
+   * @return true 
+   * @return false 
+   */
   bool onDisk(size_t index) { //doesn't work, will see later
     if (std::shared_ptr<SNPVectorDisk> test = std::dynamic_pointer_cast<SNPVectorDisk>(SNPs[index])) return true;
     return false;

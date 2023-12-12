@@ -1,3 +1,11 @@
+/**
+ * @file readBedFileMemory.cpp
+ * @author Hervé Perdry
+ * @brief Main file with functions to interact with SNPvector and SNPmatrix
+ * exported by readBedFileMemory.h and called in test_readBedFileMemory.cpp
+ * @date 2023-12-11
+ * 
+ */
 #include "SNPmatrix.h"
 #include "SNPvectorMemory.h"
 #include <iostream>
@@ -10,6 +18,16 @@
 #include "SNPvectorDisk.h"
 #include <cstring>
 
+
+/**
+ * @brief Reading a bed file, storing SNPs in a SNPmatrix returned
+ * 
+ * @param filename The name of the file to be opened
+ * @param n_ind The number of individuals/samples
+ * @param n_snp The number of SNP to read from the file and to load into the Matrix.
+ * 
+ * @return SNPmatrix, stocking shared_ptrs to SNPvectorMemory 
+ */
 SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp) {
   std::ifstream file(filename, std::ifstream::binary);
   if(!file.is_open()) {
@@ -40,6 +58,17 @@ SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp) {
   return M;
 }
 
+/** @fn SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp)
+ * @brief Reading a bed file with memory mapping, storing SNPs in a SNPmatrix returned
+ * 
+ * A more detailled description here
+ * 
+ * @param path The path to the file to be opened. Can be relative or absolute
+ * @param n_ind The number of individuals/samples, given by the .bim ?
+ * @param n_snp The number of SNP to read from the file and to load into the Matrix.
+ *   
+ * @return a SNPmatrix, stocking shared_ptrs to SNPvectorDisk 
+*/
 SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp) {
   std::ifstream file_test(path, std::ifstream::binary);
   if (file_test.bad()) throw std::runtime_error("This file does not exists\n");

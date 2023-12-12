@@ -5,3 +5,11 @@ test_readBedFileMemory <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_test_readBedFileMemory`, filename, n_ind, n_snp)
 }
 
+test_readBedFileDisk <- function(filename, n_ind, n_snp) {
+    .Call(`_snipsnop_test_readBedFileDisk`, filename, n_ind, n_snp)
+}
+
+test_delete <- function(filename, n_ind, n_snp) {
+    .Call(`_snipsnop_test_delete`, filename, n_ind, n_snp)
+}
+
