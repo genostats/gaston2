@@ -8,7 +8,7 @@
 /**
  * @brief A class derived from SNPvector abstract class 
  * 
- * keeps SNP data in memory and 
+ * keeps SNP data in memory
  * @emoji cry
  */
 class SNPvectorMemory : public SNPvector {
@@ -28,14 +28,19 @@ class SNPvectorMemory : public SNPvector {
   */
 
   // nb of individuals
+  /**
+   * @brief gives number of indiduals or samples in the SNPs
+   * 
+   * @return size_t 
+   */
   size_t nbInds() {
     return nbInds_;
   }
 
   /**
    * @brief A function pointing to the first character of the SNP 
-   * @example 
-   * 01101100
+   * 
+   * 01101100            
    * ^ here 
    * 
    * @return uint8_t* 
