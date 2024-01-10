@@ -100,14 +100,19 @@ SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp) {
   SNPmatrix M;
   auto file_offset = 3; // BCOS MAGIC BYTES 
   for(size_t i = 0; i < n_snp; i++) {
-    std::shared_ptr<SNPVectorDisk> snpVec(new SNPVectorDisk(n_ind,file_ptr));
+    std::shared_ptr<SNPVectorDisk> snpVec(new SNPVectorDisk(n_ind,file_ptr, i));
     size_t n = snpVec->nbChars(); // func inherited from SNPVec, gives back sizof vec
-    uint8_t * data = snpVec->data(); // this data is ptr to first char of SNPVector
-    //Copies count n bytes from file_ptr->data to data, vector of SNPVec. Both are reinterpreted as arrays of unsigned char. 
-    std::memcpy(data, file_ptr->data() + file_offset, n);
+
+    // TODO : check if this part works
+    // maybe no need to give it, already done in constructor...
+
+
+    // uint8_t * data = snpVec->data(); // this data is ptr to first char of SNPVector
+    // //Copies count n bytes from file_ptr->data to data, vector of SNPVec. Both are reinterpreted as arrays of unsigned char. 
+    // std::memcpy(data, file_ptr->data() + file_offset, n);
 
     M.push_back(snpVec);
-    // Increment the file offset based on the size of the data
+    // // Increment the file offset based on the size of the data
     file_offset += n;
   }
   return M;

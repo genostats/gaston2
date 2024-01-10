@@ -49,11 +49,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_read_parts
+IntegerVector test_read_parts(std::string filename, size_t n_ind, size_t n_snp);
+RcppExport SEXP _snipsnop_test_read_parts(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
+    Rcpp::traits::input_parameter< size_t >::type n_ind(n_indSEXP);
+    Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_read_parts(filename, n_ind, n_snp));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 3},
     {"_snipsnop_test_readBedFileDisk", (DL_FUNC) &_snipsnop_test_readBedFileDisk, 3},
     {"_snipsnop_test_delete", (DL_FUNC) &_snipsnop_test_delete, 3},
+    {"_snipsnop_test_read_parts", (DL_FUNC) &_snipsnop_test_read_parts, 3},
     {NULL, NULL, 0}
 };
 

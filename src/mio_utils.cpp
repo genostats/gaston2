@@ -15,7 +15,9 @@
  * @brief function opening a fstream with path and going  to_add bytes past the end of file, sizing it up
  * 
  * This function uses seekp with an offset from the end of the file, then puts a \0 byte 
- * (thus adding +1 byte in size hence the to_add-1) before flushing and closing. 
+ * (thus adding +1 byte in size hence the to_add-1) before flushing and closing.
+ * This works even if the file is simultaneously open in memory_mapping,
+ * it will be used to dynamically increase a memory_mapped file.
  * 
  * @param path 
  * @param to_add 

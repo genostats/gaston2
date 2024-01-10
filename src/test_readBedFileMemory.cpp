@@ -49,3 +49,21 @@ IntegerVector test_delete(std::string filename, size_t n_ind, size_t n_snp) {
   std::cout << "Is the file destroyed before or after ?\n";
   return wrap(res);
 }
+
+// test reading only first bit of SNPs in the same file, opened in 2 different ways
+// [[Rcpp::export]]
+IntegerVector test_read_parts(std::string filename, size_t n_ind, size_t n_snp) {
+  SNPmatrix Mem = readBedFileMemory(filename, n_ind, n_snp);
+  std::vector<int> res;
+  for (auto v : Mem.SNPs) {
+    res.push_back(v->data()[0]);
+  }
+  for (int i = 0; i < 10; i++) {
+    res.push_back(0);
+  }
+  SNPmatrix Dis = readBedFileDisk(filename, n_ind, n_snp);
+  for (auto v : Dis.SNPs) {
+    res.push_back(*v->data());
+  }
+  return wrap(res);
+}

@@ -21,26 +21,28 @@ class SNPVectorDisk : public SNPvector {
 
   public:
 
-  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::mmap_source> file_ref) : data_(nbInds/4 + ((nbInds%4 == 0u)?0:1)), nbInds_(nbInds), file_ref_(file_ref) {} 
+  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::mmap_source> file_ref, size_t SNP_index) : 
+      // data_ is a ptr IN the file, it depends on how many SNPs were read. The 3 offset is to account to the magic nbr in bed file
+      data_(file_ref->data() + 3 + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index ), nbInds_(nbInds), file_ref_(file_ref) {} 
 
   ~SNPVectorDisk() {
-    //std::cout << "Destroying a SNP, here's the count of file_ref_ : " << file_ref_.use_count() << "\n";
+  // std::cout << "Destroying a SNP, here's the count of file_ref_ : " << file_ref_.use_count() << "\n";
   }
 
   size_t nbInds() {
     return nbInds_;
   }
 
-  // pointer to the first char
   uint8_t * data() {
-    return &data_[0];
-    //return data_;
+    // TODO : think bcos we lost compatibility in reading between SNPvectorMemory
+    // TODO : think if not better to have data directly be uint8_t and casted in c°
+    // TODO : think of having a way to never go beyond one SNP ( no call more than nbINds/4 + ((nbInds%4 == 0u)?0:1))
+    return reinterpret_cast<uint8_t *>(const_cast<char*>(data_));
   }
   
   private:
-  /** @brief a vector containing the bits composing the SNP */
-  std::vector<uint8_t> data_;
-  //uint8_t *data_;
+  /** @brief a pointer to the first bit of SNP in the file */
+  const char *data_;
    /** @brief to help parse SNP*/
   size_t nbInds_;
   /** @brief a shared_ptr to the object handling the file, 
