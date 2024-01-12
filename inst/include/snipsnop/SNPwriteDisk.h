@@ -1,25 +1,20 @@
 #ifndef SNPWRITEDISK
 #define SNPWRITEDISK
 
-
-
-// TODO : alleviate includes pls 
 #include "SNPvector.h"
-#include <cstddef>
-#include <cstdint>
 #include <vector>
 #include <memory> // for shared_ptr
 #include "mio.hpp" // for mmap sink
 #include <iostream>
+#include "mio_utils.h" // for resizing
 
 // TODO : shared ptr ??? on disk only ??? 
-// TODO : what do I need ? a file to write to, an index, and a data, a boolean if writing went wrong ? 
+// TODO : what do I need ? a boolean if writing went wrong ? 
 // TODO : why a class and why inherited ? 
-// TODO : write in insertion ? by replacing ? 
 // TODO : combine with the resizing ??????
 // TODO : THINK WHY A CLASS
+// TODO : PUT FORULA IN A VARIABLE PLEASE
 
-// TODO : think, by doing that need to update current SNP 
 /**
  * @brief Another class derived from SNPvector abstract class (maybe ?)
  * A class to write in a file opened with mio in sink mode
@@ -29,25 +24,24 @@ class SNPWriteDisk : public SNPvector {
 
   public:
 
-  SNPWriteDisk(size_t nbInds, std::shared_ptr<mio::mmap_sink> file_ref, size_t SNP_index, std::vector<uint8_t> to_write) : 
+  SNPWriteDisk(size_t nbInds, std::shared_ptr<mio::mmap_sink> file_ref, size_t SNP_index, std::vector<uint8_t> to_write, std::string filename) : 
     file_ref_(file_ref), data_( reinterpret_cast<uint8_t *>(file_ref->data() + 3 + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index )) {
-    if (!((*file_ref_).is_open())) std::cerr << "File is not registered as properly mapped !\n";
-    if (((*file_ref_).size() - 3) / 8 < SNP_index) std::cerr << "Index seems out of bound\n"; // eventually resizing it + CHECK MODULO
+    if (!((*file_ref_).is_open())) throw std::runtime_error("File is not registered as properly mapped !\n");
+    if ((((*file_ref_).size() - 3) / (nbInds/4 + ((nbInds%4 == 0u)?0:1))) < SNP_index) {
+      std::cout << "Index is out of bound, resizing the file to add the SNP at the end...\n";
+      if (resizing_file(filename, nbInds/4 + ((nbInds%4 == 0u)?0:1)) < 0) throw std::runtime_error("Resizing of the file failed.\n");
+    }
     if (to_write.size() == (nbInds/4 + ((nbInds%4 == 0u)?0:1))) {
-      // write, so for boucle on every bit
       // put size in variable ? 
+      size_t starting_index = 3 + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index;
       // to debug :
       std::cout << "File is okay for writing, starting now\n";
-      for (int i = 0; i < to_write.size(); i++) {
-        data_[i] = to_write[i];
+      for (size_t i = 0; i < to_write.size(); i++) {
+        // cannot use data_
+        (*file_ref_).data()[starting_index + i] = to_write[i];
       }
-    } else {
-      //error, but exception ? std::cerr ? 
-    }
-    
-
-
-  } 
+    } else { throw std::runtime_error("The SNP is not of the right size!\n"); }
+  }
 
     // TODO : rm, not necessary
   ~SNPWriteDisk() {
@@ -57,9 +51,18 @@ class SNPWriteDisk : public SNPvector {
   uint8_t * data() {
     return data_;
   }
+
+  /**
+   * @brief gives number of indiduals or samples in the SNPs (or else considered an abstract class)
+   * 
+   * @return size_t 
+   */
+  size_t nbInds() {
+    return nbInds_;
+  }
   
   private:
-  /** @brief a pointer to the first bit where to write in the file */
+  /** @brief a pointer to the first bit written in the file */
   uint8_t *data_;
 
    /** @brief to help parse SNP (kept to verify sizof(SNP))*/
@@ -70,6 +73,5 @@ class SNPWriteDisk : public SNPvector {
   when the last SNP from the same file is deleted, the file is unmapped and closed */
   std::shared_ptr<mio::mmap_sink> file_ref_;
 };
-
 
 #endif // SNPWRITEDISK

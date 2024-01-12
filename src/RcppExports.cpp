@@ -62,12 +62,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// writeBedFileDisk
+Rcpp::IntegerVector writeBedFileDisk(std::string path, size_t n_ind, size_t n_snp, size_t index);
+RcppExport SEXP _snipsnop_writeBedFileDisk(SEXP pathSEXP, SEXP n_indSEXP, SEXP n_snpSEXP, SEXP indexSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< size_t >::type n_ind(n_indSEXP);
+    Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
+    Rcpp::traits::input_parameter< size_t >::type index(indexSEXP);
+    rcpp_result_gen = Rcpp::wrap(writeBedFileDisk(path, n_ind, n_snp, index));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 3},
     {"_snipsnop_test_readBedFileDisk", (DL_FUNC) &_snipsnop_test_readBedFileDisk, 3},
     {"_snipsnop_test_delete", (DL_FUNC) &_snipsnop_test_delete, 3},
     {"_snipsnop_test_read_parts", (DL_FUNC) &_snipsnop_test_read_parts, 3},
+    {"_snipsnop_writeBedFileDisk", (DL_FUNC) &_snipsnop_writeBedFileDisk, 4},
     {NULL, NULL, 0}
 };
 

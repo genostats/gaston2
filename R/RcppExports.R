@@ -17,3 +17,7 @@ test_read_parts <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_test_read_parts`, filename, n_ind, n_snp)
 }
 
+writeBedFileDisk <- function(path, n_ind, n_snp, index) {
+    .Call(`_snipsnop_writeBedFileDisk`, path, n_ind, n_snp, index)
+}
+
