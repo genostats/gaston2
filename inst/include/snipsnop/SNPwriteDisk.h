@@ -24,13 +24,12 @@ class SNPWriteDisk {
     file_ref_(file_ref), sizeofSNP_(nbInds/4 + ((nbInds%4 == 0u)?0:1))  {
     if (!((*file_ref_).is_open())) throw std::runtime_error("File is not registered as properly mapped !\n");
     if ((((*file_ref_).size() - 3) / sizeofSNP_) < SNP_index) {
-      std::cout << "Index is out of bound, resizing the file to add the SNP at the end...\n";
+      // std::cout << "Index is out of bound, resizing the file to add the SNP at the end...\n";
       if (resizing_file(filename, sizeofSNP_) < 0) throw std::runtime_error("Resizing of the file failed.\n");
     }
     if (to_write.size() == sizeofSNP_) {
       size_t starting_index = 3 + (sizeofSNP_ * SNP_index);
-      // to debug :
-      std::cout << "File is okay for writing, starting now\n";
+      // std::cout << "File is okay for writing, starting now\n";
       for (size_t i = 0; i < to_write.size(); i++) {
         // cannot use data_
         (*file_ref_).data()[starting_index + i] = to_write[i];

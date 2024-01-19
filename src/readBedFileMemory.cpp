@@ -86,7 +86,7 @@ SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp) {
   char magic[3];
   for (int i = 0; i < 3; i++)
   {
-    std::cout << int(*data) << ' ';
+    // std::cout << int(*data) << ' ';
     magic[i] = *data++;
   }
   std::cout << '\n';

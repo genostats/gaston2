@@ -35,7 +35,7 @@ class SNPmatrix {
    * @return true 
    * @return false 
    */
-  bool onDisk(size_t index) { //doesn't work, will see later
+  bool onDisk(size_t index) {
     if (std::shared_ptr<SNPVectorDisk> test = std::dynamic_pointer_cast<SNPVectorDisk>(SNPs[index])) return true;
     return false;
   }

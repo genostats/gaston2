@@ -23,6 +23,8 @@
  * @param to_add 
  * @return int 
  */
+
+// [[Rcpp::export]]
 int resizing_file(std::string path, int to_add) {
     try {
         std::fstream file(path);
@@ -38,6 +40,18 @@ int resizing_file(std::string path, int to_add) {
     }
 }
 
+int resizing_stream(std::ofstream & file, int to_add) {
+    try {
+        if (!file ||!file.is_open()) throw std::runtime_error("File not open.");
+        file.seekp(to_add - 1, std::ios_base::end);
+        file.put('\0');
+        file.flush();
+        return 0;
+    } catch (const std::out_of_range& e) {
+        std::cerr << "Error when resizing file: " << e.what() << std::endl;
+        return -1;
+    }
+}
 
 int resizing_with_mio(std::string path){
     try {
@@ -57,3 +71,21 @@ int resizing_with_mio(std::string path){
     }
     return 0;
 }
+
+/*
+int SNPWrite(std::fstream file, size_t nbInds, std::vector<uint8_t> to_write) {
+    if (!((*file_ref_).is_open())) throw std::runtime_error("File is not registered as properly mapped !\n");
+    if ((((*file_ref_).size() - 3) / sizeofSNP_) < SNP_index) {
+      // std::cout << "Index is out of bound, resizing the file to add the SNP at the end...\n";
+      if (resizing_file(filename, sizeofSNP_) < 0) throw std::runtime_error("Resizing of the file failed.\n");
+    }
+    if (to_write.size() == sizeofSNP_) {
+      size_t starting_index = 3 + (sizeofSNP_ * SNP_index);
+      // std::cout << "File is okay for writing, starting now\n";
+      for (size_t i = 0; i < to_write.size(); i++) {
+        // cannot use data_
+        (*file_ref_).data()[starting_index + i] = to_write[i];
+      }
+    } else { throw std::runtime_error("The SNP is not of the right size!\n"); }
+  }
+ */
