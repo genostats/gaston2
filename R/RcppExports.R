@@ -13,3 +13,15 @@ test_delete <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_test_delete`, filename, n_ind, n_snp)
 }
 
+test_performance_iterator_default <- function(n) {
+    .Call(`_snipsnop_test_performance_iterator_default`, n)
+}
+
+test_performance_iterator_1 <- function(n) {
+    .Call(`_snipsnop_test_performance_iterator_1`, n)
+}
+
+test_performance_iterator_2 <- function(n) {
+    .Call(`_snipsnop_test_performance_iterator_2`, n)
+}
+

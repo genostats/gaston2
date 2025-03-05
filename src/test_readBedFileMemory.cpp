@@ -10,8 +10,11 @@
 
 using namespace Rcpp;
 
+//when testing using : "extdata/LCT.bed" n_ind : 503 n_snp : 607
+
 // [[Rcpp::export]]
 IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp) {
+  std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
   SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp);
   std::vector<int> res;
   for(auto v : M.SNPs) {
@@ -48,4 +51,40 @@ IntegerVector test_delete(std::string filename, size_t n_ind, size_t n_snp) {
   }
   std::cout << "Is the file destroyed before or after ?\n";
   return wrap(res);
+}
+
+// TODO : to test with numerous SNPs, so other rows in the bed matrix
+
+const char file_hardcode[68] = "/home/ju/R/x86_64-pc-linux-gnu-library/4.4/snipsnop/extdata/LCT.bed";
+
+// [[Rcpp::export]]
+unsigned int test_performance_iterator_default(unsigned int n) {
+  if (n > 503) n = 503; //parce que 503 individus dans le file hardcodé
+  SNPmatrix M = readBedFileMemory(file_hardcode, n, 1);
+  auto vec = M.SNPs[0]; //peut pas déréférencer là parce qu'un peu tatillon et considère que j'instancie la classe abstraite SNPvector
+  unsigned int S = vec->sum();
+  return S;
+}
+
+// [[Rcpp::export]]
+unsigned int test_performance_iterator_1(unsigned int n) {
+  if (n > 503) n = 503;
+  SNPmatrix M = readBedFileMemory(file_hardcode, n, 1);
+  auto vec = M.SNPs[0];
+  unsigned int S = 0;
+  for(unsigned int a : *vec)
+    S += a;
+  return S;
+}
+
+// [[Rcpp::export]]
+unsigned int test_performance_iterator_2(unsigned int n) {
+  if (n > 503) n = 503;
+  SNPmatrix M = readBedFileMemory(file_hardcode, n, 1);
+  auto vec = M.SNPs[0];
+  unsigned int S = 0;
+  // TODO : check with type SNPvectorMemory::Iterator pa ???
+  for(auto pa = vec->begin(); pa != vec->end(); ++pa)
+    S += *pa;
+  return S;
 }
