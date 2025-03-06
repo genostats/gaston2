@@ -25,3 +25,15 @@ test_performance_iterator_2 <- function(n) {
     .Call(`_snipsnop_test_performance_iterator_2`, n)
 }
 
+test_performance_iterator_disk <- function(n) {
+    .Call(`_snipsnop_test_performance_iterator_disk`, n)
+}
+
+test_performance_iterator_1d <- function(n) {
+    .Call(`_snipsnop_test_performance_iterator_1d`, n)
+}
+
+test_performance_iterator_2d <- function(n) {
+    .Call(`_snipsnop_test_performance_iterator_2d`, n)
+}
+

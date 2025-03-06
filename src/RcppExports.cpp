@@ -82,6 +82,39 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_performance_iterator_disk
+unsigned int test_performance_iterator_disk(unsigned int n);
+RcppExport SEXP _snipsnop_test_performance_iterator_disk(SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< unsigned int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_performance_iterator_disk(n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_performance_iterator_1d
+unsigned int test_performance_iterator_1d(unsigned int n);
+RcppExport SEXP _snipsnop_test_performance_iterator_1d(SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< unsigned int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_performance_iterator_1d(n));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_performance_iterator_2d
+unsigned int test_performance_iterator_2d(unsigned int n);
+RcppExport SEXP _snipsnop_test_performance_iterator_2d(SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< unsigned int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_performance_iterator_2d(n));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 3},
@@ -90,6 +123,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_performance_iterator_default", (DL_FUNC) &_snipsnop_test_performance_iterator_default, 1},
     {"_snipsnop_test_performance_iterator_1", (DL_FUNC) &_snipsnop_test_performance_iterator_1, 1},
     {"_snipsnop_test_performance_iterator_2", (DL_FUNC) &_snipsnop_test_performance_iterator_2, 1},
+    {"_snipsnop_test_performance_iterator_disk", (DL_FUNC) &_snipsnop_test_performance_iterator_disk, 1},
+    {"_snipsnop_test_performance_iterator_1d", (DL_FUNC) &_snipsnop_test_performance_iterator_1d, 1},
+    {"_snipsnop_test_performance_iterator_2d", (DL_FUNC) &_snipsnop_test_performance_iterator_2d, 1},
     {NULL, NULL, 0}
 };
 

@@ -975,9 +975,8 @@ template<access_mode AccessMode, typename ByteT>
 basic_mmap<AccessMode, ByteT>::~basic_mmap()
 {
     // TODO : rm later
-    // std::cout << "Destroying \n";
-    const void* buf = "Destroying file\n";
-    write(1, buf, 17);
+    // const void* buf = "Destroying file\n";
+    // write(1, buf, 17);
     conditional_sync();
     unmap();
 }

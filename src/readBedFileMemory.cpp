@@ -83,19 +83,19 @@ SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp) {
   const char* data = reinterpret_cast<const char*>(file_ptr->data());// const necessary bcos read only 
   
   // check magic number
-  char magic[3];
-  for (int i = 0; i < 3; i++)
-  {
-    std::cout << int(*data) << ' ';
-    magic[i] = *data++;
-  }
-  std::cout << '\n';
-  if(magic[0] != 108 || magic[1] != 27) {
-    throw std::runtime_error("Not a bed file");
-  }
-  if(magic[2] != 1) {
-    throw std::runtime_error("Not a bed file in SNP major mode");
-  }
+  // char magic[3];
+  // for (int i = 0; i < 3; i++)
+  // {
+  //   std::cout << int(*data) << ' ';
+  //   magic[i] = *data++;
+  // }
+  // std::cout << '\n';
+  // if(magic[0] != 108 || magic[1] != 27) {
+  //   throw std::runtime_error("Not a bed file");
+  // }
+  // if(magic[2] != 1) {
+  //   throw std::runtime_error("Not a bed file in SNP major mode");
+  // }
   
   SNPmatrix M;
   auto file_offset = 3; // BCOS MAGIC BYTES 
