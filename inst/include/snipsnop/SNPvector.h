@@ -47,19 +47,21 @@ class SNPvector {
   //   return S;
   // }
 
-  unsigned int sum() {
+  unsigned int sum(int n = -1) {
     unsigned int S = 0;
     uint8_t * d = data();
     size_t nc = nbChars();
+    int cptr = 0;
+    if (n == -1) cptr = nc;
     
-    for(size_t i = 0; i < nc; i++) {
+    for(size_t i = 0; (cptr < n && i < nc); i++) {
       uint8_t byte = d[i];
-      for (unsigned int bits = 0; bits < 4; bits++) {
-        byte >>= (2 * bits); // pour avoir les 2bits de poids faible
-        S += (byte & 3);
+      for (unsigned int bits = 0; (cptr <n && bits < 4); bits++) {
+          unsigned int val = (byte >> (2 * bits)) & 3; // Extract the SNP (2 bits)
+          S += val;
+          cptr++;
       }
     }
-    
     return S;
   }
 
@@ -68,7 +70,6 @@ class SNPvector {
     private:
     int currentChar; // ii dans le code RV, correspond au byte sur lequel je suis
     int current2bits; // ss dans le code RV, correspond au bit (0...3) dans le byte
-
     uint8_t * iterated;
 
     public:
@@ -76,14 +77,20 @@ class SNPvector {
     Iterator(uint8_t * it) : currentChar(0), current2bits(0), iterated(it) {}
 
     // TODO : bound check to add
-    Iterator(size_t ind, uint8_t * it) : currentChar(ind / 4), current2bits(ind % 4), iterated(it) {}
+    // Iterator(size_t ind, uint8_t * it) : currentChar((ind%4 == 0)? ((ind/4)- 1) : (ind/4)), current2bits((ind%4 == 0)? 3 : (ind%4)), iterated(it) {
+    // std::cout << "Creating an End iterator at " << currentChar << "th byte on the " << current2bits << " bit \n";
+    // }
+    Iterator(size_t ind, uint8_t * it) : currentChar(ind / 4), current2bits(ind % 4), iterated(it) {
+    //std::cout << "Creating an End iterator at " << currentChar << "th byte on the " << current2bits << " bit \n";
+    }
 
     // operateur * const : renvoie la valeur 2bits par 2bits
     unsigned int operator*() {
       uint8_t byte = iterated[currentChar];
       byte >>= (2 * current2bits); // pour avoir les 2bits de poids faible
       unsigned int val = (byte & 3); // mtn on les isole
-      // if (val != 3) std::cout << "This is the " << currentChar << "th byte on the " << current2bits << " bit value :" << val << "\n";
+      //if (val != 3) 
+      //std::cout << "This is the " << currentChar << "th byte on the " << current2bits << " bit value :" << val << "\n";
       return val;
     }
 

@@ -69,7 +69,7 @@ unsigned int test_performance_iterator_default(unsigned int n) {
   if (n > 503) n = 503; //parce que 503 individus dans le file hardcodé
   SNPmatrix M = readBedFileMemory(file_hardcode, n, 1);
   auto vec = M.SNPs[0]; //peut pas déréférencer là parce qu'instancie la classe abstraite SNPvector
-  unsigned int S = vec->sum();
+  unsigned int S = vec->sum(n);
   return S;
 }
 
@@ -103,7 +103,7 @@ unsigned int test_performance_iterator_disk(unsigned int n) {
   if (n > 503) n = 503; //parce que 503 individus dans le file hardcodé
   SNPmatrix M = readBedFileDisk(file_hardcode, n, 1);
   auto vec = M.SNPs[0]; //peut pas déréférencer là parce qu'instancie la classe abstraite SNPvector
-  unsigned int S = vec->sum();
+  unsigned int S = vec->sum(n);
   return S;
 }
 
