@@ -10,7 +10,7 @@
  * @brief A class keeping in a vector pointers to SNPvectors
  * (either SNPvectorDisk or SNPvectorMemory)
  * 
- * and not a very good idea to leave SNPs public
+ * TODO :and not a very good idea to leave SNPs public
  * --> will change
  */
 class SNPmatrix {
@@ -35,12 +35,14 @@ class SNPmatrix {
    * @return true 
    * @return false 
    */
-  bool onDisk(size_t index) { //doesn't work, will see later
+  bool onDisk(size_t index) { //TODO  check why was that written ????doesn't work, will see later
     if (std::shared_ptr<SNPVectorDisk> test = std::dynamic_pointer_cast<SNPVectorDisk>(SNPs[index])) return true;
     return false;
   }
 
   std::vector<std::shared_ptr<SNPvector>> SNPs;
+
+  // TODO : add mu and sigma std::vector de double, calculable avec les array de N
 };
 
 #endif

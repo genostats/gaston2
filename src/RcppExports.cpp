@@ -49,6 +49,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_readModes
+IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp);
+RcppExport SEXP _snipsnop_test_readModes(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
+    Rcpp::traits::input_parameter< size_t >::type n_ind(n_indSEXP);
+    Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_readModes(filename, n_ind, n_snp));
+    return rcpp_result_gen;
+END_RCPP
+}
 // test_performance_iterator_default
 unsigned int test_performance_iterator_default(unsigned int n);
 RcppExport SEXP _snipsnop_test_performance_iterator_default(SEXP nSEXP) {
@@ -120,6 +133,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 3},
     {"_snipsnop_test_readBedFileDisk", (DL_FUNC) &_snipsnop_test_readBedFileDisk, 3},
     {"_snipsnop_test_delete", (DL_FUNC) &_snipsnop_test_delete, 3},
+    {"_snipsnop_test_readModes", (DL_FUNC) &_snipsnop_test_readModes, 3},
     {"_snipsnop_test_performance_iterator_default", (DL_FUNC) &_snipsnop_test_performance_iterator_default, 1},
     {"_snipsnop_test_performance_iterator_1", (DL_FUNC) &_snipsnop_test_performance_iterator_1, 1},
     {"_snipsnop_test_performance_iterator_2", (DL_FUNC) &_snipsnop_test_performance_iterator_2, 1},

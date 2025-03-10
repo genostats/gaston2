@@ -104,4 +104,4 @@ LCT.test <- c(26475L, 25512L, 31368L, 29316L, 14908L, 31210L, 31389L, 31389L,
 14552L, 26325L, 26848L, 26345L, 26848L, 26345L, 15764L, 26345L, 
 26828L, 26848L, 26868L, 26848L, 31246L, 14552L, 31840L)
 
-#microbenchmark::microbenchmark(test_performance_iterator_default(503), test_performance_iterator_1(503), test_performance_iterator_2(503), times = 1e4)
+# microbenchmark::microbenchmark(test_performance_iterator_default(503), test_performance_iterator_1(503), test_performance_iterator_2(503), times = 1e4)

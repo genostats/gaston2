@@ -53,6 +53,37 @@ IntegerVector test_delete(std::string filename, size_t n_ind, size_t n_snp) {
   return wrap(res);
 }
 
+IntegerVector loop_sum(SNPmatrix matrix) {
+  std::vector<int> res;
+  for(auto v : matrix.SNPs) {
+    //== sum(503)
+    res.push_back(v->sum());
+  }
+  return wrap(res);
+}
+
+
+// [[Rcpp::export]]
+IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp) {
+  std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
+  std::cout << " reading in Numeric (classic) Mode \n";
+  SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, 0);
+  IntegerVector res = loop_sum(M);
+  std::cout << " reading in Centered (not implemented yet) Mode \n";
+  M = readBedFileMemory(filename, n_ind, n_snp, 1);
+  IntegerVector res2 = loop_sum(M);
+  for (auto i : res2) res.push_back(i);
+  std::cout << " reading in Standardized (not implemented yet) Mode \n";
+  M = readBedFileMemory(filename, n_ind, n_snp, 2);
+  IntegerVector res3 = loop_sum(M);
+  for (auto i : res3) res.push_back(i);
+  std::cout << " reading in PLINK Mode \n";
+  M = readBedFileMemory(filename, n_ind, n_snp, 3);
+  IntegerVector res4 = loop_sum(M);
+  for (auto i : res4) res.push_back(i);
+  return wrap(res);
+}
+
 /************************
  *    Test SNP reading  *
  ************************/
