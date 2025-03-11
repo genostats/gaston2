@@ -20,10 +20,11 @@
 class SNPVectorDisk : public SNPvector {
 
   public:
-
-  // By default, mode is Numeric (0), TODO : add int checking
-  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::mmap_source> file_ref, int modeInt = 0) : data_(nbInds/4 + ((nbInds%4 == 0u)?0:1)), nbInds_(nbInds), file_ref_(file_ref), mode_((modeInt > 3)? static_cast<SNPvector::Mode>(0) : static_cast<SNPvector::Mode>(modeInt)) {
-    if (modeInt > 3 || modeInt < 0) throw std::runtime_error("Wrong mode chosen for reading SNP");
+  
+  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::mmap_source> file_ref, const uint8_t* mode = Defaultmode ) : data_(nbInds/4 + ((nbInds%4 == 0u)?0:1)), nbInds_(nbInds), file_ref_(file_ref), mode_(mode) {
+    if (!mode) {
+      mode_ = Defaultmode;
+    }
   } 
 
   ~SNPVectorDisk() {
@@ -39,18 +40,22 @@ class SNPVectorDisk : public SNPvector {
     return &data_[0];
   }
 
-  Mode mode() {
+  const uint8_t* mode() {
     return mode_;
   }
   
+  uint8_t mode(unsigned int n) {
+    return mode_[n];
+  }
+
   private:
   /** @brief a vector containing the bits composing the SNP */
   std::vector<uint8_t> data_;
   //uint8_t *data_;
    /** @brief to help parse SNP*/
   size_t nbInds_;
-  /** @brief an enum helping converting datas if necessary */
-  enum Mode mode_;
+  /** @brief an array helping converting datas */
+  const uint8_t* mode_;
   /** @brief a shared_ptr to the object handling the file, 
   when the last SNP from the same file is deleted, the file is unmapped and closed */
   std::shared_ptr<mio::mmap_source> file_ref_;

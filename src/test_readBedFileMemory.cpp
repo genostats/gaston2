@@ -16,7 +16,7 @@ using namespace Rcpp;
 IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp) {
   std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
   SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp);
-  std::vector<int> res;
+  std::vector<unsigned int> res;
   for(auto v : M.SNPs) {
     res.push_back(v->sum());
   }
@@ -26,7 +26,7 @@ IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t 
 // [[Rcpp::export]]
 IntegerVector test_readBedFileDisk(std::string filename, size_t n_ind, size_t n_snp) {
   SNPmatrix M = readBedFileDisk(filename, n_ind, n_snp);
-  std::vector<int> res;
+  std::vector<unsigned int> res;
   for(auto v : M.SNPs) {
     res.push_back(v->sum());
   }
@@ -66,19 +66,22 @@ IntegerVector loop_sum(SNPmatrix matrix) {
 // [[Rcpp::export]]
 IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp) {
   std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
-  std::cout << " reading in Numeric (classic) Mode \n";
-  SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, 0);
+  std::cout << " reading in Numeric Mode \n";
+  uint8_t Num[4] = {0, 1, 2, 3};
+  SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, Num);
   IntegerVector res = loop_sum(M);
   std::cout << " reading in Centered (not implemented yet) Mode \n";
-  M = readBedFileMemory(filename, n_ind, n_snp, 1);
+  uint8_t Cent[4] = { 0, 0, 0, 0};
+  M = readBedFileMemory(filename, n_ind, n_snp, Cent);
   IntegerVector res2 = loop_sum(M);
   for (auto i : res2) res.push_back(i);
   std::cout << " reading in Standardized (not implemented yet) Mode \n";
-  M = readBedFileMemory(filename, n_ind, n_snp, 2);
+  uint8_t Std[4] = {0, 0, 0, 0};
+  M = readBedFileMemory(filename, n_ind, n_snp, Std);
   IntegerVector res3 = loop_sum(M);
   for (auto i : res3) res.push_back(i);
   std::cout << " reading in PLINK Mode \n";
-  M = readBedFileMemory(filename, n_ind, n_snp, 3);
+  M = readBedFileMemory(filename, n_ind, n_snp);
   IntegerVector res4 = loop_sum(M);
   for (auto i : res4) res.push_back(i);
   return wrap(res);
@@ -97,10 +100,22 @@ const char file_hardcode[68] = "/home/ju/R/x86_64-pc-linux-gnu-library/4.4/snips
 
 // [[Rcpp::export]]
 unsigned int test_performance_iterator_default(unsigned int n) {
-  if (n > 503) n = 503; //parce que 503 individus dans le file hardcodé
-  SNPmatrix M = readBedFileMemory(file_hardcode, n, 1);
-  auto vec = M.SNPs[0]; //peut pas déréférencer là parce qu'instancie la classe abstraite SNPvector
-  unsigned int S = vec->sum(n);
+  int nbSNPs = 1;
+  unsigned int S = 0;
+  if (n > 503) { // cas où je dépasse SNP[0]
+    nbSNPs = n/503;
+    n = n%503;
+  } //parce que 503 individus dans le file hardcodé
+  SNPmatrix M = readBedFileMemory(file_hardcode, n, nbSNPs);
+  for (int i = 0; i < nbSNPs; i++) {
+    auto vec = M.SNPs[i]; //peut pas déréférencer là parce qu'instancie la classe abstraite SNPvector
+    if (i == nbSNPs -1)
+    {
+      S += vec->sum(n);
+      return S;
+    }
+    S += vec->sum(503);
+  }
   return S;
 }
 
@@ -159,4 +174,37 @@ unsigned int test_performance_iterator_2d(unsigned int n) {
   for(auto pa = vec->begin(); pa != vec->end(); ++pa)
     S += *pa;
   return S;
+}
+
+// [[Rcpp::export]]
+IntegerVector test_snp_stats(unsigned int n) {
+  if (n > 503) n = 503;
+  SNPmatrix M = readBedFileMemory(file_hardcode, n, 1);
+  auto vec = M.SNPs[0];
+  auto stats = vec->compute_stats();
+  std::vector<unsigned int> res(stats, stats + 4);
+  return wrap(res);
+}
+
+// [[Rcpp::export]]
+IntegerVector test_snp_stats_d(unsigned int n) {
+  if (n > 503) n = 503;
+  SNPmatrix M = readBedFileDisk(file_hardcode, n, 1);
+  auto vec = M.SNPs[0];
+  auto stats = vec->compute_stats();
+  std::vector<unsigned int> res(stats, stats + 4);
+  return wrap(res);
+}
+
+/*******************************
+ *    Test SNP sum comparison  *
+ ********************************/
+
+// [[Rcpp::export]]
+unsigned int test_sums(unsigned int n){
+
+  unsigned int sum_with_iterator = test_performance_iterator_1(n);
+  IntegerVector stats = test_snp_stats(n);
+
+
 }

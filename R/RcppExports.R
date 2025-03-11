@@ -41,3 +41,15 @@ test_performance_iterator_2d <- function(n) {
     .Call(`_snipsnop_test_performance_iterator_2d`, n)
 }
 
+test_snp_stats <- function(n) {
+    .Call(`_snipsnop_test_snp_stats`, n)
+}
+
+test_snp_stats_d <- function(n) {
+    .Call(`_snipsnop_test_snp_stats_d`, n)
+}
+
+test_sums <- function(n) {
+    .Call(`_snipsnop_test_sums`, n)
+}
+

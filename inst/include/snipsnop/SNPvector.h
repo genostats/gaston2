@@ -11,6 +11,45 @@
   static uint8_t mu = 0;
   static uint8_t sigma = 1;
 
+  static uint8_t N0[256] = {
+  4, 3, 3, 3, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 
+  3, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 
+  3, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 
+  3, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 
+  3, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 
+  2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 
+  2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 
+  2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 
+  3, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 
+  2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 
+  2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 
+  2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 
+  3, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 
+  2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 
+  2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 
+  2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
+
+  static uint8_t N1[256] = {
+  0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 
+  1, 2, 1, 1, 2, 3, 2, 2, 1, 2, 1, 1, 1, 2, 1, 1, 
+  0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 
+  0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 
+  1, 2, 1, 1, 2, 3, 2, 2, 1, 2, 1, 1, 1, 2, 1, 1, 
+  2, 3, 2, 2, 3, 4, 3, 3, 2, 3, 2, 2, 2, 3, 2, 2, 
+  1, 2, 1, 1, 2, 3, 2, 2, 1, 2, 1, 1, 1, 2, 1, 1, 
+  1, 2, 1, 1, 2, 3, 2, 2, 1, 2, 1, 1, 1, 2, 1, 1, 
+  0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 
+  1, 2, 1, 1, 2, 3, 2, 2, 1, 2, 1, 1, 1, 2, 1, 1, 
+  0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 
+  0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 
+  0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 
+  1, 2, 1, 1, 2, 3, 2, 2, 1, 2, 1, 1, 1, 2, 1, 1, 
+  0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 
+  0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0};
+
+  // BY DEFAULT, PLINK format, with 01 = missing genotype
+  constexpr uint8_t Defaultmode[4] = {0, 3, 1, 2};
+
 /**
  * @brief An abstract class instanciated through SNPvectorMemory or SNPvectorDisk
  * 
@@ -28,16 +67,25 @@ class SNPvector {
   virtual uint8_t * data() = 0;
   // nombre d'individus
   virtual size_t nbInds() = 0;
+
+  virtual const uint8_t* mode() = 0;
+  virtual uint8_t mode(unsigned int n) = 0;
   
-  enum Mode { 
-    NUMERIC = 0, // (g = {0, 1, 2 and 3 = NA})
-    CENTERED = 1, // (g -= mu)
-    STANDARDIZED = 2, // (g = (g-mu)/sd)
-    PLINK = 3// .bed file : (g = {0, 1, 3 and 2 = NA})
-  };
+  // TODO : maybe with env var ?
+  //{0, 3, 1, 2};
+
+  // TODO : A REFAIRE 
+  // enum Mode { 
+  //   NUMERIC = 0, // (g = {0, 1, 2 and 3 = NA})
+  //   CENTERED = 1, // (g -= mu)
+  //   STANDARDIZED = 2, // (g = (g-mu)/sd)
+  //   PLINK = 3// .bed file : (g = {0, 1, 3 and 2 = NA})
+  // };
   //TODO : check if done correctly 
-  virtual Mode mode() = 0;
-  //TODO : add N0, N1, N2, N3 = nbre d’élts de valeurs 0 1 2 et 3
+  //virtual Mode mode() = 0;
+  /* Containing N0, N1, N2, N3 on the whole SNP
+  populated by compute_stats() */
+  unsigned int stats[4] = {0, 0, 0, 0};
 
   /**
    * @brief function calculating the size of the vector
@@ -62,11 +110,44 @@ class SNPvector {
       uint8_t byte = d[i];
       for (unsigned int bits = 0; (cptr < n && bits < 4); bits++) {
           unsigned int val = (byte >> (2 * bits)) & 3; // Extract the SNP (2 bits)
-          S += val;
+          S += mode(val);
           cptr++;
       }
     }
     return S;
+  }
+
+  // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
+  // TODO : REVOIR POUR CLEAN CETTE METHODE TRES MOCHE ààààà
+  unsigned int * compute_stats() {
+    size_t nbByte = nbChars();
+    size_t BitsInLastByte = (nbInds()%4); // number of bits to read on last byte
+    for (size_t i = 0; i < nbByte; i++) {
+        
+        uint8_t d = data()[i];
+
+        if ((i == nbByte-1) && BitsInLastByte > 0) {
+          while (BitsInLastByte > 0) {
+          
+            //std::cout << "On last byte, " << BitsInLastByte << " left\n";
+            unsigned int val = (d & 3);
+            std::cout << "This is the " << i << "th byte on the " << 3 - BitsInLastByte << " bit value :" << val << "\n";
+            //std::cout << "Stats array before adding val :" << stats[0] << "," << stats[1]<< "," << stats[2]<< "," << stats[3] << "\n";
+            stats[val]++;
+            BitsInLastByte--;
+            d >>= 2; // 1 shift par loop
+          }
+          return stats;
+        }
+      //sinon, fini pile à la fin d'une byte je peux return
+      else if (i == nbByte-1) return stats;
+      stats[0] += N0[d];
+      stats[3] += N0[255-d];
+      stats[1] += N1[d];
+      stats[2] += N1[255-d];
+    }
+    // maybe add a translation following diff modes ? 
+    return stats;
   }
 
   class Iterator {
@@ -89,23 +170,7 @@ class SNPvector {
       uint8_t byte = iterated.data()[currentChar];
       byte >>= (2 * current2bits); // pour avoir les 2bits de poids faible
       unsigned int val = (byte & 3); // mtn on les isole
-      //if (val != 3) 
-      //std::cout << "This is the " << currentChar << "th byte on the " << current2bits << " bit value :" << val << "\n";
-      //std::cout << "This is the iterated.mode" << iterated.mode() << "\n";
-      switch (iterated.mode()) {
-            case NUMERIC:
-                return val;
-            case CENTERED:
-                return (val - mu);
-            case STANDARDIZED:
-                return (val - mu) / sigma; // TODO : check if sigma CAN divide 
-            case PLINK:
-                if (val == 3) return 2;
-                if (val == 2) return 3;
-                return val;
-            default:
-                return val;
-        }
+      return iterated.mode(val);
     }
 
     // Operateur ++ : passe à la valeur suivante, PRE-INCRÉMENTATION 

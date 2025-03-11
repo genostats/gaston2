@@ -30,7 +30,7 @@
  * 
  * @return SNPmatrix, stocking shared_ptrs to SNPvectorMemory 
  */
-SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, int modeInt) {
+SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, uint8_t* modeArray) {
   std::ifstream file(filename, std::ifstream::binary);
   if(!file.is_open()) {
     throw std::runtime_error("Cannot open file");
@@ -49,7 +49,7 @@ SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, in
   SNPmatrix M;
   for(size_t i = 0; i < n_snp; i++) {
     //makes a shared_ptr on a vector of snips 
-    std::shared_ptr<SNPvectorMemory> snpVec(new SNPvectorMemory(n_ind, modeInt));
+    std::shared_ptr<SNPvectorMemory> snpVec(new SNPvectorMemory(n_ind, modeArray));
     size_t n = snpVec->nbChars();
     uint8_t * data = snpVec->data();
     file.read(reinterpret_cast<char *>(data), n);
@@ -71,7 +71,7 @@ SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, in
  *   
  * @return a SNPmatrix, stocking shared_ptrs to SNPvectorDisk 
 */
-SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, int modeInt) {
+SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, uint8_t* modeArray) {
   std::ifstream file_test(path, std::ifstream::binary);
   if (file_test.bad()) throw std::runtime_error("This file does not exists\n");
   std::error_code error;
@@ -102,7 +102,7 @@ SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, int mode
   SNPmatrix M;
   auto file_offset = 3; // BCOS MAGIC BYTES 
   for(size_t i = 0; i < n_snp; i++) {
-    std::shared_ptr<SNPVectorDisk> snpVec(new SNPVectorDisk(n_ind,file_ptr));
+    std::shared_ptr<SNPVectorDisk> snpVec(new SNPVectorDisk(n_ind,file_ptr, modeArray));
     size_t n = snpVec->nbChars(); // func inherited from SNPVec, gives back sizof vec
     uint8_t * data = snpVec->data(); // this data is ptr to first char of SNPVector
     //Copies count n bytes from file_ptr->data to data, vector of SNPVec. Both are reinterpreted as arrays of unsigned char. 

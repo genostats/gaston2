@@ -5,6 +5,8 @@
 
 #ifndef _snpvectormemory_
 #define _snpvectormemory_
+
+
 /**
  * @brief A class derived from SNPvector abstract class 
  * 
@@ -15,11 +17,13 @@ class SNPvectorMemory : public SNPvector {
   private:
   std::vector<uint8_t> data_;
   size_t nbInds_;
-  enum Mode mode_;
+  const uint8_t* mode_;
   public:
   // un constructeur, taille nbInds
-  SNPvectorMemory(size_t nbInds, int modeInt = 0) : data_(nbInds/4 + ((nbInds%4 == 0u)?0:1)), nbInds_(nbInds), mode_((modeInt > 3)? static_cast<SNPvector::Mode>(0) : static_cast<SNPvector::Mode>(modeInt)) {
-        if (modeInt > 3 || modeInt < 0) throw std::runtime_error("Wrong mode chosen for reading SNP");
+  SNPvectorMemory(size_t nbInds, const uint8_t* mode = Defaultmode ) : data_(nbInds/4 + ((nbInds%4 == 0u)?0:1)), nbInds_(nbInds), mode_(mode) {
+    if (!mode) {
+        mode_ = Defaultmode;
+    }
   } 
 
 
@@ -47,8 +51,12 @@ class SNPvectorMemory : public SNPvector {
     return &data_[0];
   } 
 
-  Mode mode() {
+  const uint8_t * mode() {
     return mode_;
+  }
+
+  uint8_t mode(unsigned int n) {
+    return mode_[n];
   }
 };
 
