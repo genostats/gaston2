@@ -151,7 +151,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // test_sums
-unsigned int test_sums(unsigned int n);
+IntegerVector test_sums(unsigned int n);
 RcppExport SEXP _snipsnop_test_sums(SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

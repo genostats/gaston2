@@ -103,87 +103,163 @@ unsigned int test_performance_iterator_default(unsigned int n) {
   int nbSNPs = 1;
   unsigned int S = 0;
   if (n > 503) { // cas où je dépasse SNP[0]
-    nbSNPs = n/503;
+    nbSNPs = (n/503) + 1;
     n = n%503;
   } //parce que 503 individus dans le file hardcodé
-  SNPmatrix M = readBedFileMemory(file_hardcode, n, nbSNPs);
+  //std::cout << "Nb of SNPs: " << nbSNPs << " and nb of bits to read on last :" << n <<"\n";
+  SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1)? 503 : n, nbSNPs);
   for (int i = 0; i < nbSNPs; i++) {
     auto vec = M.SNPs[i]; //peut pas déréférencer là parce qu'instancie la classe abstraite SNPvector
-    if (i == nbSNPs -1)
-    {
+    if (i == nbSNPs -1) {
       S += vec->sum(n);
+      //std::cout << "final S: " << S <<"\n";
       return S;
     }
-    S += vec->sum(503);
+    S += vec->sum();
+    //std::cout << "S for now: " << S <<"\n";
+
   }
-  return S;
+  return -1;
 }
 
 // [[Rcpp::export]]
 unsigned int test_performance_iterator_1(unsigned int n) {
-  if (n > 503) n = 503;
-  SNPmatrix M = readBedFileMemory(file_hardcode, n, 1);
-  auto vec = M.SNPs[0];
+  int nbSNPs = 1;
   unsigned int S = 0;
-  for(unsigned int a : *vec)
-    S += a;
-  return S;
+  if (n > 503) { // cas où je dépasse SNP[0]
+    nbSNPs = (n/503) + 1;
+    n = n%503;
+  }
+  SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1)? 503 : n, nbSNPs);
+
+  for (int i = 0; i < nbSNPs; i++) {
+    auto vec = M.SNPs[i];
+    if (i == nbSNPs -1) {
+      S += vec->sum(n);
+      return S;
+    }
+    for(unsigned int a : *vec)
+      S += a;
+  }
+  return -1;
 }
 
 // [[Rcpp::export]]
 unsigned int test_performance_iterator_2(unsigned int n) {
-  if (n > 503) n = 503;
-  SNPmatrix M = readBedFileMemory(file_hardcode, n, 1);
-  auto vec = M.SNPs[0];
+  int nbSNPs = 1;
   unsigned int S = 0;
-  // TODO : check with type SNPvectorMemory::Iterator pa ???
+  if (n > 503) {
+    nbSNPs = (n/503) + 1;
+    n = n%503;
+  }
+  SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1)? 503 : n, nbSNPs);
+
+  for (int i = 0; i < nbSNPs; i++) {
+    auto vec = M.SNPs[i];
+    if (i == nbSNPs -1) {
+      S += vec->sum(n);
+      return S;
+    }
   for(auto pa = vec->begin(); pa != vec->end(); ++pa)
-    S += *pa;
-  return S;
+      S += *pa;
+  }
+  return -1;
 }
 
 // ON DISK NOW, mean = 15 microseconds
 
 // [[Rcpp::export]]
 unsigned int test_performance_iterator_disk(unsigned int n) {
-  if (n > 503) n = 503; //parce que 503 individus dans le file hardcodé
-  SNPmatrix M = readBedFileDisk(file_hardcode, n, 1);
-  auto vec = M.SNPs[0]; //peut pas déréférencer là parce qu'instancie la classe abstraite SNPvector
-  unsigned int S = vec->sum(n);
-  return S;
+  int nbSNPs = 1;
+  unsigned int S = 0;
+  if (n > 503) { // cas où je dépasse SNP[0]
+    nbSNPs = (n/503) + 1;
+    n = n%503;
+  }
+  SNPmatrix M = readBedFileDisk(file_hardcode, (nbSNPs > 1)? 503 : n, nbSNPs);
+  for (int i = 0; i < nbSNPs; i++) {
+    auto vec = M.SNPs[i];
+    if (i == nbSNPs -1) {
+      S += vec->sum(n);
+      return S;
+    }
+    S += vec->sum();
+  }
+  return -1;
 }
 
 // [[Rcpp::export]]
 unsigned int test_performance_iterator_1d(unsigned int n) {
-  if (n > 503) n = 503;
-  SNPmatrix M = readBedFileDisk(file_hardcode, n, 1);
-  auto vec = M.SNPs[0];
+  int nbSNPs = 1;
   unsigned int S = 0;
-  for(unsigned int a : *vec)
-    S += a;
-  return S;
+  if (n > 503) { // cas où je dépasse SNP[0]
+    nbSNPs = (n/503) + 1;
+    n = n%503;
+  }
+  SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1)? 503 : n, nbSNPs);
+
+  for (int i = 0; i < nbSNPs; i++) {
+    auto vec = M.SNPs[i];
+    if (i == nbSNPs -1) {
+      S += vec->sum(n);
+      return S;
+    }
+    for(unsigned int a : *vec)
+      S += a;
+  }
+  return -1;
 }
 
 // [[Rcpp::export]]
 unsigned int test_performance_iterator_2d(unsigned int n) {
-  if (n > 503) n = 503;
-  SNPmatrix M = readBedFileDisk(file_hardcode, n, 1);
-  auto vec = M.SNPs[0];
+  int nbSNPs = 1;
   unsigned int S = 0;
-  // TODO : check with type SNPvectorMemory::Iterator pa ???
+  if (n > 503) {
+    nbSNPs = (n/503) + 1;
+    n = n%503;
+  }
+  SNPmatrix M = readBedFileDisk(file_hardcode, (nbSNPs > 1)? 503 : n, nbSNPs);
+
+  for (int i = 0; i < nbSNPs; i++) {
+    auto vec = M.SNPs[i];
+    if (i == nbSNPs -1) {
+      S += vec->sum(n);
+      return S;
+    }
   for(auto pa = vec->begin(); pa != vec->end(); ++pa)
-    S += *pa;
-  return S;
+      S += *pa;
+  }
+  return -1;
 }
+
+// TODO : 
 
 // [[Rcpp::export]]
 IntegerVector test_snp_stats(unsigned int n) {
-  if (n > 503) n = 503;
-  SNPmatrix M = readBedFileMemory(file_hardcode, n, 1);
-  auto vec = M.SNPs[0];
-  auto stats = vec->compute_stats();
-  std::vector<unsigned int> res(stats, stats + 4);
-  return wrap(res);
+  int nbSNPs = 1;
+  unsigned int S = 0;
+  if (n > 503) {
+    nbSNPs = (n/503) + 1;
+    n = n%503;
+  }
+  SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1)? 503 : n, nbSNPs);
+
+  std::vector<unsigned int> res(4, 0);  // Initialize sum vector {0, 0, 0, 0}
+
+  for (int i = 0; i < nbSNPs; i++) {
+    auto vec = M.SNPs[i]; 
+    auto stats = vec->compute_stats();
+
+    for (int j = 0; j < 4; j++) {
+      res[j] += stats[j];  // Element-wise sum
+    }
+    // FOR now no way to stop on a part of the SNP
+    if (i == nbSNPs -1) {
+      return wrap(res);
+    }
+
+  }
+  return -1;
 }
 
 // [[Rcpp::export]]
@@ -201,10 +277,19 @@ IntegerVector test_snp_stats_d(unsigned int n) {
  ********************************/
 
 // [[Rcpp::export]]
-unsigned int test_sums(unsigned int n){
+IntegerVector test_sums(unsigned int n){
 
-  unsigned int sum_with_iterator = test_performance_iterator_1(n);
+  unsigned int sum_default = test_performance_iterator_default(n);
+  auto sum_1 = test_performance_iterator_1(n);
+  auto sum_2 = test_performance_iterator_2(n);
+  auto sum_disk = test_performance_iterator_disk(n);
+  auto sum_1d = test_performance_iterator_1d(n);
+  auto sum_2d = test_performance_iterator_2d(n);
+
+  if (std::set<unsigned int>{sum_default, sum_1, sum_2, sum_disk, sum_1d, sum_2d}.size() == 1) { // set rm duplicates, if size == 1 only 1 value
+    std::cout << "All sums are equal!\n";
+  }
+
   IntegerVector stats = test_snp_stats(n);
-
-
+  return stats;
 }

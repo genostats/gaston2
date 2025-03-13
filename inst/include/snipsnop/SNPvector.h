@@ -131,7 +131,7 @@ class SNPvector {
           
             //std::cout << "On last byte, " << BitsInLastByte << " left\n";
             unsigned int val = (d & 3);
-            std::cout << "This is the " << i << "th byte on the " << 3 - BitsInLastByte << " bit value :" << val << "\n";
+            //std::cout << "This is the " << i << "th byte on the " << 3 - BitsInLastByte << " bit value :" << val << "\n";
             //std::cout << "Stats array before adding val :" << stats[0] << "," << stats[1]<< "," << stats[2]<< "," << stats[3] << "\n";
             stats[val]++;
             BitsInLastByte--;
