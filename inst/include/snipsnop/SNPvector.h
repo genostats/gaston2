@@ -1,6 +1,8 @@
 #include <cstdint>
 #include <cstddef>
 
+#include <math.h>       /* for sqrt... */
+
 //TODO cleanup if not useful
 #include <iostream> // only for printing in debug
 
@@ -8,8 +10,8 @@
 #define _SNPvector_
 
   //TODO : find a way to change default value
-  static uint8_t mu = 0;
-  static uint8_t sigma = 1;
+  // static uint8_t mu = 0;
+  // static uint8_t sigma = 1;
 
   static uint8_t N0[256] = {
   4, 3, 3, 3, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 
@@ -49,6 +51,7 @@
 
   // BY DEFAULT, PLINK format, with 01 = missing genotype
   constexpr uint8_t Defaultmode[4] = {0, 3, 1, 2};
+  //constexpr uint8_t Defaultmode[4] = {0, 2}
 
 /**
  * @brief An abstract class instanciated through SNPvectorMemory or SNPvectorDisk
@@ -69,23 +72,14 @@ class SNPvector {
   virtual size_t nbInds() = 0;
 
   virtual const uint8_t* mode() = 0;
-  virtual uint8_t mode(unsigned int n) = 0;
+  virtual int mode(unsigned int n) = 0;
   
-  // TODO : maybe with env var ?
-  //{0, 3, 1, 2};
+  /* Containing N0, N1, N2, NAs on the whole SNP, following Plink format
+  populated by compute_stats()*/
+  unsigned int stats_[4] = {0, 0, 0, 0};
 
-  // TODO : A REFAIRE 
-  // enum Mode { 
-  //   NUMERIC = 0, // (g = {0, 1, 2 and 3 = NA})
-  //   CENTERED = 1, // (g -= mu)
-  //   STANDARDIZED = 2, // (g = (g-mu)/sd)
-  //   PLINK = 3// .bed file : (g = {0, 1, 3 and 2 = NA})
-  // };
-  //TODO : check if done correctly 
-  //virtual Mode mode() = 0;
-  /* Containing N0, N1, N2, N3 on the whole SNP
-  populated by compute_stats() */
-  unsigned int stats[4] = {0, 0, 0, 0};
+  double mu_ = 0;
+  double sigma_ = 0;
 
   /**
    * @brief function calculating the size of the vector
@@ -96,6 +90,19 @@ class SNPvector {
   size_t nbChars() {
     const size_t n = nbInds();
     return n/4 + ((n%4 == 0u)?0:1);
+  }
+
+  //TODO : helper for now, see if logical
+  unsigned int * stats() {
+    return stats_;
+  }
+
+  double mu() {
+    return mu_;
+  }
+
+  double sigma() {
+    return sigma_;
   }
 
   // dummy function summing the n first individuals from the SNP
@@ -117,38 +124,102 @@ class SNPvector {
     return S;
   }
 
+  /*IN GASTON DONE LIKE THIS 
+  if(set.mu_sigma) { # calcul brutal
+    n <- nrow(x) - x@snps$NAs;
+    mu <- (2*x@snps$N2 + x@snps$N1)/n; # c'est 2 pp ... enfin bref
+    N <- nrow(x)
+    s <- sqrt( (x@snps$N1 + 4*x@snps$N2 + mu**2*x@snps$NAs)/(N-1) - N/(N-1)*mu**2 )
+    x@mu <- mu;
+    x@sigma <- s
+    if(verbose) cat("'mu' and 'sigma' have been set.\n");
+  }
+  x
+  */
+  double compute_mu_sigma() {
+    size_t ntotal = nbInds(); //equal to ncols in gaston
+    // check if Plink mode or corrected "à la gaston"
+    // TODO : change the way stats send it back
+    unsigned int N1s = stats_[1];
+    unsigned int N2s = stats_[2];
+    unsigned int NAs = stats_[3];
+    double n = ntotal - NAs;
+    // JUST TO SEE COS WTF
+    std::cout << " N1s (154) : " << N1s << ", N2s(325) : " << N2s << ", NAs : " << NAs << "; n = " << n << "\n";
+
+    mu_ = (2 * N2s + N1s) / n;
+    double mu2 = mu_ * mu_;
+    sigma_ = sqrt(( N1s + (4 * N2s) + (NAs * mu2)) / (ntotal - 1) - (ntotal / (ntotal - 1)) * mu2);
+    return mu_;
+  }
+
+
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
-  // TODO : REVOIR POUR CLEAN CETTE METHODE TRES MOCHE ààààà
   unsigned int * compute_stats() {
     size_t nbByte = nbChars();
     size_t BitsInLastByte = (nbInds()%4); // number of bits to read on last byte
+
     for (size_t i = 0; i < nbByte; i++) {
         
         uint8_t d = data()[i];
 
         if ((i == nbByte-1) && BitsInLastByte > 0) {
           while (BitsInLastByte > 0) {
-          
-            //std::cout << "On last byte, " << BitsInLastByte << " left\n";
+            
+            // TODO : check if done with plink formatting
             unsigned int val = (d & 3);
-            //std::cout << "This is the " << i << "th byte on the " << 3 - BitsInLastByte << " bit value :" << val << "\n";
-            //std::cout << "Stats array before adding val :" << stats[0] << "," << stats[1]<< "," << stats[2]<< "," << stats[3] << "\n";
-            stats[val]++;
+            stats_[mode(val)]++;
             BitsInLastByte--;
             d >>= 2; // 1 shift par loop
           }
-          return stats;
+
+          return stats_;
         }
       //sinon, fini pile à la fin d'une byte je peux return
-      else if (i == nbByte-1) return stats;
-      stats[0] += N0[d];
-      stats[3] += N0[255-d];
-      stats[1] += N1[d];
-      stats[2] += N1[255-d];
+      else if (i == nbByte-1) return stats_;
+      stats_[0] += N0[d];
+      stats_[2] += N0[255-d]; // 2
+      stats_[3] += N1[d]; // 3
+      stats_[1] += N1[255-d]; // 1
     }
     // maybe add a translation following diff modes ? 
-    return stats;
+    return nullptr;
+
   }
+
+  
+  // for scalar product :
+  //TODO : think if better to have it as an overwritten operator ?
+  // or else how to name the method 
+  // TODO : think on what are the limits (error checking) => what calls in gaston ?
+  // double LD(const SNPvector & other) { //for ref : double LD_colxx(matrix4 & A, double mu1, double mu2, double v, size_t x1, size_t x2) {
+  //   double LD = 0;
+  //   double gg[16];
+  //   gg[3] = gg[7] = gg[11] = gg[12] = gg[13] = gg[14] = gg[15] = 0;
+  //   gg[0] = (-mu1)*(-mu2);
+  //   gg[1] = (-mu1)*(1.-mu2);
+  //   gg[2] = (-mu1)*(2.-mu2);
+
+  //   gg[4] = (1.-mu1)*(-mu2);
+  //   gg[5] = (1.-mu1)*(1.-mu2);
+  //   gg[6] = (1.-mu1)*(2.-mu2);
+
+  //   gg[8] = (2.-mu1)*(-mu2);
+  //   gg[9] = (2.-mu1)*(1.-mu2);
+  //   gg[10]= (2.-mu1)*(2.-mu2);
+
+  //   for(size_t i = 0; i < A.true_ncol; i++) {
+  //     uint8_t g1 = A.data[x1][i];
+  //     uint8_t g2 = A.data[x2][i];
+  //     for(int ss = 0; ss < 4; ss++) {
+  //       LD += gg[ ((g1&3)*4) + (g2&3) ];
+  //       g1 >>= 2;
+  //       g2 >>= 2;
+  //     }
+  //   }
+  //   return LD/(v*(A.ncol-1));   
+  // }
+
 
   class Iterator {
     private:

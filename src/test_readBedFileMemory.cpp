@@ -293,3 +293,33 @@ IntegerVector test_sums(unsigned int n){
   IntegerVector stats = test_snp_stats(n);
   return stats;
 }
+
+
+/*******************************
+ *    Test mu and sigma  *
+ ********************************/
+
+// [[Rcpp::export]]
+NumericVector test_mu_sigma(unsigned int n) {
+  int nbSNPs = n;
+
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, nbSNPs);
+
+  std::vector<double> res;
+
+  for (int i = 0; i < nbSNPs; i++) {
+    auto vec = M.SNPs[i]; 
+    // NEED TO COMPUTE BEFORE 
+    auto stats = vec->compute_stats();
+    //std::cout << "This is stats for SNP[" << i << "] : " << stats[0] << ", " << stats[1] << ", " << stats[2];
+
+    auto musi = vec->compute_mu_sigma();
+    double sigma = vec->sigma();
+    double mu = vec->mu();
+    res.push_back(mu);
+    res.push_back(sigma);
+    res.push_back(0);
+    std::cout << "These are stats for SNP[" << i << "], mu: " << mu << ", sigma: " << sigma << "\n";
+  }
+  return wrap(res);
+}

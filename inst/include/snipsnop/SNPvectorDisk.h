@@ -44,7 +44,7 @@ class SNPVectorDisk : public SNPvector {
     return mode_;
   }
   
-  uint8_t mode(unsigned int n) {
+  int mode(unsigned int n) {
     return mode_[n];
   }
 

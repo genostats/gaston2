@@ -53,3 +53,7 @@ test_sums <- function(n) {
     .Call(`_snipsnop_test_sums`, n)
 }
 
+test_mu_sigma <- function(n) {
+    .Call(`_snipsnop_test_mu_sigma`, n)
+}
+
