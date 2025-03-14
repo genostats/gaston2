@@ -172,6 +172,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_centered
+NumericVector test_centered();
+RcppExport SEXP _snipsnop_test_centered() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(test_centered());
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 3},
@@ -188,6 +198,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_snp_stats_d", (DL_FUNC) &_snipsnop_test_snp_stats_d, 1},
     {"_snipsnop_test_sums", (DL_FUNC) &_snipsnop_test_sums, 1},
     {"_snipsnop_test_mu_sigma", (DL_FUNC) &_snipsnop_test_mu_sigma, 1},
+    {"_snipsnop_test_centered", (DL_FUNC) &_snipsnop_test_centered, 0},
     {NULL, NULL, 0}
 };
 

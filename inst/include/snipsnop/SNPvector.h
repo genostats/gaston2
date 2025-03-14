@@ -49,9 +49,6 @@
   0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 
   0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0};
 
-  // BY DEFAULT, PLINK format, with 01 = missing genotype
-  constexpr uint8_t Defaultmode[4] = {0, 3, 1, 2};
-  //constexpr uint8_t Defaultmode[4] = {0, 2}
 
 /**
  * @brief An abstract class instanciated through SNPvectorMemory or SNPvectorDisk
@@ -68,12 +65,25 @@ class SNPvector {
    * @return uint8_t* 
    */
   virtual uint8_t * data() = 0;
+  virtual const uint8_t * data() const = 0;
   // nombre d'individus
   virtual size_t nbInds() = 0;
 
-  virtual const uint8_t* mode() = 0;
-  virtual int mode(unsigned int n) = 0;
-  
+  enum Mode { 
+    PLINK = 0, // .bed file : (g = {0, 1, 3 and 2 = NA})
+    CENTERED = 1, // (g -= mu)
+    STANDARDIZED_P = 2, // (g = (g-2*p) / sqrt(2*p*(1-p)) = (g - mu) / sqrt(mu*(1-mu/2)) 
+    STANDARDIZED_MU_SIGMA = 3, // (g = (g-mu)/sd)
+    NUMERIC = 4 // (g = {0, 1, 2 and 3 = NA}) (almost never used)
+  };
+
+  // BY DEFAULT, PLINK format, with 01 = missing genotype
+  double currentMode_[4][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}};
+
+  virtual double * mode() = 0;
+  virtual double mode(unsigned int n) = 0;
+
+
   /* Containing N0, N1, N2, NAs on the whole SNP, following Plink format
   populated by compute_stats()*/
   unsigned int stats_[4] = {0, 0, 0, 0};
@@ -106,8 +116,8 @@ class SNPvector {
   }
 
   // dummy function summing the n first individuals from the SNP
-  unsigned int sum(int n = -1) {
-    unsigned int S = 0;
+  double sum(int n = -1) {
+    double S = 0;
     uint8_t * d = data();
     size_t nc = nbChars(); //max nb of bytes
     int cptr = 0;
@@ -124,19 +134,8 @@ class SNPvector {
     return S;
   }
 
-  /*IN GASTON DONE LIKE THIS 
-  if(set.mu_sigma) { # calcul brutal
-    n <- nrow(x) - x@snps$NAs;
-    mu <- (2*x@snps$N2 + x@snps$N1)/n; # c'est 2 pp ... enfin bref
-    N <- nrow(x)
-    s <- sqrt( (x@snps$N1 + 4*x@snps$N2 + mu**2*x@snps$NAs)/(N-1) - N/(N-1)*mu**2 )
-    x@mu <- mu;
-    x@sigma <- s
-    if(verbose) cat("'mu' and 'sigma' have been set.\n");
-  }
-  x
-  */
-  double compute_mu_sigma() {
+
+  void compute_mu_sigma() {
     size_t ntotal = nbInds(); //equal to ncols in gaston
     // check if Plink mode or corrected "à la gaston"
     // TODO : change the way stats send it back
@@ -144,16 +143,27 @@ class SNPvector {
     unsigned int N2s = stats_[2];
     unsigned int NAs = stats_[3];
     double n = ntotal - NAs;
-    // JUST TO SEE COS WTF
-    std::cout << " N1s (154) : " << N1s << ", N2s(325) : " << N2s << ", NAs : " << NAs << "; n = " << n << "\n";
 
     mu_ = (2 * N2s + N1s) / n;
     double mu2 = mu_ * mu_;
     sigma_ = sqrt(( N1s + (4 * N2s) + (NAs * mu2)) / (ntotal - 1) - (ntotal / (ntotal - 1)) * mu2);
-    return mu_;
+
+    // Centered mode Plinked
+    currentMode_[1][0] = -mu_;
+    currentMode_[1][1] = 0;
+    currentMode_[1][2] = 1 - mu_;
+    currentMode_[1][3] = 2 - mu_;
+
+    // Centré réduit
+    currentMode_[2][0] = currentMode_[1][0] / sigma_;
+    currentMode_[2][1] = 0;
+    currentMode_[2][2] = currentMode_[1][2] / sigma_;
+    currentMode_[2][3] = currentMode_[1][3] / sigma_;
   }
 
 
+
+  // TODO : redo this funciton
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
   unsigned int * compute_stats() {
     size_t nbByte = nbChars();
@@ -165,10 +175,9 @@ class SNPvector {
 
         if ((i == nbByte-1) && BitsInLastByte > 0) {
           while (BitsInLastByte > 0) {
-            
-            // TODO : check if done with plink formatting
             unsigned int val = (d & 3);
-            stats_[mode(val)]++;
+            unsigned int val_plink = currentMode_[0][val];
+            stats_[val_plink]++;
             BitsInLastByte--;
             d >>= 2; // 1 shift par loop
           }
@@ -178,13 +187,11 @@ class SNPvector {
       //sinon, fini pile à la fin d'une byte je peux return
       else if (i == nbByte-1) return stats_;
       stats_[0] += N0[d];
-      stats_[2] += N0[255-d]; // 2
-      stats_[3] += N1[d]; // 3
-      stats_[1] += N1[255-d]; // 1
+      stats_[2] += N0[255-d]; // raw = 3
+      stats_[3] += N1[d]; // raw = 1
+      stats_[1] += N1[255-d]; // raw = 2
     }
-    // maybe add a translation following diff modes ? 
     return nullptr;
-
   }
 
   
@@ -192,33 +199,41 @@ class SNPvector {
   //TODO : think if better to have it as an overwritten operator ?
   // or else how to name the method 
   // TODO : think on what are the limits (error checking) => what calls in gaston ?
-  // double LD(const SNPvector & other) { //for ref : double LD_colxx(matrix4 & A, double mu1, double mu2, double v, size_t x1, size_t x2) {
-  //   double LD = 0;
-  //   double gg[16];
-  //   gg[3] = gg[7] = gg[11] = gg[12] = gg[13] = gg[14] = gg[15] = 0;
-  //   gg[0] = (-mu1)*(-mu2);
-  //   gg[1] = (-mu1)*(1.-mu2);
-  //   gg[2] = (-mu1)*(2.-mu2);
+  //for ref : double LD_colxx(matrix4 & A, double mu1, double mu2, double v, size_t x1, size_t x2) {
+  double LD(const SNPvector & other) {
+    double LD = 0;
+    double gg[16];
+    //RV : gg[3] = gg[7] = gg[11] = gg[12] = gg[13] = gg[14] = gg[15] = 0; // NAN, at col 3 and l3 bcos gaston
+    gg[1] = gg[4] = gg[5] = gg[6] = gg[7] = gg[9] = gg[13] = 0;
+    gg[0] = (-mu_)*(-(other.mu_));
+    // RV : gg[1] = (-mu1)*(1.-mu2);
+    gg[2] = (-mu_)*(1.-(other.mu_));
+    //RV : gg[2] = (-mu1)*(2.-mu2);
+    gg[3] = (-mu_)*(2.-(other.mu_));
 
-  //   gg[4] = (1.-mu1)*(-mu2);
-  //   gg[5] = (1.-mu1)*(1.-mu2);
-  //   gg[6] = (1.-mu1)*(2.-mu2);
+    gg[8] = (1.-mu_)*(-(other.mu_));
+    gg[10] = (1.-mu_)*(1.-(other.mu_));
+    gg[11] = (1.-mu_)*(2.-(other.mu_));
 
-  //   gg[8] = (2.-mu1)*(-mu2);
-  //   gg[9] = (2.-mu1)*(1.-mu2);
-  //   gg[10]= (2.-mu1)*(2.-mu2);
+    gg[12] = (2.-mu_)*(-(other.mu_));
+    gg[14] = (2.-mu_)*(1.-(other.mu_));
+    gg[15]= (2.-mu_)*(2.-(other.mu_));
 
-  //   for(size_t i = 0; i < A.true_ncol; i++) {
-  //     uint8_t g1 = A.data[x1][i];
-  //     uint8_t g2 = A.data[x2][i];
-  //     for(int ss = 0; ss < 4; ss++) {
-  //       LD += gg[ ((g1&3)*4) + (g2&3) ];
-  //       g1 >>= 2;
-  //       g2 >>= 2;
-  //     }
-  //   }
-  //   return LD/(v*(A.ncol-1));   
-  // }
+    double v = sigma_ * other.sigma_;
+
+    for(size_t i = 0; i < nbChars(); i++) { // A.true ncol ?
+      uint8_t g1 = data()[i]; //je récup les ièmes char
+      // TODO : const causing some problems
+      const uint8_t g2_const = other.data()[i];
+      uint8_t g2 = g2_const;
+      for(int ss = 0; ss < 4; ss++) { // que je vais lire 2bits par 2bits
+        LD += gg[ ((g1&3)*4) + (g2&3) ];
+        g1 >>= 2;
+        g2 >>= 2;
+      }
+    }
+    return LD/(v*(nbInds())); //nbinds should be the same for both
+  }
 
 
   class Iterator {
@@ -237,7 +252,7 @@ class SNPvector {
     }
 
     // operateur * const : renvoie la valeur 2bits par 2bits
-    unsigned int operator*() {
+    double operator*() {
       uint8_t byte = iterated.data()[currentChar];
       byte >>= (2 * current2bits); // pour avoir les 2bits de poids faible
       unsigned int val = (byte & 3); // mtn on les isole

@@ -57,3 +57,7 @@ test_mu_sigma <- function(n) {
     .Call(`_snipsnop_test_mu_sigma`, n)
 }
 
+test_centered <- function() {
+    .Call(`_snipsnop_test_centered`)
+}
+

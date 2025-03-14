@@ -57,6 +57,8 @@ IntegerVector loop_sum(SNPmatrix matrix) {
   std::vector<int> res;
   for(auto v : matrix.SNPs) {
     //== sum(503)
+    auto ok = v->compute_stats(); // to get stats full
+    v->compute_mu_sigma(); // needed to calculate mu and sigma
     res.push_back(v->sum());
   }
   return wrap(res);
@@ -65,18 +67,18 @@ IntegerVector loop_sum(SNPmatrix matrix) {
 
 // [[Rcpp::export]]
 IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp) {
-  std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
-  std::cout << " reading in Numeric Mode \n";
-  uint8_t Num[4] = {0, 1, 2, 3};
-  SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, Num);
-  IntegerVector res = loop_sum(M);
+  // std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
+  // std::cout << " reading in Numeric Mode \n";
+  // int Num = 3;
+  // SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, Num);
+  // IntegerVector res = loop_sum(M);
   std::cout << " reading in Centered (not implemented yet) Mode \n";
-  uint8_t Cent[4] = { 0, 0, 0, 0};
-  M = readBedFileMemory(filename, n_ind, n_snp, Cent);
-  IntegerVector res2 = loop_sum(M);
-  for (auto i : res2) res.push_back(i);
+  int Cent = 1;
+  SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, Cent);
+  IntegerVector res = loop_sum(M);
+  //for (auto i : res2) res.push_back(i);
   std::cout << " reading in Standardized (not implemented yet) Mode \n";
-  uint8_t Std[4] = {0, 0, 0, 0};
+  int Std = 2;
   M = readBedFileMemory(filename, n_ind, n_snp, Std);
   IntegerVector res3 = loop_sum(M);
   for (auto i : res3) res.push_back(i);
@@ -313,13 +315,33 @@ NumericVector test_mu_sigma(unsigned int n) {
     auto stats = vec->compute_stats();
     //std::cout << "This is stats for SNP[" << i << "] : " << stats[0] << ", " << stats[1] << ", " << stats[2];
 
-    auto musi = vec->compute_mu_sigma();
+    vec->compute_mu_sigma();
     double sigma = vec->sigma();
     double mu = vec->mu();
     res.push_back(mu);
     res.push_back(sigma);
-    res.push_back(0);
-    std::cout << "These are stats for SNP[" << i << "], mu: " << mu << ", sigma: " << sigma << "\n";
+    //res.push_back(0);
+    //std::cout << "These are stats for SNP[" << i << "], mu: " << mu << ", sigma: " << sigma << "\n";
+  }
+  
+  return wrap(res);
+}
+
+// [[Rcpp::export]]
+NumericVector test_centered() {
+  std::cout << " reading in Centered (not implemented yet) Mode \n";
+  int Cent = 1;
+  std::vector<double> res;
+
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607, Cent);
+  for(auto v : M.SNPs) {
+    v->compute_stats();
+    v->compute_mu_sigma();
+    //std::cout << "Mode : " << v->mode()[0] << ", " << v->mode()[1] << ", " << v->mode()[2]<< ", " << v->mode()[3] << "\n";
+
+    for(auto a : *v) {
+      res.push_back(a);
+    }
   }
   return wrap(res);
 }

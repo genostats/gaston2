@@ -30,7 +30,7 @@
  * 
  * @return SNPmatrix, stocking shared_ptrs to SNPvectorMemory 
  */
-SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, uint8_t* modeArray) {
+SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, int modeArray) {
   std::ifstream file(filename, std::ifstream::binary);
   if(!file.is_open()) {
     throw std::runtime_error("Cannot open file");
@@ -71,7 +71,7 @@ SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, ui
  *   
  * @return a SNPmatrix, stocking shared_ptrs to SNPvectorDisk 
 */
-SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, uint8_t* modeArray) {
+SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, int modeArray) {
   std::ifstream file_test(path, std::ifstream::binary);
   if (file_test.bad()) throw std::runtime_error("This file does not exists\n");
   std::error_code error;
