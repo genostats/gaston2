@@ -61,3 +61,7 @@ test_centered <- function() {
     .Call(`_snipsnop_test_centered`)
 }
 
+test_LD <- function(SNPnb1, SNPnb2) {
+    .Call(`_snipsnop_test_LD`, SNPnb1, SNPnb2)
+}
+

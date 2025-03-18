@@ -136,17 +136,20 @@ class SNPvector {
 
 
   void compute_mu_sigma() {
-    size_t ntotal = nbInds(); //equal to ncols in gaston
+    double N = nbInds(); //equal to ncols in gaston
     // check if Plink mode or corrected "à la gaston"
-    // TODO : change the way stats send it back
+
     unsigned int N1s = stats_[1];
     unsigned int N2s = stats_[2];
     unsigned int NAs = stats_[3];
-    double n = ntotal - NAs;
+    double n = N - NAs;
+
+    //std::cout << " N1s (154) : " << N1s << ", N2s(325) : " << N2s << ", NAs : " << NAs << "; n = " << n << "\n";
 
     mu_ = (2 * N2s + N1s) / n;
     double mu2 = mu_ * mu_;
-    sigma_ = sqrt(( N1s + (4 * N2s) + (NAs * mu2)) / (ntotal - 1) - (ntotal / (ntotal - 1)) * mu2);
+    // RV : s <- sqrt( (x@snps$N1 + 4*x@snps$N2 + mu**2*x@snps$NAs)/(N-1) - N/(N-1)*mu**2 )
+    sigma_ = sqrt(( N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
 
     // Centered mode Plinked
     currentMode_[1][0] = -mu_;
@@ -168,6 +171,9 @@ class SNPvector {
   unsigned int * compute_stats() {
     size_t nbByte = nbChars();
     size_t BitsInLastByte = (nbInds()%4); // number of bits to read on last byte
+
+    // restarting with blank stats_ :
+    stats_[0] = stats_[1] = stats_[2] = stats_[3] = 0;
 
     for (size_t i = 0; i < nbByte; i++) {
         
@@ -201,14 +207,17 @@ class SNPvector {
   // TODO : think on what are the limits (error checking) => what calls in gaston ?
   //for ref : double LD_colxx(matrix4 & A, double mu1, double mu2, double v, size_t x1, size_t x2) {
   double LD(const SNPvector & other) {
+    // TODO : add check of nb inds on bogth snps
+    std::cout << "Using mu = " << mu_ << " And other.mu_ = " << other.mu_ << "\n";
+    std::cout << "Using sd = " << sigma_ << " And other.sd = " << other.sigma_ << "\n";
+
+    // TODO : check that read using same mode ?
     double LD = 0;
     double gg[16];
-    //RV : gg[3] = gg[7] = gg[11] = gg[12] = gg[13] = gg[14] = gg[15] = 0; // NAN, at col 3 and l3 bcos gaston
     gg[1] = gg[4] = gg[5] = gg[6] = gg[7] = gg[9] = gg[13] = 0;
+    
     gg[0] = (-mu_)*(-(other.mu_));
-    // RV : gg[1] = (-mu1)*(1.-mu2);
     gg[2] = (-mu_)*(1.-(other.mu_));
-    //RV : gg[2] = (-mu1)*(2.-mu2);
     gg[3] = (-mu_)*(2.-(other.mu_));
 
     gg[8] = (1.-mu_)*(-(other.mu_));
@@ -223,15 +232,19 @@ class SNPvector {
 
     for(size_t i = 0; i < nbChars(); i++) { // A.true ncol ?
       uint8_t g1 = data()[i]; //je récup les ièmes char
-      // TODO : const causing some problems
       const uint8_t g2_const = other.data()[i];
       uint8_t g2 = g2_const;
       for(int ss = 0; ss < 4; ss++) { // que je vais lire 2bits par 2bits
-        LD += gg[ ((g1&3)*4) + (g2&3) ];
+        // NOT using mode here cos gg modified to fit
+        int g1val = g1&3;
+        int g2val = g2&3;
+        LD += gg[ (g1val*4) + g2val ];
+        //std::cout << "G1 :" << g1val << " G2 :" << g2val<< "\n";
         g1 >>= 2;
         g2 >>= 2;
       }
     }
+    std::cout << "LD" << LD << "\n";
     return LD/(v*(nbInds())); //nbinds should be the same for both
   }
 

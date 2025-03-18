@@ -302,12 +302,12 @@ IntegerVector test_sums(unsigned int n){
  ********************************/
 
 // [[Rcpp::export]]
-NumericVector test_mu_sigma(unsigned int n) {
+NumericMatrix test_mu_sigma(unsigned int n) {
   int nbSNPs = n;
 
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, nbSNPs);
 
-  std::vector<double> res;
+  NumericMatrix res(2, nbSNPs);
 
   for (int i = 0; i < nbSNPs; i++) {
     auto vec = M.SNPs[i]; 
@@ -318,13 +318,13 @@ NumericVector test_mu_sigma(unsigned int n) {
     vec->compute_mu_sigma();
     double sigma = vec->sigma();
     double mu = vec->mu();
-    res.push_back(mu);
-    res.push_back(sigma);
+    res(0, i) = mu;
+    res(1, i) = sigma;
     //res.push_back(0);
     //std::cout << "These are stats for SNP[" << i << "], mu: " << mu << ", sigma: " << sigma << "\n";
   }
   
-  return wrap(res);
+  return res;
 }
 
 // [[Rcpp::export]]
@@ -344,4 +344,50 @@ NumericVector test_centered() {
     }
   }
   return wrap(res);
+}
+
+
+
+/********************************
+ *           Test LD            *
+ ********************************/
+
+// [[Rcpp::export]]
+NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
+  if (SNPnb1 > SNPnb2) {
+    std::cerr << "Please swap your SNPs to have a correct range \n" << std::endl;
+    return 0;
+  }
+
+  int nbSNPs = SNPnb2 - SNPnb1 + 1;
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
+  NumericMatrix res(nbSNPs, nbSNPs);
+  // don't think its usefull, don't have names
+  //CharacterVector snpNames(nbSNPs);
+
+  for (int i = 0; i < nbSNPs; i++) {
+    SNPvector &snp1 = *M.SNPs[SNPnb1 + i];
+    //forst loading stats for mu and sigma:
+    std::cout << "Computing for SNP[" << SNPnb1 + i << "] : " << "\n";
+    snp1.compute_stats();
+    snp1.compute_mu_sigma();
+    //snpNames[i] = "rs" + std::to_string(SNPnb1 + i);
+
+    for (int j = 0; j < nbSNPs; j++) {
+      SNPvector &snp2 = *M.SNPs[SNPnb1 + j];
+      if (j > i) {// aka where I haven't been before
+        std::cout << "in j loop, Computing for SNP[" << SNPnb1 + j << "] : " << "\n";
+        snp2.compute_stats();
+        snp2.compute_mu_sigma();
+      }
+
+      res(i, j) = snp1.LD(snp2);
+    }
+  }
+
+  // Set row and column names
+  //colnames(res) = snpNames;
+  //rownames(res) = snpNames;
+
+  return res;
 }

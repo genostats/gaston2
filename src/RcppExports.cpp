@@ -162,7 +162,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // test_mu_sigma
-NumericVector test_mu_sigma(unsigned int n);
+NumericMatrix test_mu_sigma(unsigned int n);
 RcppExport SEXP _snipsnop_test_mu_sigma(SEXP nSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -179,6 +179,18 @@ BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     rcpp_result_gen = Rcpp::wrap(test_centered());
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_LD
+NumericMatrix test_LD(int SNPnb1, int SNPnb2);
+RcppExport SEXP _snipsnop_test_LD(SEXP SNPnb1SEXP, SEXP SNPnb2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type SNPnb1(SNPnb1SEXP);
+    Rcpp::traits::input_parameter< int >::type SNPnb2(SNPnb2SEXP);
+    rcpp_result_gen = Rcpp::wrap(test_LD(SNPnb1, SNPnb2));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -199,6 +211,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_sums", (DL_FUNC) &_snipsnop_test_sums, 1},
     {"_snipsnop_test_mu_sigma", (DL_FUNC) &_snipsnop_test_mu_sigma, 1},
     {"_snipsnop_test_centered", (DL_FUNC) &_snipsnop_test_centered, 0},
+    {"_snipsnop_test_LD", (DL_FUNC) &_snipsnop_test_LD, 2},
     {NULL, NULL, 0}
 };
 
