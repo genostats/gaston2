@@ -57,8 +57,8 @@ IntegerVector loop_sum(SNPmatrix matrix) {
   std::vector<int> res;
   for(auto v : matrix.SNPs) {
     //== sum(503)
-    auto ok = v->compute_stats(); // to get stats full
-    v->compute_mu_sigma(); // needed to calculate mu and sigma
+    v->compute_stats(); // to get stats full
+    //v->compute_mu_sigma(); // needed to calculate mu and sigma
     res.push_back(v->sum());
   }
   return wrap(res);
@@ -67,16 +67,16 @@ IntegerVector loop_sum(SNPmatrix matrix) {
 
 // [[Rcpp::export]]
 IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp) {
-  // std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
-  // std::cout << " reading in Numeric Mode \n";
-  // int Num = 3;
-  // SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, Num);
-  // IntegerVector res = loop_sum(M);
+  std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
+  std::cout << " reading in Numeric Mode \n";
+  int Num = 3;
+  SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, Num);
+  IntegerVector res = loop_sum(M);
   std::cout << " reading in Centered (not implemented yet) Mode \n";
   int Cent = 1;
-  SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, Cent);
-  IntegerVector res = loop_sum(M);
-  //for (auto i : res2) res.push_back(i);
+  M = readBedFileMemory(filename, n_ind, n_snp, Cent);
+  IntegerVector res2 = loop_sum(M);
+  for (auto i : res2) res.push_back(i);
   std::cout << " reading in Standardized (not implemented yet) Mode \n";
   int Std = 2;
   M = readBedFileMemory(filename, n_ind, n_snp, Std);
@@ -250,7 +250,8 @@ IntegerVector test_snp_stats(unsigned int n) {
 
   for (int i = 0; i < nbSNPs; i++) {
     auto vec = M.SNPs[i]; 
-    auto stats = vec->compute_stats();
+    vec->compute_stats();
+    auto stats = vec->stats();
 
     for (int j = 0; j < 4; j++) {
       res[j] += stats[j];  // Element-wise sum
@@ -265,11 +266,32 @@ IntegerVector test_snp_stats(unsigned int n) {
 }
 
 // [[Rcpp::export]]
+IntegerMatrix test_snp_stats_all(int n_ind, int n_snp) {
+
+  SNPmatrix M = readBedFileMemory(file_hardcode, n_ind, n_snp);
+
+  IntegerMatrix res(n_snp, 4);
+
+  for (int i = 0; i < n_snp; i++) {
+    auto vec = M.SNPs[i]; 
+    vec->compute_stats();
+    auto stats = vec->stats();
+
+    res(i, 0) = stats[0];
+    res(i, 1) = stats[1];
+    res(i, 2) = stats[2];
+    res(i, 3) = stats[3];
+  }
+  return res; // retourne un vecteur avec les stats du SNP à la ligne correpondante
+}
+
+// [[Rcpp::export]]
 IntegerVector test_snp_stats_d(unsigned int n) {
   if (n > 503) n = 503;
   SNPmatrix M = readBedFileDisk(file_hardcode, n, 1);
   auto vec = M.SNPs[0];
-  auto stats = vec->compute_stats();
+  vec->compute_stats();
+  auto stats = vec->stats();
   std::vector<unsigned int> res(stats, stats + 4);
   return wrap(res);
 }
@@ -312,14 +334,15 @@ NumericMatrix test_mu_sigma(unsigned int n) {
   for (int i = 0; i < nbSNPs; i++) {
     auto vec = M.SNPs[i]; 
     // NEED TO COMPUTE BEFORE 
-    auto stats = vec->compute_stats();
+    vec->compute_stats();
+    auto stats = vec->stats();
     //std::cout << "This is stats for SNP[" << i << "] : " << stats[0] << ", " << stats[1] << ", " << stats[2];
 
     vec->compute_mu_sigma();
     double sigma = vec->sigma();
     double mu = vec->mu();
-    res(0, i) = mu;
-    res(1, i) = sigma;
+    res(i, 0) = mu;
+    res(i, 1) = sigma;
     //res.push_back(0);
     //std::cout << "These are stats for SNP[" << i << "], mu: " << mu << ", sigma: " << sigma << "\n";
   }
@@ -363,20 +386,16 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
   NumericMatrix res(nbSNPs, nbSNPs);
   // don't think its usefull, don't have names
-  //CharacterVector snpNames(nbSNPs);
 
   for (int i = 0; i < nbSNPs; i++) {
     SNPvector &snp1 = *M.SNPs[SNPnb1 + i];
     //forst loading stats for mu and sigma:
-    std::cout << "Computing for SNP[" << SNPnb1 + i << "] : " << "\n";
     snp1.compute_stats();
     snp1.compute_mu_sigma();
-    //snpNames[i] = "rs" + std::to_string(SNPnb1 + i);
 
     for (int j = 0; j < nbSNPs; j++) {
       SNPvector &snp2 = *M.SNPs[SNPnb1 + j];
       if (j > i) {// aka where I haven't been before
-        std::cout << "in j loop, Computing for SNP[" << SNPnb1 + j << "] : " << "\n";
         snp2.compute_stats();
         snp2.compute_mu_sigma();
       }
@@ -384,10 +403,86 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
       res(i, j) = snp1.LD(snp2);
     }
   }
-
-  // Set row and column names
-  //colnames(res) = snpNames;
-  //rownames(res) = snpNames;
-
   return res;
+}
+
+
+/****************************
+ *        TESTSUITE         *
+ ****************************/
+
+// [[Rcpp::export]]
+ void testsuite() {
+
+  //test_readBedFileMemory  
+  std::vector<int> expected = { 804, 771, 982, 873, 399, 968, 976, 976, 976, 976, 976, 397, 873, 976, 873, 981, 976, 981, 843, 976, 804, 
+  771, 464, 873, 843, 980, 399, 873, 398, 994, 771, 771, 843, 873, 771, 921, 981, 398, 795, 771, 995, 976,
+  771, 976, 921, 976, 803, 398, 398, 843, 968, 976, 398, 873, 991, 398, 976, 398, 756, 804, 368, 873, 398,
+  873, 771, 991, 873, 399, 873, 500, 976, 974, 976, 771, 974, 398, 398, 873, 803, 974, 771, 771, 771, 398,
+  771, 843, 994, 981, 976, 771, 873, 398, 398, 992, 873, 994, 769, 873, 974, 770, 397, 770, 770, 977, 397,
+  397, 991, 874, 977, 977, 770, 874, 875, 992, 769, 846, 977, 992, 977, 977, 397, 977, 847, 421, 976, 995,
+  977, 977, 769, 876, 396, 992, 847, 769, 769, 973, 977, 977, 977, 973, 976, 769, 976, 802, 860, 802, 973,
+  396, 876, 876, 876, 986, 979, 396, 845, 598, 598, 973, 973, 973, 875, 973, 363, 989, 977, 802, 925, 774,
+  887, 802, 993, 772, 801, 354, 772, 801, 801, 844, 974, 981, 363, 877, 831, 978, 988, 976, 994, 388, 976,
+  808, 389, 389, 965, 965, 857, 857, 857, 995, 857, 857, 806, 981, 995, 976, 390, 977, 976, 719, 719, 347,
+  975, 389, 389, 718, 992, 349, 718, 719, 994, 390, 965, 995, 872, 718, 719, 995, 983, 389, 791, 944, 872,
+  791, 945, 791, 965, 965, 872, 872, 976, 945, 976, 349, 791, 390, 976, 718, 945, 872, 390, 945, 389, 348,
+  873, 983, 389, 945, 995, 943, 965, 872, 793, 965, 977, 995, 392, 720, 347, 793, 994, 945, 719, 976, 719,
+  945, 945, 792, 975, 965, 945, 995, 792, 872, 389, 794, 792, 872, 872, 975, 720, 390, 720, 349, 718, 718,
+  720, 722, 965, 945, 995, 389, 793, 793, 347, 979, 976, 995, 975, 793, 346, 872, 793, 904, 995, 389, 995,
+  388, 792, 967, 991, 792, 792, 877, 793, 937, 377, 975, 874, 346, 388, 992, 874, 993, 990, 976, 926, 995,
+  792, 388, 791, 810, 792, 364, 784, 785, 845, 406, 407, 856, 974, 783, 753, 753, 753, 992, 855, 855, 907,
+  985, 992, 852, 977, 407, 855, 977, 993, 782, 855, 782, 977, 981, 855, 991, 964, 977, 977, 407, 977, 823,
+  977, 407, 993, 975, 989, 855, 855, 407, 407, 407, 855, 974, 974, 375, 782, 974, 782, 992, 407, 407, 782,
+  977, 782, 782, 976, 782, 973, 976, 976, 782, 856, 782, 407, 976, 782, 407, 990, 993, 783, 784, 406, 783,
+  856, 783, 403, 406, 856, 783, 856, 784, 980, 784, 855, 406, 406, 856, 985, 784, 976, 600, 976, 862, 976,
+  899, 793, 976, 631, 411, 411, 973, 977, 971, 973, 981, 970, 992, 987, 906, 413, 495, 973, 973, 411, 993,
+  419, 973, 419, 783, 985, 419, 994, 419, 419, 846, 494, 800, 419, 445, 783, 783, 970, 973, 970, 970, 623,
+  419, 783, 973, 973, 846, 783, 783, 419, 846, 783, 988, 783, 846, 419, 419, 419, 419, 995, 785, 846, 419,
+  781, 992, 781, 992, 419, 848, 848, 848, 781, 420, 848, 781, 419, 780, 848, 781, 419, 834, 418, 830, 793,
+  973, 849, 776, 993, 793, 973, 796, 833, 798, 798, 833, 798, 995, 798, 794, 977, 794, 975, 798, 832, 798,
+  794, 794, 797, 974, 417, 889, 838, 992, 798, 798, 797, 798, 784, 784, 780, 793, 990, 846, 784, 798, 417,
+  798, 832, 797, 801, 794, 784, 784, 974, 832, 780, 991, 417, 799, 832, 975, 798, 798, 417, 798, 794, 992,
+  795, 795, 784, 784, 386, 781, 798, 784, 798, 784, 417, 784, 795, 797, 800, 798, 976, 386, 994 };
+  
+  IntegerVector result1 = test_readBedFileMemory("./inst/extdata/LCT.bed",503,607);
+  IntegerVector result2 = test_readBedFileDisk("./inst/extdata/LCT.bed",503,607);
+  if (result1.size() != expected.size())    std::cerr << "Error: result from readBedFileMemory size does not match expected size!" << std::endl;
+  if (result2.size() == expected.size())    std::cerr << "Error: result from readBedFileDisk size does not match expected size!" << std::endl;
+
+  for (size_t i = 0; i < expected.size(); i++) {
+    if (result1[i] != expected[i]) std::cerr << "Error: result1 at index " << i << " does not match expected value!" << std::endl;
+    if (result2[i] != expected[i]) std::cerr << "Error: result2 at index " << i << " does not match expected value!" << std::endl;
+  }
+
+  std::cout << "Tests for readBedFileMemory passed!" << std::endl;
+  std::cout << "Tests for readBedFileDisk passed!" << std::endl;
+
+  // now test snp_stats_all with ref file ? 
+  std::vector<int> expected_stats;
+  std::ifstream file("./inst/extdata/snp_counts.txt");
+  int value;
+
+  IntegerMatrix result_stats = test_snp_stats_all(503, 607);
+  
+  if (!file) {
+      std::cerr << "Problem, failed to open reference file " << std::endl;
+      exit(EXIT_FAILURE);
+  }
+  int i = 0;
+  int j = 0;
+  while (file >> value) {
+    //std::cout << result_stats(i, j) << " and ref = " << value << std::endl;
+    if (result_stats(i, j++) != value)  std::cerr << "Error: result_stats at (" << i << "," << j - 1 << ") does not match reference value!" << std::endl;
+    if (j > 3) { i++; j = 0; }
+    if (i > 607) std::cerr << "Error: more snps in reference file than calculated !" << std::endl;
+    
+  }
+  std::cout << "Test for N0s N1s N2s and N3s on SNPs passed!" << std::endl;
+
+  
+
+
+  std::cout << "All tests passed!" << std::endl;
+
 }

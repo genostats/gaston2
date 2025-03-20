@@ -9,10 +9,6 @@
 #ifndef _SNPvector_
 #define _SNPvector_
 
-  //TODO : find a way to change default value
-  // static uint8_t mu = 0;
-  // static uint8_t sigma = 1;
-
   static uint8_t N0[256] = {
   4, 3, 3, 3, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 
   3, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 
@@ -137,18 +133,14 @@ class SNPvector {
 
   void compute_mu_sigma() {
     double N = nbInds(); //equal to ncols in gaston
-    // check if Plink mode or corrected "à la gaston"
 
     unsigned int N1s = stats_[1];
     unsigned int N2s = stats_[2];
     unsigned int NAs = stats_[3];
     double n = N - NAs;
 
-    //std::cout << " N1s (154) : " << N1s << ", N2s(325) : " << N2s << ", NAs : " << NAs << "; n = " << n << "\n";
-
     mu_ = (2 * N2s + N1s) / n;
     double mu2 = mu_ * mu_;
-    // RV : s <- sqrt( (x@snps$N1 + 4*x@snps$N2 + mu**2*x@snps$NAs)/(N-1) - N/(N-1)*mu**2 )
     sigma_ = sqrt(( N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
 
     // Centered mode Plinked
@@ -168,7 +160,7 @@ class SNPvector {
 
   // TODO : redo this funciton
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
-  unsigned int * compute_stats() {
+  void compute_stats() {
     size_t nbByte = nbChars();
     size_t BitsInLastByte = (nbInds()%4); // number of bits to read on last byte
 
@@ -188,16 +180,15 @@ class SNPvector {
             d >>= 2; // 1 shift par loop
           }
 
-          return stats_;
+          return compute_mu_sigma();
         }
       //sinon, fini pile à la fin d'une byte je peux return
-      else if (i == nbByte-1) return stats_;
+      else if (i == nbByte-1) return compute_mu_sigma();
       stats_[0] += N0[d];
       stats_[2] += N0[255-d]; // raw = 3
       stats_[3] += N1[d]; // raw = 1
       stats_[1] += N1[255-d]; // raw = 2
     }
-    return nullptr;
   }
 
   
@@ -207,10 +198,7 @@ class SNPvector {
   // TODO : think on what are the limits (error checking) => what calls in gaston ?
   //for ref : double LD_colxx(matrix4 & A, double mu1, double mu2, double v, size_t x1, size_t x2) {
   double LD(const SNPvector & other) {
-    // TODO : add check of nb inds on bogth snps
-    std::cout << "Using mu = " << mu_ << " And other.mu_ = " << other.mu_ << "\n";
-    std::cout << "Using sd = " << sigma_ << " And other.sd = " << other.sigma_ << "\n";
-
+    //if (nbInds() != other.nbInds())
     // TODO : check that read using same mode ?
     double LD = 0;
     double gg[16];
@@ -230,7 +218,7 @@ class SNPvector {
 
     double v = sigma_ * other.sigma_;
 
-    for(size_t i = 0; i < nbChars(); i++) { // A.true ncol ?
+    for(size_t i = 0; i < nbChars(); i++) {
       uint8_t g1 = data()[i]; //je récup les ièmes char
       const uint8_t g2_const = other.data()[i];
       uint8_t g2 = g2_const;
@@ -239,13 +227,12 @@ class SNPvector {
         int g1val = g1&3;
         int g2val = g2&3;
         LD += gg[ (g1val*4) + g2val ];
-        //std::cout << "G1 :" << g1val << " G2 :" << g2val<< "\n";
         g1 >>= 2;
         g2 >>= 2;
       }
     }
-    std::cout << "LD" << LD << "\n";
-    return LD/(v*(nbInds())); //nbinds should be the same for both
+    double r = LD/(v*(nbInds()-1)); //nbInds should be the same for both
+    return r * r;
   }
 
 

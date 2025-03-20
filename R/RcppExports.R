@@ -45,6 +45,10 @@ test_snp_stats <- function(n) {
     .Call(`_snipsnop_test_snp_stats`, n)
 }
 
+test_snp_stats_all <- function(n_ind, n_snp) {
+    .Call(`_snipsnop_test_snp_stats_all`, n_ind, n_snp)
+}
+
 test_snp_stats_d <- function(n) {
     .Call(`_snipsnop_test_snp_stats_d`, n)
 }
@@ -63,5 +67,9 @@ test_centered <- function() {
 
 test_LD <- function(SNPnb1, SNPnb2) {
     .Call(`_snipsnop_test_LD`, SNPnb1, SNPnb2)
+}
+
+testsuite <- function() {
+    invisible(.Call(`_snipsnop_testsuite`))
 }
 

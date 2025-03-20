@@ -139,6 +139,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_snp_stats_all
+IntegerMatrix test_snp_stats_all(int n_ind, int n_snp);
+RcppExport SEXP _snipsnop_test_snp_stats_all(SEXP n_indSEXP, SEXP n_snpSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n_ind(n_indSEXP);
+    Rcpp::traits::input_parameter< int >::type n_snp(n_snpSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_snp_stats_all(n_ind, n_snp));
+    return rcpp_result_gen;
+END_RCPP
+}
 // test_snp_stats_d
 IntegerVector test_snp_stats_d(unsigned int n);
 RcppExport SEXP _snipsnop_test_snp_stats_d(SEXP nSEXP) {
@@ -194,6 +206,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// testsuite
+void testsuite();
+RcppExport SEXP _snipsnop_testsuite() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    testsuite();
+    return R_NilValue;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 3},
@@ -207,11 +228,13 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_performance_iterator_1d", (DL_FUNC) &_snipsnop_test_performance_iterator_1d, 1},
     {"_snipsnop_test_performance_iterator_2d", (DL_FUNC) &_snipsnop_test_performance_iterator_2d, 1},
     {"_snipsnop_test_snp_stats", (DL_FUNC) &_snipsnop_test_snp_stats, 1},
+    {"_snipsnop_test_snp_stats_all", (DL_FUNC) &_snipsnop_test_snp_stats_all, 2},
     {"_snipsnop_test_snp_stats_d", (DL_FUNC) &_snipsnop_test_snp_stats_d, 1},
     {"_snipsnop_test_sums", (DL_FUNC) &_snipsnop_test_sums, 1},
     {"_snipsnop_test_mu_sigma", (DL_FUNC) &_snipsnop_test_mu_sigma, 1},
     {"_snipsnop_test_centered", (DL_FUNC) &_snipsnop_test_centered, 0},
     {"_snipsnop_test_LD", (DL_FUNC) &_snipsnop_test_LD, 2},
+    {"_snipsnop_testsuite", (DL_FUNC) &_snipsnop_testsuite, 0},
     {NULL, NULL, 0}
 };
 
