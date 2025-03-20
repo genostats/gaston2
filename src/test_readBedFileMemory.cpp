@@ -411,8 +411,14 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
  *        TESTSUITE         *
  ****************************/
 
+ #define GREEN "\033[1;32m"
+ #define RESET "\033[0m"
+ #define RED "\033[1;31m"
+
 // [[Rcpp::export]]
  void testsuite() {
+
+  int total = 5; //nb of tests in total
 
   //test_readBedFileMemory  
   std::vector<int> expected = { 804, 771, 982, 873, 399, 968, 976, 976, 976, 976, 976, 397, 873, 976, 873, 981, 976, 981, 843, 976, 804, 
@@ -447,16 +453,33 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
   
   IntegerVector result1 = test_readBedFileMemory("./inst/extdata/LCT.bed",503,607);
   IntegerVector result2 = test_readBedFileDisk("./inst/extdata/LCT.bed",503,607);
+  int yayy = 0;
   if (result1.size() != expected.size())    std::cerr << "Error: result from readBedFileMemory size does not match expected size!" << std::endl;
-  if (result2.size() == expected.size())    std::cerr << "Error: result from readBedFileDisk size does not match expected size!" << std::endl;
-
+  else yayy++;
+  if (result2.size() != expected.size())    std::cerr << "Error: result from readBedFileDisk size does not match expected size!" << std::endl;
+  else yayy++;
+  
+  int nayy1 = 0;
+  int nayy2 = 0;
   for (size_t i = 0; i < expected.size(); i++) {
-    if (result1[i] != expected[i]) std::cerr << "Error: result1 at index " << i << " does not match expected value!" << std::endl;
-    if (result2[i] != expected[i]) std::cerr << "Error: result2 at index " << i << " does not match expected value!" << std::endl;
+    if (result1[i] != expected[i]) {
+      std::cerr << "Error: result1 at index " << i << " does not match expected value!" << std::endl;
+      nayy1++;
+    }
+    if (result2[i] != expected[i]) {
+      std::cerr << "Error: result2 at index " << i << " does not match expected value!" << std::endl;
+      nayy2++;
+    }
   }
 
-  std::cout << "Tests for readBedFileMemory passed!" << std::endl;
-  std::cout << "Tests for readBedFileDisk passed!" << std::endl;
+  if (!nayy1) {
+    std::cout << GREEN << "Tests for readBedFileMemory passed!" << RESET  << std::endl;
+    yayy++;
+  }
+  if (!nayy2) {
+    std::cout << GREEN << "Tests for readBedFileDisk passed!" << RESET << std::endl; 
+    yayy++;
+  }
 
   // now test snp_stats_all with ref file ? 
   std::vector<int> expected_stats;
@@ -471,18 +494,23 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
   }
   int i = 0;
   int j = 0;
+  nayy1 = 0;
   while (file >> value) {
     //std::cout << result_stats(i, j) << " and ref = " << value << std::endl;
-    if (result_stats(i, j++) != value)  std::cerr << "Error: result_stats at (" << i << "," << j - 1 << ") does not match reference value!" << std::endl;
+    if (result_stats(i, j++) != value) {
+      std::cerr << "Error: result_stats at (" << i << "," << j - 1 << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << std::endl;
+      nayy1++;
+    }
+    if (i > 606) std::cerr << "Error: more snps in reference file than calculated !" << std::endl;
     if (j > 3) { i++; j = 0; }
-    if (i > 607) std::cerr << "Error: more snps in reference file than calculated !" << std::endl;
-    
   }
-  std::cout << "Test for N0s N1s N2s and N3s on SNPs passed!" << std::endl;
+  if (!nayy1) {
+  std::cout << GREEN << "Test for N0s N1s N2s and N3s on SNPs passed!" << RESET  << std::endl;
+  yayy++;
+  }
 
-  
+  // Still need to check LD 
 
-
-  std::cout << "All tests passed!" << std::endl;
-
+  if (yayy == total)  std::cout << GREEN << yayy << "/" << total << " tests passed!" << RESET << std::endl;
+  else std::cout << RED << yayy << "/" << total << " tests passed..." << RESET << std::endl;
 }

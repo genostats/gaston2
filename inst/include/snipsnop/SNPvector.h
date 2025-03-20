@@ -1,10 +1,8 @@
 #include <cstdint>
 #include <cstddef>
 
-#include <math.h>       /* for sqrt... */
-
-//TODO cleanup if not useful
-#include <iostream> // only for printing in debug
+#include <math.h>       // for sqrt...
+#include <stdexcept>      // for out of range exceptio
 
 #ifndef _SNPvector_
 #define _SNPvector_
@@ -164,6 +162,8 @@ class SNPvector {
     size_t nbByte = nbChars();
     size_t BitsInLastByte = (nbInds()%4); // number of bits to read on last byte
 
+    /* FIRST : filling up stats_ with N0s, N1s, N2s, and NAs with PLINK translation*/
+
     // restarting with blank stats_ :
     stats_[0] = stats_[1] = stats_[2] = stats_[3] = 0;
 
@@ -246,9 +246,8 @@ class SNPvector {
     // le constructeur vide démarre à 0, et récupère l'instance qui l'appelle
     Iterator(SNPvector & it) : currentChar(0), current2bits(0), iterated(it) {}
 
-    // TODO : bound check to add
     Iterator(size_t ind, SNPvector & it) : currentChar(ind / 4), current2bits(ind % 4), iterated(it) {
-    //std::cout << "Creating an End iterator at " << currentChar << "th byte on the " << current2bits << " bit \n";
+      if (currentChar > iterated.nbChars()) throw std::out_of_range("End Iterator is too far !");
     }
 
     // operateur * const : renvoie la valeur 2bits par 2bits
@@ -272,12 +271,9 @@ class SNPvector {
 
     // Opérateur de comparaison entre deux itérateurs
     bool operator!=(const Iterator & other) const {
-      // TODO : modify with < maybe ?
       return (currentChar != other.currentChar) || (current2bits != other.current2bits);
     }
   };
-
-  //begin et end dans la classe mère.
 
   // begin() : renvoie un itérateur
   Iterator begin() {
