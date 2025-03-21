@@ -51,6 +51,15 @@
  * 
  */
 class SNPvector {
+
+  protected : // can be accessed also by class inheriting
+  /* Containing N0, N1, N2, NAs on the whole SNP, following Plink format
+  populated by compute_stats()*/
+  unsigned int stats_[4] = {0, 0, 0, 0};
+
+  double mu_ = 0;
+  double sigma_ = 0;
+
   public:
   /**
    * @brief pure virtual function, 
@@ -77,14 +86,6 @@ class SNPvector {
   virtual double * mode() = 0;
   virtual double mode(unsigned int n) = 0;
 
-
-  /* Containing N0, N1, N2, NAs on the whole SNP, following Plink format
-  populated by compute_stats()*/
-  unsigned int stats_[4] = {0, 0, 0, 0};
-
-  double mu_ = 0;
-  double sigma_ = 0;
-
   /**
    * @brief function calculating the size of the vector
    * from the number of individuals/samples 
@@ -96,17 +97,25 @@ class SNPvector {
     return n/4 + ((n%4 == 0u)?0:1);
   }
 
-  //TODO : helper for now, see if logical
-  unsigned int * stats() {
+  unsigned int * getStats() {
     return stats_;
   }
 
-  double mu() {
+  double getMu() {
     return mu_;
   }
 
-  double sigma() {
+  void setMu(double mu) {
+    mu_ = mu;
+  }
+
+  double getSigma() {
     return sigma_;
+  }
+
+
+  void setSigma(double sigma) {
+    sigma_ = sigma;
   }
 
   // dummy function summing the n first individuals from the SNP
@@ -137,9 +146,9 @@ class SNPvector {
     unsigned int NAs = stats_[3];
     double n = N - NAs;
 
-    mu_ = (2 * N2s + N1s) / n;
+    if (!mu_) mu_ = (2 * N2s + N1s) / n; //setting mu only if == 0, so if not set by caller
     double mu2 = mu_ * mu_;
-    sigma_ = sqrt(( N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
+    if (!sigma_) sigma_ = sqrt(( N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
 
     // Centered mode Plinked
     currentMode_[1][0] = -mu_;
@@ -193,12 +202,10 @@ class SNPvector {
 
   
   // for scalar product :
-  //TODO : think if better to have it as an overwritten operator ?
-  // or else how to name the method 
   // TODO : think on what are the limits (error checking) => what calls in gaston ?
   //for ref : double LD_colxx(matrix4 & A, double mu1, double mu2, double v, size_t x1, size_t x2) {
   double LD(const SNPvector & other) {
-    //if (nbInds() != other.nbInds())
+    //if (nbInds() != other.nbInds()) // CAUSES PROBLEMS WITH CONST
     // TODO : check that read using same mode ?
     double LD = 0;
     double gg[16];

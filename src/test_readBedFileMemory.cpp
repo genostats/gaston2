@@ -251,7 +251,7 @@ IntegerVector test_snp_stats(unsigned int n) {
   for (int i = 0; i < nbSNPs; i++) {
     auto vec = M.SNPs[i]; 
     vec->compute_stats();
-    auto stats = vec->stats();
+    auto stats = vec->getStats();
 
     for (int j = 0; j < 4; j++) {
       res[j] += stats[j];  // Element-wise sum
@@ -275,7 +275,7 @@ IntegerMatrix test_snp_stats_all(int n_ind, int n_snp) {
   for (int i = 0; i < n_snp; i++) {
     auto vec = M.SNPs[i]; 
     vec->compute_stats();
-    auto stats = vec->stats();
+    auto stats = vec->getStats();
 
     res(i, 0) = stats[0];
     res(i, 1) = stats[1];
@@ -291,7 +291,7 @@ IntegerVector test_snp_stats_d(unsigned int n) {
   SNPmatrix M = readBedFileDisk(file_hardcode, n, 1);
   auto vec = M.SNPs[0];
   vec->compute_stats();
-  auto stats = vec->stats();
+  auto stats = vec->getStats();
   std::vector<unsigned int> res(stats, stats + 4);
   return wrap(res);
 }
@@ -335,12 +335,12 @@ NumericMatrix test_mu_sigma(unsigned int n) {
     auto vec = M.SNPs[i]; 
     // NEED TO COMPUTE BEFORE 
     vec->compute_stats();
-    auto stats = vec->stats();
+    auto stats = vec->getStats();
     //std::cout << "This is stats for SNP[" << i << "] : " << stats[0] << ", " << stats[1] << ", " << stats[2];
 
     vec->compute_mu_sigma();
-    double sigma = vec->sigma();
-    double mu = vec->mu();
+    double sigma = vec->getSigma();
+    double mu = vec->getMu();
     res(i, 0) = mu;
     res(i, 1) = sigma;
     //res.push_back(0);
@@ -415,10 +415,18 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
  #define RESET "\033[0m"
  #define RED "\033[1;31m"
 
+ bool equal(double val1, double val2) {
+  double margin = 0.00000001;
+  double res = val1 - val2;
+  //std::cout << res < margin << " " << -res << std::endl;
+
+  return (res < margin) && (-res < margin);
+ }
+
 // [[Rcpp::export]]
  void testsuite() {
 
-  int total = 5; //nb of tests in total
+  int total = 6; //nb of tests in total
 
   //test_readBedFileMemory  
   std::vector<int> expected = { 804, 771, 982, 873, 399, 968, 976, 976, 976, 976, 976, 397, 873, 976, 873, 981, 976, 981, 843, 976, 804, 
@@ -481,7 +489,7 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
     yayy++;
   }
 
-  // now test snp_stats_all with ref file ? 
+  // snp_stats_all with ref file (snp_counts) 
   std::vector<int> expected_stats;
   std::ifstream file("./inst/extdata/snp_counts.txt");
   int value;
@@ -489,7 +497,7 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
   IntegerMatrix result_stats = test_snp_stats_all(503, 607);
   
   if (!file) {
-      std::cerr << "Problem, failed to open reference file " << std::endl;
+      std::cerr << "Problem, failed to open reference file for test_snp_stats_all" << std::endl;
       exit(EXIT_FAILURE);
   }
   int i = 0;
@@ -509,7 +517,36 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
   yayy++;
   }
 
+  // still need to check modes (how do i get them in gaston ??)
   // Still need to check LD 
+  std::vector<double> expected_LD;
+  std::ifstream file2("./inst/extdata/LD_ref.txt");
+  double value2;
+
+  NumericMatrix result_LD = test_LD(0, 503);
+  
+  if (!file2) {
+      std::cerr << "Problem, failed to open reference file for test_snp_stats_all" << std::endl;
+      exit(EXIT_FAILURE);
+  }
+  i = 0;
+  j = 0;
+  nayy1 = 0;
+  while (file2 >> value2) {
+    //std::cout << result_LD(i, j) << " and ref = " << value2 << std::endl;
+    if (!equal(result_LD(i, j),value2)) {
+      std::cerr << "Error: result_LD at (" << i << "," << j << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << std::endl;
+      nayy1++;
+      return;
+    }
+    j++;
+    if (i > 502) std::cerr << "Error: more LD values in reference file than calculated !" << std::endl;
+    if (j > 502) { i++; j = 0; }
+  }
+  if (!nayy1) {
+  std::cout << GREEN << "Test for LD values on all SNPs passed!" << RESET  << std::endl;
+  yayy++;
+  }
 
   if (yayy == total)  std::cout << GREEN << yayy << "/" << total << " tests passed!" << RESET << std::endl;
   else std::cout << RED << yayy << "/" << total << " tests passed..." << RESET << std::endl;
