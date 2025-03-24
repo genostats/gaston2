@@ -113,7 +113,6 @@ class SNPvector {
     return sigma_;
   }
 
-
   void setSigma(double sigma) {
     sigma_ = sigma;
   }

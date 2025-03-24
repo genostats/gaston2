@@ -415,6 +415,15 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
  #define RESET "\033[0m"
  #define RED "\033[1;31m"
 
+ std::vector<std::string> tests_names = {
+    "ReadBedFile from memory",
+    "ReadBedFile from disk",
+    "Computing stats",
+    "Computing LD"
+    // Will need to add modes here
+};
+
+ //helper to compare to doubles (surely very time consuming)
  bool equal(double val1, double val2) {
   double margin = 0.00000001;
   double res = val1 - val2;
@@ -426,8 +435,8 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
 // [[Rcpp::export]]
  void testsuite() {
 
-  int total = 6; //nb of tests in total
-
+  std::vector<int> total = {0, 0, 0, 0};
+  
   //test_readBedFileMemory  
   std::vector<int> expected = { 804, 771, 982, 873, 399, 968, 976, 976, 976, 976, 976, 397, 873, 976, 873, 981, 976, 981, 843, 976, 804, 
   771, 464, 873, 843, 980, 399, 873, 398, 994, 771, 771, 843, 873, 771, 921, 981, 398, 795, 771, 995, 976,
@@ -461,32 +470,26 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
   
   IntegerVector result1 = test_readBedFileMemory("./inst/extdata/LCT.bed",503,607);
   IntegerVector result2 = test_readBedFileDisk("./inst/extdata/LCT.bed",503,607);
-  int yayy = 0;
   if (result1.size() != expected.size())    std::cerr << "Error: result from readBedFileMemory size does not match expected size!" << std::endl;
-  else yayy++;
+  else total[0] = 1;
   if (result2.size() != expected.size())    std::cerr << "Error: result from readBedFileDisk size does not match expected size!" << std::endl;
-  else yayy++;
-  
-  int nayy1 = 0;
-  int nayy2 = 0;
+  else total[1] = 1;
   for (size_t i = 0; i < expected.size(); i++) {
     if (result1[i] != expected[i]) {
-      std::cerr << "Error: result1 at index " << i << " does not match expected value!" << std::endl;
-      nayy1++;
+      std::cout << RED <<"Error: result1 at index " << i << " does not match expected value!"<< RESET << std::endl;
+      total[0] = 0;
     }
     if (result2[i] != expected[i]) {
-      std::cerr << "Error: result2 at index " << i << " does not match expected value!" << std::endl;
-      nayy2++;
+      std::cout << RED <<"Error: result2 at index " << i << " does not match expected value!" << RESET<< std::endl;
+      total[1] = 0;
     }
   }
 
-  if (!nayy1) {
+  if (total[0]) {
     std::cout << GREEN << "Tests for readBedFileMemory passed!" << RESET  << std::endl;
-    yayy++;
   }
-  if (!nayy2) {
-    std::cout << GREEN << "Tests for readBedFileDisk passed!" << RESET << std::endl; 
-    yayy++;
+  if (total[1]) {
+    std::cout << GREEN << "Tests for readBedFileDisk passed!" << RESET << std::endl;
   }
 
   // snp_stats_all with ref file (snp_counts) 
@@ -502,23 +505,21 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
   }
   int i = 0;
   int j = 0;
-  nayy1 = 0;
+  total[2] = 1;
   while (file >> value) {
     //std::cout << result_stats(i, j) << " and ref = " << value << std::endl;
     if (result_stats(i, j++) != value) {
-      std::cerr << "Error: result_stats at (" << i << "," << j - 1 << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << std::endl;
-      nayy1++;
+      std::cout << RED << "Error: result_stats at (" << i << "," << j - 1 << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << RESET << std::endl;
+      total[2] = 0;
     }
     if (i > 606) std::cerr << "Error: more snps in reference file than calculated !" << std::endl;
     if (j > 3) { i++; j = 0; }
   }
-  if (!nayy1) {
+  if (total[2]) {
   std::cout << GREEN << "Test for N0s N1s N2s and N3s on SNPs passed!" << RESET  << std::endl;
-  yayy++;
   }
 
-  // still need to check modes (how do i get them in gaston ??)
-  // Still need to check LD 
+  // tests LD on all the snps
   std::vector<double> expected_LD;
   std::ifstream file2("./inst/extdata/LD_ref.txt");
   double value2;
@@ -531,23 +532,32 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
   }
   i = 0;
   j = 0;
-  nayy1 = 0;
+  total[3] = 1;
   while (file2 >> value2) {
     //std::cout << result_LD(i, j) << " and ref = " << value2 << std::endl;
     if (!equal(result_LD(i, j),value2)) {
-      std::cerr << "Error: result_LD at (" << i << "," << j << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << std::endl;
-      nayy1++;
-      return;
+      std::cout << RED << "Error: result_LD at (" << i << "," << j << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << RESET << std::endl;
+      total[3] = 0;
     }
     j++;
     if (i > 502) std::cerr << "Error: more LD values in reference file than calculated !" << std::endl;
     if (j > 502) { i++; j = 0; }
   }
-  if (!nayy1) {
+  if (total[3]) {
   std::cout << GREEN << "Test for LD values on all SNPs passed!" << RESET  << std::endl;
-  yayy++;
   }
 
-  if (yayy == total)  std::cout << GREEN << yayy << "/" << total << " tests passed!" << RESET << std::endl;
-  else std::cout << RED << yayy << "/" << total << " tests passed..." << RESET << std::endl;
+  // still need to check modes (how do i get them in gaston ??)
+
+  //std::count(vect.begin(), vect.end(), 0) should == 0 (all 1s) so !0 = true
+  if (!std::count(total.begin(), total.end(), 0))  std::cout << GREEN << total.size() << "/" << total.size() << " tests passed!" << RESET << std::endl;
+  else {
+  std::cout << RED << std::count(total.begin(), total.end(), 1) << "/" << total.size() << " tests passed..." << RESET << std::endl;
+  for (int i = 0; i < total.size(); i++) 
+    if (!total[i]) std::cout << RED << "Failed the " << tests_names[i] << " test..." << RESET << std::endl;
+    // if (!total[0]) std::cout << RED << "Failed the ReadbedFile from memory test..." << RESET << std::endl;
+    // if (!total[1]) std::cout << RED << "Failed the ReadbedFile from disk test..." << RESET << std::endl;
+    // if (!total[2]) std::cout << RED << "Failed the computing stats test..." << RESET << std::endl;
+    // if (!total[3]) std::cout << RED << "Failed the computing LD test..." << RESET << std::endl;
+  }
 }
