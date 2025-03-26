@@ -50,7 +50,6 @@
   enum Mode { 
     PLINK = 0, // .bed file : (g = {0, 1, 3 and 2 = NA})
     CENTERED = 1, // (g -= mu)
-    STANDARDIZED_P = 2, // (g = (g-2*p) / sqrt(2*p*(1-p)) = (g - mu) / sqrt(mu*(1-mu/2)) 
     STANDARDIZED_MU_SIGMA = 3, // (g = (g-mu)/sd)
     NUMERIC = 4 // (g = {0, 1, 2 and 3 = NA}) (almost never used)
   };
@@ -85,7 +84,7 @@ class SNPvector {
   virtual size_t nbInds() = 0;
 
   // BY DEFAULT, PLINK format, with 01 = missing genotype
-  double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}};
+  double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}};
 
   virtual void setMode(Mode mode) = 0;
   virtual double * mode() = 0;
@@ -165,11 +164,6 @@ class SNPvector {
      currentMode_[1][2] = 1 - mu_;
      currentMode_[1][3] = 2 - mu_;
 
-     //TODO : ADD MODE STANDARDIZE P
-    // (g = (g-2*p) / sqrt(2*p*(1-p)) = (g - mu) / sqrt(mu*(1-mu/2)) 
-
-
- 
      // Centré réduit
      currentMode_[3][0] = currentMode_[1][0] / sigma_;
      currentMode_[3][1] = 0;
@@ -255,7 +249,6 @@ class SNPvector {
     double r = LD/(v*(nbInds()-1)); //nbInds should be the same for both
     return r * r;
   }
-
 
   //function returning a 16 int vector holding frequency distribution
   std::vector<int> contingency(const SNPvector & other) {
