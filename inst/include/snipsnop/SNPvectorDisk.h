@@ -21,7 +21,7 @@ class SNPVectorDisk : public SNPvector {
 
   public:
   
-  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::mmap_source> file_ref, int modeInt = 0) : data_(nbInds/4 + ((nbInds%4 == 0u)?0:1)), nbInds_(nbInds), file_ref_(file_ref), mode_((modeInt > 3)? static_cast<SNPvector::Mode>(0) : static_cast<SNPvector::Mode>(modeInt)) {
+  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::mmap_source> file_ref, int modeInt = 0) : data_(nbInds/4 + ((nbInds%4 == 0u)?0:1)), nbInds_(nbInds), file_ref_(file_ref), mode_((modeInt > 3)? static_cast<Mode>(0) : static_cast<Mode>(modeInt)) {
     if (modeInt > 3 || modeInt < 0) throw std::runtime_error("Wrong mode chosen for reading SNP");
   } 
 
@@ -40,6 +40,10 @@ class SNPVectorDisk : public SNPvector {
 
   const uint8_t * data() const {
     return &data_[0];
+  }
+
+  void setMode(Mode mode) {
+    mode_ = mode;
   }
 
   // returns the array used to translate datas

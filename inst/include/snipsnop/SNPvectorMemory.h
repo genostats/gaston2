@@ -20,7 +20,7 @@ class SNPvectorMemory : public SNPvector {
   enum Mode mode_;
   public:
   // un constructeur, taille nbInds
-  SNPvectorMemory(size_t nbInds, int modeInt = 0 ) : data_(nbInds/4 + ((nbInds%4 == 0u)?0:1)), nbInds_(nbInds), mode_((modeInt > 3)? static_cast<SNPvector::Mode>(0) : static_cast<SNPvector::Mode>(modeInt)) {
+  SNPvectorMemory(size_t nbInds, int modeInt = 0 ) : data_(nbInds/4 + ((nbInds%4 == 0u)?0:1)), nbInds_(nbInds), mode_((modeInt > 3)? static_cast<Mode>(0) : static_cast<Mode>(modeInt)) {
     if (modeInt > 3 || modeInt < 0) throw std::runtime_error("Wrong mode chosen for reading SNP");
 } 
 
@@ -53,6 +53,9 @@ class SNPvectorMemory : public SNPvector {
     return &data_[0];
   }
 
+  void setMode(Mode mode) {
+    mode_ = mode;
+  }
 
   // returns the array used to translate datas
   // TODO : see if Mode enum more usefulS

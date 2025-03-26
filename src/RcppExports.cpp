@@ -206,6 +206,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_contingency
+IntegerMatrix test_contingency(int SNPnb1, int SNPnb2);
+RcppExport SEXP _snipsnop_test_contingency(SEXP SNPnb1SEXP, SEXP SNPnb2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type SNPnb1(SNPnb1SEXP);
+    Rcpp::traits::input_parameter< int >::type SNPnb2(SNPnb2SEXP);
+    rcpp_result_gen = Rcpp::wrap(test_contingency(SNPnb1, SNPnb2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// set_num_thread
+void set_num_thread(int num);
+RcppExport SEXP _snipsnop_set_num_thread(SEXP numSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type num(numSEXP);
+    set_num_thread(num);
+    return R_NilValue;
+END_RCPP
+}
 // testsuite
 void testsuite();
 RcppExport SEXP _snipsnop_testsuite() {
@@ -234,6 +256,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_mu_sigma", (DL_FUNC) &_snipsnop_test_mu_sigma, 1},
     {"_snipsnop_test_centered", (DL_FUNC) &_snipsnop_test_centered, 0},
     {"_snipsnop_test_LD", (DL_FUNC) &_snipsnop_test_LD, 2},
+    {"_snipsnop_test_contingency", (DL_FUNC) &_snipsnop_test_contingency, 2},
+    {"_snipsnop_set_num_thread", (DL_FUNC) &_snipsnop_set_num_thread, 1},
     {"_snipsnop_testsuite", (DL_FUNC) &_snipsnop_testsuite, 0},
     {NULL, NULL, 0}
 };

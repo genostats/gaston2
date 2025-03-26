@@ -69,6 +69,14 @@ test_LD <- function(SNPnb1, SNPnb2) {
     .Call(`_snipsnop_test_LD`, SNPnb1, SNPnb2)
 }
 
+test_contingency <- function(SNPnb1, SNPnb2) {
+    .Call(`_snipsnop_test_contingency`, SNPnb1, SNPnb2)
+}
+
+set_num_thread <- function(num) {
+    invisible(.Call(`_snipsnop_set_num_thread`, num))
+}
+
 testsuite <- function() {
     invisible(.Call(`_snipsnop_testsuite`))
 }

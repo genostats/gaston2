@@ -1,8 +1,12 @@
 #include <cstdint>
 #include <cstddef>
+#include <omp.h>
 
 #include <math.h>       // for sqrt...
 #include <stdexcept>      // for out of range exceptio
+#include <iostream>
+#include <vector> //for contingency !!
+#include <algorithm> // for omp reduction ? 
 
 #ifndef _SNPvector_
 #define _SNPvector_
@@ -43,6 +47,13 @@
   0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 
   0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0};
 
+  enum Mode { 
+    PLINK = 0, // .bed file : (g = {0, 1, 3 and 2 = NA})
+    CENTERED = 1, // (g -= mu)
+    STANDARDIZED_P = 2, // (g = (g-2*p) / sqrt(2*p*(1-p)) = (g - mu) / sqrt(mu*(1-mu/2)) 
+    STANDARDIZED_MU_SIGMA = 3, // (g = (g-mu)/sd)
+    NUMERIC = 4 // (g = {0, 1, 2 and 3 = NA}) (almost never used)
+  };
 
 /**
  * @brief An abstract class instanciated through SNPvectorMemory or SNPvectorDisk
@@ -53,7 +64,8 @@
 class SNPvector {
 
   protected : // can be accessed also by class inheriting
-  /* Containing N0, N1, N2, NAs on the whole SNP, following Plink format
+  /* Containing N0, N1, N2, NAs on the whole SNP, 
+  following Plink format
   populated by compute_stats()*/
   unsigned int stats_[4] = {0, 0, 0, 0};
 
@@ -72,17 +84,10 @@ class SNPvector {
   // nombre d'individus
   virtual size_t nbInds() = 0;
 
-  enum Mode { 
-    PLINK = 0, // .bed file : (g = {0, 1, 3 and 2 = NA})
-    CENTERED = 1, // (g -= mu)
-    STANDARDIZED_P = 2, // (g = (g-2*p) / sqrt(2*p*(1-p)) = (g - mu) / sqrt(mu*(1-mu/2)) 
-    STANDARDIZED_MU_SIGMA = 3, // (g = (g-mu)/sd)
-    NUMERIC = 4 // (g = {0, 1, 2 and 3 = NA}) (almost never used)
-  };
-
   // BY DEFAULT, PLINK format, with 01 = missing genotype
-  double currentMode_[4][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}};
+  double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}};
 
+  virtual void setMode(Mode mode) = 0;
   virtual double * mode() = 0;
   virtual double mode(unsigned int n) = 0;
 
@@ -107,6 +112,7 @@ class SNPvector {
 
   void setMu(double mu) {
     mu_ = mu;
+    compute_mode();
   }
 
   double getSigma() {
@@ -115,9 +121,10 @@ class SNPvector {
 
   void setSigma(double sigma) {
     sigma_ = sigma;
+    compute_mode();
   }
 
-  // dummy function summing the n first individuals from the SNP
+  // dummy function summing the n first individuals from the SNP, if no n specified, summing all SNPs available
   double sum(int n = -1) {
     double S = 0;
     uint8_t * d = data();
@@ -136,7 +143,7 @@ class SNPvector {
     return S;
   }
 
-
+// CAREFULL ! This function WILL overwrite mu and sigma !
   void compute_mu_sigma() {
     double N = nbInds(); //equal to ncols in gaston
 
@@ -145,23 +152,30 @@ class SNPvector {
     unsigned int NAs = stats_[3];
     double n = N - NAs;
 
-    if (!mu_) mu_ = (2 * N2s + N1s) / n; //setting mu only if == 0, so if not set by caller
+    mu_ = (2 * N2s + N1s) / n;
     double mu2 = mu_ * mu_;
-    if (!sigma_) sigma_ = sqrt(( N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
-
-    // Centered mode Plinked
-    currentMode_[1][0] = -mu_;
-    currentMode_[1][1] = 0;
-    currentMode_[1][2] = 1 - mu_;
-    currentMode_[1][3] = 2 - mu_;
-
-    // Centré réduit
-    currentMode_[2][0] = currentMode_[1][0] / sigma_;
-    currentMode_[2][1] = 0;
-    currentMode_[2][2] = currentMode_[1][2] / sigma_;
-    currentMode_[2][3] = currentMode_[1][3] / sigma_;
+    sigma_ = sqrt(( N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
   }
 
+  void compute_mode() {
+
+     // Centered mode Plinked
+     currentMode_[1][0] = -mu_;
+     currentMode_[1][1] = 0;
+     currentMode_[1][2] = 1 - mu_;
+     currentMode_[1][3] = 2 - mu_;
+
+     //TODO : ADD MODE STANDARDIZE P
+    // (g = (g-2*p) / sqrt(2*p*(1-p)) = (g - mu) / sqrt(mu*(1-mu/2)) 
+
+
+ 
+     // Centré réduit
+     currentMode_[3][0] = currentMode_[1][0] / sigma_;
+     currentMode_[3][1] = 0;
+     currentMode_[3][2] = currentMode_[1][2] / sigma_;
+     currentMode_[3][3] = currentMode_[1][3] / sigma_;
+  }
 
 
   // TODO : redo this funciton
@@ -176,9 +190,7 @@ class SNPvector {
     stats_[0] = stats_[1] = stats_[2] = stats_[3] = 0;
 
     for (size_t i = 0; i < nbByte; i++) {
-        
         uint8_t d = data()[i];
-
         if ((i == nbByte-1) && BitsInLastByte > 0) {
           while (BitsInLastByte > 0) {
             unsigned int val = (d & 3);
@@ -187,11 +199,14 @@ class SNPvector {
             BitsInLastByte--;
             d >>= 2; // 1 shift par loop
           }
-
-          return compute_mu_sigma();
+          if (!mu_ || !sigma_) compute_mu_sigma(); //compute mu & sd ONLY IF == 0 
+          return compute_mode();
         }
       //sinon, fini pile à la fin d'une byte je peux return
-      else if (i == nbByte-1) return compute_mu_sigma();
+      else if (i == nbByte-1) {
+        if (!mu_ || !sigma_) compute_mu_sigma();
+        return compute_mode();
+      }
       stats_[0] += N0[d];
       stats_[2] += N0[255-d]; // raw = 3
       stats_[3] += N1[d]; // raw = 1
@@ -202,7 +217,6 @@ class SNPvector {
   
   // for scalar product :
   // TODO : think on what are the limits (error checking) => what calls in gaston ?
-  //for ref : double LD_colxx(matrix4 & A, double mu1, double mu2, double v, size_t x1, size_t x2) {
   double LD(const SNPvector & other) {
     //if (nbInds() != other.nbInds()) // CAUSES PROBLEMS WITH CONST
     // TODO : check that read using same mode ?
@@ -224,6 +238,7 @@ class SNPvector {
 
     double v = sigma_ * other.sigma_;
 
+#pragma omp parallel for reduction(+:LD)
     for(size_t i = 0; i < nbChars(); i++) {
       uint8_t g1 = data()[i]; //je récup les ièmes char
       const uint8_t g2_const = other.data()[i];
@@ -240,6 +255,32 @@ class SNPvector {
     double r = LD/(v*(nbInds()-1)); //nbInds should be the same for both
     return r * r;
   }
+
+
+  //function returning a 16 int vector holding frequency distribution
+  std::vector<int> contingency(const SNPvector & other) {
+    std::vector<int> table(16);
+// #pragma omp declare reduction(vec_incr : std::vector<int> : \
+//   std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
+//   initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+// #pragma omp parallel for reduction(vec_incr : table)
+    for(size_t i = 0; i < nbChars(); i++) {
+      uint8_t snp1 = data()[i]; //je récup les ièmes char
+      const uint8_t snp2_const = other.data()[i];
+      uint8_t snp2 = snp2_const;
+      for(int ss = 0; ss < 4; ss++) { // que je vais lire 2bits par 2bits
+        // Hardcoded to only use Plink here, without touching mode
+        int ind1 = currentMode_[0][snp1&3];
+        int ind2 = currentMode_[0][snp2&3];
+        table[ind1*4 + ind2]++;
+        //std::cout << "ind1 = " << ind1 << " ind2 = " << ind2 << ", " << "Table[" << ind1*4 + ind2 << "] = " << table[ind1*4 + ind2] << "\n";
+        ind1 >>= 2;
+        ind2 >>= 2;
+      }
+    }
+    return table;
+  }
+  
 
 
   class Iterator {

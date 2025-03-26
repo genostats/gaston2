@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
+#include <omp.h>
 
 using namespace Rcpp;
 
@@ -377,27 +378,30 @@ NumericVector test_centered() {
 
 // [[Rcpp::export]]
 NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
+  if (SNPnb1 > 503 || SNPnb2 > 503) {
+    std::cerr << "Please ju stop calling SNPs that don't exist \n" << std::endl;
+    exit(EXIT_FAILURE);
+  }
   if (SNPnb1 > SNPnb2) {
     std::cerr << "Please swap your SNPs to have a correct range \n" << std::endl;
-    return 0;
+    exit(EXIT_FAILURE);
   }
 
   int nbSNPs = SNPnb2 - SNPnb1 + 1;
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
   NumericMatrix res(nbSNPs, nbSNPs);
-  // don't think its usefull, don't have names
 
   for (int i = 0; i < nbSNPs; i++) {
     SNPvector &snp1 = *M.SNPs[SNPnb1 + i];
-    //forst loading stats for mu and sigma:
+    //first loading stats for mu and sigma:
     snp1.compute_stats();
-    snp1.compute_mu_sigma();
+    //snp1.compute_mu_sigma();
 
     for (int j = 0; j < nbSNPs; j++) {
       SNPvector &snp2 = *M.SNPs[SNPnb1 + j];
       if (j > i) {// aka where I haven't been before
         snp2.compute_stats();
-        snp2.compute_mu_sigma();
+        //snp2.compute_mu_sigma();
       }
 
       res(i, j) = snp1.LD(snp2);
@@ -406,6 +410,31 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
   return res;
 }
 
+// [[Rcpp::export]]
+IntegerMatrix test_contingency(int SNPnb1, int SNPnb2){
+  if (SNPnb1 > 502 || SNPnb2 > 502) {
+    std::cerr << "Please ju stop calling SNPs that don't exist \n" << std::endl;
+    return 0;
+  }
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
+  IntegerVector res(16);
+  SNPvector &snp1 = *M.SNPs[SNPnb1];
+  SNPvector &snp2 = *M.SNPs[SNPnb2];
+  res = snp1.contingency(snp2);
+  res.attr("dim") = Dimension(4, 4);
+  IntegerMatrix m = as<IntegerMatrix>(res);
+  // CharacterVector SNPdesc1 = { SNPnb1 };
+  // CharacterVector SNPdesc2 = { SNPnb2 };
+
+  // rownames(m) = SNPdesc1;
+  // colnames(m) = SNPdesc2;
+  return m;
+}
+
+//[[Rcpp::export]]
+void set_num_thread(int num) {
+  omp_set_num_threads(num);
+}
 
 /****************************
  *        TESTSUITE         *
@@ -434,6 +463,8 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
 
 // [[Rcpp::export]]
  void testsuite() {
+
+  std::cout << "Using " <<  omp_get_max_threads() << " thread(s).\n";
 
   std::vector<int> total = {0, 0, 0, 0};
   
@@ -525,6 +556,7 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
   double value2;
 
   NumericMatrix result_LD = test_LD(0, 503);
+  //if (result_LD == 0) goto conclusion;
   
   if (!file2) {
       std::cerr << "Problem, failed to open reference file for test_snp_stats_all" << std::endl;
@@ -549,15 +581,12 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
 
   // still need to check modes (how do i get them in gaston ??)
 
+conclusion:
   //std::count(vect.begin(), vect.end(), 0) should == 0 (all 1s) so !0 = true
   if (!std::count(total.begin(), total.end(), 0))  std::cout << GREEN << total.size() << "/" << total.size() << " tests passed!" << RESET << std::endl;
   else {
   std::cout << RED << std::count(total.begin(), total.end(), 1) << "/" << total.size() << " tests passed..." << RESET << std::endl;
   for (int i = 0; i < total.size(); i++) 
     if (!total[i]) std::cout << RED << "Failed the " << tests_names[i] << " test..." << RESET << std::endl;
-    // if (!total[0]) std::cout << RED << "Failed the ReadbedFile from memory test..." << RESET << std::endl;
-    // if (!total[1]) std::cout << RED << "Failed the ReadbedFile from disk test..." << RESET << std::endl;
-    // if (!total[2]) std::cout << RED << "Failed the computing stats test..." << RESET << std::endl;
-    // if (!total[3]) std::cout << RED << "Failed the computing LD test..." << RESET << std::endl;
   }
 }
