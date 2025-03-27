@@ -50,8 +50,8 @@
   enum Mode { 
     PLINK = 0, // .bed file : (g = {0, 1, 3 and 2 = NA})
     CENTERED = 1, // (g -= mu)
-    STANDARDIZED_MU_SIGMA = 3, // (g = (g-mu)/sd)
-    NUMERIC = 4 // (g = {0, 1, 2 and 3 = NA}) (almost never used)
+    STANDARDIZED_MU_SIGMA = 2, // (g = (g-mu)/sd)
+    NUMERIC = 3 // (g = {0, 1, 2 and 3 = NA}) (almost never used)
   };
 
 /**
@@ -165,10 +165,10 @@ class SNPvector {
      currentMode_[1][3] = 2 - mu_;
 
      // Centré réduit
-     currentMode_[3][0] = currentMode_[1][0] / sigma_;
-     currentMode_[3][1] = 0;
-     currentMode_[3][2] = currentMode_[1][2] / sigma_;
-     currentMode_[3][3] = currentMode_[1][3] / sigma_;
+     currentMode_[2][0] = currentMode_[1][0] / sigma_;
+     currentMode_[2][1] = 0;
+     currentMode_[2][2] = currentMode_[1][2] / sigma_;
+     currentMode_[2][3] = currentMode_[1][3] / sigma_;
   }
 
 

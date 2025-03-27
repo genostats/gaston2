@@ -353,16 +353,14 @@ NumericMatrix test_mu_sigma(unsigned int n) {
 
 // [[Rcpp::export]]
 NumericVector test_centered() {
-  std::cout << " reading in Centered (not implemented yet) Mode \n";
+  std::cout << " reading in Centered Mode \n";
   int Cent = 1;
   std::vector<double> res;
 
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607, Cent);
   for(auto v : M.SNPs) {
     v->compute_stats();
-    v->compute_mu_sigma();
-    //std::cout << "Mode : " << v->mode()[0] << ", " << v->mode()[1] << ", " << v->mode()[2]<< ", " << v->mode()[3] << "\n";
-
+    v->setSigma(1); //will call compute_mode also
     for(auto a : *v) {
       res.push_back(a);
     }
@@ -412,7 +410,7 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2) {
 
 // [[Rcpp::export]]
 IntegerMatrix test_contingency(int SNPnb1, int SNPnb2){
-  if (SNPnb1 > 502 || SNPnb2 > 502) {
+  if (SNPnb1 > 503 || SNPnb2 > 503) {
     std::cerr << "Please ju stop calling SNPs that don't exist \n" << std::endl;
     return 0;
   }
@@ -448,7 +446,8 @@ void set_num_thread(int num) {
     "ReadBedFile from memory",
     "ReadBedFile from disk",
     "Computing stats",
-    "Computing LD"
+    "Computing LD", 
+    "Computing values in centered mode"
     // Will need to add modes here
 };
 
@@ -456,7 +455,7 @@ void set_num_thread(int num) {
  bool equal(double val1, double val2) {
   double margin = 0.00000001;
   double res = val1 - val2;
-  //std::cout << res < margin << " " << -res << std::endl;
+  //std::cout << (res < margin) << " " << (-res < margin) << std::endl;
 
   return (res < margin) && (-res < margin);
  }
@@ -466,7 +465,7 @@ void set_num_thread(int num) {
 
   std::cout << "Using " <<  omp_get_max_threads() << " thread(s).\n";
 
-  std::vector<int> total = {0, 0, 0, 0};
+  std::vector<int> total = {0, 0, 0, 0, 0};
   
   //test_readBedFileMemory  
   std::vector<int> expected = { 804, 771, 982, 873, 399, 968, 976, 976, 976, 976, 976, 397, 873, 976, 873, 981, 976, 981, 843, 976, 804, 
@@ -551,9 +550,8 @@ void set_num_thread(int num) {
   }
 
   // tests LD on all the snps
-  std::vector<double> expected_LD;
   std::ifstream file2("./inst/extdata/LD_ref.txt");
-  double value2;
+  double expected_LD;
 
   NumericMatrix result_LD = test_LD(0, 503);
   //if (result_LD == 0) goto conclusion;
@@ -565,21 +563,63 @@ void set_num_thread(int num) {
   i = 0;
   j = 0;
   total[3] = 1;
-  while (file2 >> value2) {
+
+  while (file2 >> expected_LD) {
     //std::cout << result_LD(i, j) << " and ref = " << value2 << std::endl;
-    if (!equal(result_LD(i, j),value2)) {
+    if (!equal(result_LD(i, j), expected_LD)) {
       std::cout << RED << "Error: result_LD at (" << i << "," << j << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << RESET << std::endl;
       total[3] = 0;
     }
     j++;
-    if (i > 502) std::cerr << "Error: more LD values in reference file than calculated !" << std::endl;
+    if (i > 502) { 
+      std::cerr << "Error: more LD values in reference file than calculated !" << std::endl;
+      total[3] = 0;
+      break;
+    }
     if (j > 502) { i++; j = 0; }
   }
   if (total[3]) {
   std::cout << GREEN << "Test for LD values on all SNPs passed!" << RESET  << std::endl;
   }
 
+
   // still need to check modes (how do i get them in gaston ??)
+  NumericVector result_centered = test_centered();
+  std::ifstream file3("./inst/extdata/snps_centered.txt");
+  // file generated from gaston : example("LCT"), x@sigma <- rep(1, ncol(x)), x@standardize_mu_sigma <- TRUE
+  // !!! CHANGED EVERY NAs to 0, otherwise stopped the reading
+  double expected_centered;
+
+  if (!file3) {
+    std::cerr << "Problem, failed to open reference file for test_snp_stats_all" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+
+  int max = result_centered.size();
+  int cptr = 0;
+  total[4] = 1;
+  //std::cout << "This is max size  " << max << std::endl;
+  while (file3 >> expected_centered) {
+
+    if (cptr >= max) {
+      //std::cout << "This is actual cptr  " << cptr << std::endl;
+      std::cerr << "Error: more centered values in reference file than calculated !" << std::endl;
+      total[4] = 0;
+      break;
+    }
+    //std::cout << result_centered(cptr) << " and ref = " << expected_centered << std::endl;
+
+    if (!equal(result_centered(cptr),expected_centered)) {
+      std::cout << RED << "Error: centered snp at line " << cptr + 1 << " in the file does not match computed value!" << RESET << std::endl;
+      total[4] = 0;
+    }
+    cptr++;
+  }
+  if (total[4]) {
+  std::cout << GREEN << "Test for centered values on all SNPs passed!" << RESET  << std::endl;
+  }
+
 
 conclusion:
   //std::count(vect.begin(), vect.end(), 0) should == 0 (all 1s) so !0 = true
