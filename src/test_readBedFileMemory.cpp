@@ -352,12 +352,10 @@ NumericMatrix test_mu_sigma(unsigned int n) {
 }
 
 // [[Rcpp::export]]
-NumericVector test_centered() {
-  std::cout << " reading in Centered Mode \n";
-  int Cent = 1;
+NumericVector test_modes_setsigma_one(int mode) {
   std::vector<double> res;
 
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607, Cent);
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607, mode);
   for(auto v : M.SNPs) {
     v->compute_stats();
     v->setSigma(1); //will call compute_mode also
@@ -447,7 +445,8 @@ void set_num_thread(int num) {
     "ReadBedFile from disk",
     "Computing stats",
     "Computing LD", 
-    "Computing values in centered mode"
+    "Computing values in centered mode", 
+    "Computing values in centered reduced mode"
     // Will need to add modes here
 };
 
@@ -465,7 +464,7 @@ void set_num_thread(int num) {
 
   std::cout << "Using " <<  omp_get_max_threads() << " thread(s).\n";
 
-  std::vector<int> total = {0, 0, 0, 0, 0};
+  std::vector<int> total = {0, 0, 0, 0, 0, 0};
   
   //test_readBedFileMemory  
   std::vector<int> expected = { 804, 771, 982, 873, 399, 968, 976, 976, 976, 976, 976, 397, 873, 976, 873, 981, 976, 981, 843, 976, 804, 
@@ -584,7 +583,8 @@ void set_num_thread(int num) {
 
 
   // still need to check modes (how do i get them in gaston ??)
-  NumericVector result_centered = test_centered();
+  NumericVector result_centered = test_modes_setsigma_one(1);
+  NumericVector result_centered_reduced = test_modes_setsigma_one(2);
   std::ifstream file3("./inst/extdata/snps_centered.txt");
   // file generated from gaston : example("LCT"), x@sigma <- rep(1, ncol(x)), x@standardize_mu_sigma <- TRUE
   // !!! CHANGED EVERY NAs to 0, otherwise stopped the reading
@@ -599,6 +599,7 @@ void set_num_thread(int num) {
   int max = result_centered.size();
   int cptr = 0;
   total[4] = 1;
+  total[5] = 1;
   //std::cout << "This is max size  " << max << std::endl;
   while (file3 >> expected_centered) {
 
@@ -614,11 +615,20 @@ void set_num_thread(int num) {
       std::cout << RED << "Error: centered snp at line " << cptr + 1 << " in the file does not match computed value!" << RESET << std::endl;
       total[4] = 0;
     }
+    if (!equal(result_centered_reduced(cptr),expected_centered)) {
+      std::cout << RED << "Error: centered reduced snp at line " << cptr + 1 << " in the file does not match computed value!" << RESET << std::endl;
+      total[5] = 0;
+    }
     cptr++;
   }
   if (total[4]) {
   std::cout << GREEN << "Test for centered values on all SNPs passed!" << RESET  << std::endl;
   }
+  if (total[5]) {
+    std::cout << GREEN << "Test for centered_reduced values on all SNPs passed!" << RESET  << std::endl;
+  }
+
+
 
 
 conclusion:

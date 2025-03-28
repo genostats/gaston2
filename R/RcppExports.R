@@ -61,8 +61,8 @@ test_mu_sigma <- function(n) {
     .Call(`_snipsnop_test_mu_sigma`, n)
 }
 
-test_centered <- function() {
-    .Call(`_snipsnop_test_centered`)
+test_modes_setsigma_one <- function(mode) {
+    .Call(`_snipsnop_test_modes_setsigma_one`, mode)
 }
 
 test_LD <- function(SNPnb1, SNPnb2) {
