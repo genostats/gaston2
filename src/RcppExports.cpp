@@ -219,6 +219,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_stats_matrix
+IntegerVector test_stats_matrix(int ind1);
+RcppExport SEXP _snipsnop_test_stats_matrix(SEXP ind1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type ind1(ind1SEXP);
+    rcpp_result_gen = Rcpp::wrap(test_stats_matrix(ind1));
+    return rcpp_result_gen;
+END_RCPP
+}
 // set_num_thread
 void set_num_thread(int num);
 RcppExport SEXP _snipsnop_set_num_thread(SEXP numSEXP) {
@@ -258,6 +269,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_modes_setsigma_one", (DL_FUNC) &_snipsnop_test_modes_setsigma_one, 1},
     {"_snipsnop_test_LD", (DL_FUNC) &_snipsnop_test_LD, 2},
     {"_snipsnop_test_contingency", (DL_FUNC) &_snipsnop_test_contingency, 2},
+    {"_snipsnop_test_stats_matrix", (DL_FUNC) &_snipsnop_test_stats_matrix, 1},
     {"_snipsnop_set_num_thread", (DL_FUNC) &_snipsnop_set_num_thread, 1},
     {"_snipsnop_testsuite", (DL_FUNC) &_snipsnop_testsuite, 0},
     {NULL, NULL, 0}

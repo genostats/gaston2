@@ -427,6 +427,20 @@ IntegerMatrix test_contingency(int SNPnb1, int SNPnb2){
   return m;
 }
 
+// [[Rcpp::export]]
+IntegerVector test_stats_matrix(int ind1){
+  if (ind1 > 503) {
+    std::cerr << "Please ju stop calling individuals that don't exist \n" << std::endl;
+    return 0;
+  }
+
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
+  IntegerVector res(4);
+  res = M.compute_stats(ind1);  
+  return res;
+}
+
+
 //[[Rcpp::export]]
 void set_num_thread(int num) {
   omp_set_num_threads(num);
@@ -446,7 +460,8 @@ void set_num_thread(int num) {
     "Computing stats",
     "Computing LD", 
     "Computing values in centered mode", 
-    "Computing values in centered reduced mode"
+    "Computing values in centered reduced mode",
+    "Computing stats for all individuals"
     // Will need to add modes here
 };
 
@@ -464,7 +479,7 @@ void set_num_thread(int num) {
 
   std::cout << "Using " <<  omp_get_max_threads() << " thread(s).\n";
 
-  std::vector<int> total = {0, 0, 0, 0, 0, 0};
+  std::vector<int> total = {0, 0, 0, 0, 0, 0, 0};
   
   //test_readBedFileMemory  
   std::vector<int> expected = { 804, 771, 982, 873, 399, 968, 976, 976, 976, 976, 976, 397, 873, 976, 873, 981, 976, 981, 843, 976, 804, 
@@ -629,6 +644,43 @@ void set_num_thread(int num) {
   }
 
 
+
+
+  //Now checking stats computed for individuals
+ // snp_stats_all with ref file (snp_counts) 
+  std::ifstream file4("./inst/extdata/ind_counts.txt");
+  value = 0;
+  
+  if (!file4) {
+      std::cerr << "Problem, failed to open reference file for test_stats_matrix" << std::endl;
+      exit(EXIT_FAILURE);
+  }
+
+  i = 0;
+  j = 0;
+  total[6] = 1;
+  while (file4 >> value) {
+    if (i > 503) std::cerr << "Error: more inds in reference file than calculated !" << std::endl;
+    IntegerVector result_stats_ind = test_stats_matrix(i);
+    if ( j == 0 ) {
+    //std::cout << RESET << "Calculating 607..." << std::endl;
+    int six_cent_sept = result_stats_ind(0) + result_stats_ind(1) + result_stats_ind(2) + result_stats_ind(3);
+    if (six_cent_sept != 607) {
+      std::cout << RED << "Error: result_stats_ind at SNP n°" << i << " is illogical ! Should amount to 607" << RESET << std::endl;
+      total[6] = 0;
+      }
+    }
+    //std::cout << result_stats(i, j) << " and ref = " << value << std::endl;
+    if (result_stats_ind(j++) != value) {
+    std::cout << RED << "Error: result_stats at (" << i << "," << j - 1 << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << RESET << std::endl;
+    total[6] = 0;
+    }
+    if (j > 3) { i++; j = 0; }
+  }
+
+  if (total[6]) {
+  std::cout << GREEN << "Test for N0s N1s N2s and N3s on inds passed!" << RESET  << std::endl;
+  }
 
 
 conclusion:

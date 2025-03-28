@@ -14,10 +14,12 @@
  * @emoji cry
  */
 class SNPvectorMemory : public SNPvector {
+
   private:
   std::vector<uint8_t> data_;
   size_t nbInds_;
   enum Mode mode_;
+  
   public:
   // un constructeur, taille nbInds
   SNPvectorMemory(size_t nbInds, int modeInt = 0 ) : data_(nbInds/4 + ((nbInds%4 == 0u)?0:1)), nbInds_(nbInds), mode_((modeInt > 3)? static_cast<Mode>(0) : static_cast<Mode>(modeInt)) {

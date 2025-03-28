@@ -73,6 +73,10 @@ test_contingency <- function(SNPnb1, SNPnb2) {
     .Call(`_snipsnop_test_contingency`, SNPnb1, SNPnb2)
 }
 
+test_stats_matrix <- function(ind1) {
+    .Call(`_snipsnop_test_stats_matrix`, ind1)
+}
+
 set_num_thread <- function(num) {
     invisible(.Call(`_snipsnop_set_num_thread`, num))
 }
