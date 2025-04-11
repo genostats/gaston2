@@ -11,15 +11,16 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // test_readBedFileMemory
-IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp);
-RcppExport SEXP _snipsnop_test_readBedFileMemory(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
+IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, bool verbose);
+RcppExport SEXP _snipsnop_test_readBedFileMemory(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
     Rcpp::traits::input_parameter< size_t >::type n_ind(n_indSEXP);
     Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_readBedFileMemory(filename, n_ind, n_snp));
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_readBedFileMemory(filename, n_ind, n_snp, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -230,6 +231,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_extract_Matrix
+IntegerMatrix test_extract_Matrix(std::vector<int> keep);
+RcppExport SEXP _snipsnop_test_extract_Matrix(SEXP keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<int> >::type keep(keepSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_extract_Matrix(keep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_first_scnd_ind
+IntegerMatrix test_first_scnd_ind();
+RcppExport SEXP _snipsnop_test_first_scnd_ind() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(test_first_scnd_ind());
+    return rcpp_result_gen;
+END_RCPP
+}
 // set_num_thread
 void set_num_thread(int num);
 RcppExport SEXP _snipsnop_set_num_thread(SEXP numSEXP) {
@@ -241,17 +263,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // testsuite
-void testsuite();
-RcppExport SEXP _snipsnop_testsuite() {
+void testsuite(bool verbose);
+RcppExport SEXP _snipsnop_testsuite(SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    testsuite();
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    testsuite(verbose);
     return R_NilValue;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 3},
+    {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 4},
     {"_snipsnop_test_readBedFileDisk", (DL_FUNC) &_snipsnop_test_readBedFileDisk, 3},
     {"_snipsnop_test_delete", (DL_FUNC) &_snipsnop_test_delete, 3},
     {"_snipsnop_test_readModes", (DL_FUNC) &_snipsnop_test_readModes, 3},
@@ -270,8 +293,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_LD", (DL_FUNC) &_snipsnop_test_LD, 2},
     {"_snipsnop_test_contingency", (DL_FUNC) &_snipsnop_test_contingency, 2},
     {"_snipsnop_test_stats_matrix", (DL_FUNC) &_snipsnop_test_stats_matrix, 1},
+    {"_snipsnop_test_extract_Matrix", (DL_FUNC) &_snipsnop_test_extract_Matrix, 1},
+    {"_snipsnop_test_first_scnd_ind", (DL_FUNC) &_snipsnop_test_first_scnd_ind, 0},
     {"_snipsnop_set_num_thread", (DL_FUNC) &_snipsnop_set_num_thread, 1},
-    {"_snipsnop_testsuite", (DL_FUNC) &_snipsnop_testsuite, 0},
+    {"_snipsnop_testsuite", (DL_FUNC) &_snipsnop_testsuite, 1},
     {NULL, NULL, 0}
 };
 

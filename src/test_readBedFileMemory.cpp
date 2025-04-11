@@ -14,12 +14,12 @@ using namespace Rcpp;
 // when testing using : "extdata/LCT.bed" n_ind : 503 n_snp : 607
 
 // [[Rcpp::export]]
-IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp)
+IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, bool verbose = true)
 {
-  std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
+  if (verbose) std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
   SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp);
   std::vector<unsigned int> res;
-  for (auto v : M.SNPs)
+  for (auto v : M.getSNPs())
   {
     res.push_back(v->sum());
   }
@@ -31,7 +31,7 @@ IntegerVector test_readBedFileDisk(std::string filename, size_t n_ind, size_t n_
 {
   SNPmatrix M = readBedFileDisk(filename, n_ind, n_snp);
   std::vector<unsigned int> res;
-  for (auto v : M.SNPs)
+  for (auto v : M.getSNPs())
   {
     res.push_back(v->sum());
   }
@@ -43,12 +43,12 @@ IntegerVector test_delete(std::string filename, size_t n_ind, size_t n_snp)
 {
   SNPmatrix M = readBedFileDisk(filename, n_ind, n_snp);
   std::vector<int> res;
-  for (auto v : M.SNPs)
+  for (auto v : M.getSNPs())
   {
     res.push_back(v->sum());
   }
   SNPmatrix MM = readBedFileMemory(filename, n_ind, n_snp);
-  for (auto v : MM.SNPs)
+  for (auto v : MM.getSNPs())
   {
     M.push_back(v);
   }
@@ -65,7 +65,7 @@ IntegerVector test_delete(std::string filename, size_t n_ind, size_t n_snp)
 IntegerVector loop_sum(SNPmatrix matrix)
 {
   std::vector<int> res;
-  for (auto v : matrix.SNPs)
+  for (auto v : matrix.getSNPs())
   {
     //== sum(503)
     v->compute_stats(); // to get stats full
@@ -127,7 +127,7 @@ unsigned int test_performance_iterator_default(unsigned int n)
   SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
   for (int i = 0; i < nbSNPs; i++)
   {
-    auto vec = M.SNPs[i]; // peut pas déréférencer là parce qu'instancie la classe abstraite SNPvector
+    auto vec = M.getSNP(i); // peut pas déréférencer là parce qu'instancie la classe abstraite SNPvector
     if (i == nbSNPs - 1)
     {
       S += vec->sum(n);
@@ -154,7 +154,7 @@ unsigned int test_performance_iterator_1(unsigned int n)
 
   for (int i = 0; i < nbSNPs; i++)
   {
-    auto vec = M.SNPs[i];
+    auto vec = M.getSNP(i);;
     if (i == nbSNPs - 1)
     {
       S += vec->sum(n);
@@ -180,7 +180,7 @@ unsigned int test_performance_iterator_2(unsigned int n)
 
   for (int i = 0; i < nbSNPs; i++)
   {
-    auto vec = M.SNPs[i];
+    auto vec = M.getSNP(i);;
     if (i == nbSNPs - 1)
     {
       S += vec->sum(n);
@@ -207,7 +207,7 @@ unsigned int test_performance_iterator_disk(unsigned int n)
   SNPmatrix M = readBedFileDisk(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
   for (int i = 0; i < nbSNPs; i++)
   {
-    auto vec = M.SNPs[i];
+    auto vec = M.getSNP(i);;
     if (i == nbSNPs - 1)
     {
       S += vec->sum(n);
@@ -232,7 +232,7 @@ unsigned int test_performance_iterator_1d(unsigned int n)
 
   for (int i = 0; i < nbSNPs; i++)
   {
-    auto vec = M.SNPs[i];
+    auto vec =M.getSNP(i);;
     if (i == nbSNPs - 1)
     {
       S += vec->sum(n);
@@ -258,7 +258,7 @@ unsigned int test_performance_iterator_2d(unsigned int n)
 
   for (int i = 0; i < nbSNPs; i++)
   {
-    auto vec = M.SNPs[i];
+    auto vec = M.getSNP(i);;
     if (i == nbSNPs - 1)
     {
       S += vec->sum(n);
@@ -288,7 +288,7 @@ IntegerVector test_snp_stats(unsigned int n)
 
   for (int i = 0; i < nbSNPs; i++)
   {
-    auto vec = M.SNPs[i];
+    auto vec = M.getSNP(i);;
     vec->compute_stats();
     auto stats = vec->getStats();
 
@@ -315,7 +315,7 @@ IntegerMatrix test_snp_stats_all(int n_ind, int n_snp)
 
   for (int i = 0; i < n_snp; i++)
   {
-    auto vec = M.SNPs[i];
+    auto vec = M.getSNP(i);
     vec->compute_stats();
     auto stats = vec->getStats();
 
@@ -333,7 +333,7 @@ IntegerVector test_snp_stats_d(unsigned int n)
   if (n > 503)
     n = 503;
   SNPmatrix M = readBedFileDisk(file_hardcode, n, 1);
-  auto vec = M.SNPs[0];
+  auto vec = M.getSNP(0);;
   vec->compute_stats();
   auto stats = vec->getStats();
   std::vector<unsigned int> res(stats, stats + 4);
@@ -379,7 +379,7 @@ NumericMatrix test_mu_sigma(unsigned int n)
 
   for (int i = 0; i < nbSNPs; i++)
   {
-    auto vec = M.SNPs[i];
+    auto vec = M.getSNP(i);
     // NEED TO COMPUTE BEFORE
     vec->compute_stats();
     auto stats = vec->getStats();
@@ -403,7 +403,7 @@ NumericVector test_modes_setsigma_one(int mode)
   std::vector<double> res;
 
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607, mode);
-  for (auto v : M.SNPs)
+  for (auto v : M.getSNPs())
   {
     v->compute_stats();
     v->setSigma(1); // will call compute_mode also
@@ -441,14 +441,14 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2)
 
   for (int i = 0; i < nbSNPs; i++)
   {
-    SNPvector &snp1 = *M.SNPs[SNPnb1 + i];
+    SNPvector &snp1 = *M.getSNP(SNPnb1 + i);
     // first loading stats for mu and sigma:
     snp1.compute_stats();
     // snp1.compute_mu_sigma();
 
     for (int j = 0; j < nbSNPs; j++)
     {
-      SNPvector &snp2 = *M.SNPs[SNPnb1 + j];
+      SNPvector &snp2 = *M.getSNP(SNPnb1 + j);
       if (j > i)
       { // aka where I haven't been before
         snp2.compute_stats();
@@ -472,16 +472,12 @@ IntegerMatrix test_contingency(int SNPnb1, int SNPnb2)
   }
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
   IntegerVector res(16);
-  SNPvector &snp1 = *M.SNPs[SNPnb1];
-  SNPvector &snp2 = *M.SNPs[SNPnb2];
+  SNPvector &snp1 = *M.getSNP(SNPnb1);
+  SNPvector &snp2 = *M.getSNP(SNPnb2);
   res = snp1.contingency(snp2);
   res.attr("dim") = Dimension(4, 4);
   IntegerMatrix m = as<IntegerMatrix>(res);
-  // CharacterVector SNPdesc1 = { SNPnb1 };
-  // CharacterVector SNPdesc2 = { SNPnb2 };
-
-  // rownames(m) = SNPdesc1;
-  // colnames(m) = SNPdesc2;
+  
   return m;
 }
 
@@ -499,6 +495,65 @@ IntegerVector test_stats_matrix(int ind1)
   IntegerVector res(4);
   res = M.compute_stats(ind1);
   return res;
+}
+
+// //[[Rcpp::export]]
+// void test_exception() {
+
+// }
+
+IntegerMatrix SNPmat_to_IntMat(SNPmatrix matrix)
+{
+  const std::vector<std::shared_ptr<SNPvector>> &SNPs = matrix.getSNPs();
+  size_t n_snp = SNPs.size();
+  if (n_snp == 0)
+    return IntegerMatrix(0, 0);
+
+  size_t n_ind = SNPs[0]->nbInds();
+  IntegerMatrix mat(n_snp, n_ind);  // SNPs on rows, inds in cols
+
+  for (size_t i = 0; i < n_snp; ++i) {
+    auto snp = SNPs[i];
+    size_t j = 0;
+    for (auto it = snp->begin(); it != snp->end(); ++it) {
+      mat(i, j++) = *it; // So read with PLINK mode !
+    }
+  }
+
+  return mat;
+}
+
+// [[Rcpp::export]]
+IntegerMatrix test_extract_Matrix(std::vector<int> keep)
+{
+
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+
+  SNPmatrix M_subset = M.extract_ind(keep);
+
+  std::cout << "Number of SNPs in the new matrix (607): " << M_subset.getSNPs().size() << "\n";
+  std::cout << "Number of inds in a SNP : " << M_subset.getSNP(0)->nbInds() << "\n";
+
+  IntegerMatrix m = SNPmat_to_IntMat(M_subset);
+  colnames(m) = wrap(keep);
+
+  return m;
+}
+
+//[[Rcpp::export]]
+IntegerMatrix test_first_scnd_ind()
+{
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+  IntegerMatrix m(607, 3);
+  int i = 0;
+  for (auto v : M.getSNPs()) {
+    auto it = v->begin();
+    m(i, 0) = *(it);
+    m(i, 1) = *(++it);
+    m(i, 2) = *(++it); // read with mode
+    i++;
+  }
+  return m;
 }
 
 //[[Rcpp::export]]
@@ -537,10 +592,10 @@ bool equal(double val1, double val2)
 }
 
 // [[Rcpp::export]]
-void testsuite()
+void testsuite(bool verbose = true)
 {
 
-  std::cout << "Using " << omp_get_max_threads() << " thread(s).\n";
+  if (verbose) std::cout << "Using " << omp_get_max_threads() << " thread(s).\n";
 
   std::vector<int> total = {0, 0, 0, 0, 0, 0, 0};
 
@@ -575,7 +630,7 @@ void testsuite()
                                798, 832, 797, 801, 794, 784, 784, 974, 832, 780, 991, 417, 799, 832, 975, 798, 798, 417, 798, 794, 992,
                                795, 795, 784, 784, 386, 781, 798, 784, 798, 784, 417, 784, 795, 797, 800, 798, 976, 386, 994};
 
-  IntegerVector result1 = test_readBedFileMemory("./inst/extdata/LCT.bed", 503, 607);
+  IntegerVector result1 = test_readBedFileMemory("./inst/extdata/LCT.bed", 503, 607, verbose);
   IntegerVector result2 = test_readBedFileDisk("./inst/extdata/LCT.bed", 503, 607);
   if (result1.size() != expected.size())
     std::cerr << "Error: result from readBedFileMemory size does not match expected size!" << std::endl;
@@ -601,11 +656,11 @@ void testsuite()
 
   if (total[0])
   {
-    std::cout << GREEN << "Tests for readBedFileMemory passed!" << RESET << std::endl;
+    if (verbose) std::cout << GREEN << "Tests for readBedFileMemory passed!" << RESET << std::endl;
   }
   if (total[1])
   {
-    std::cout << GREEN << "Tests for readBedFileDisk passed!" << RESET << std::endl;
+    if (verbose) std::cout << GREEN << "Tests for readBedFileDisk passed!" << RESET << std::endl;
   }
 
   // snp_stats_all with ref file (snp_counts)
@@ -625,7 +680,7 @@ void testsuite()
   total[2] = 1;
   while (file >> value)
   {
-    // std::cout << result_stats(i, j) << " and ref = " << value << std::endl;
+    //std::cout << result_stats(i, j) << " and ref = " << value << std::endl;
     if (result_stats(i, j++) != value)
     {
       std::cout << RED << "Error: result_stats at (" << i << "," << j - 1 << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << RESET << std::endl;
@@ -641,7 +696,7 @@ void testsuite()
   }
   if (total[2])
   {
-    std::cout << GREEN << "Test for N0s N1s N2s and N3s on SNPs passed!" << RESET << std::endl;
+    if (verbose) std::cout << GREEN << "Test for N0s N1s N2s and N3s on SNPs passed!" << RESET << std::endl;
   }
 
   // tests LD on all the snps
@@ -662,7 +717,7 @@ void testsuite()
 
   while (file2 >> expected_LD)
   {
-    // std::cout << result_LD(i, j) << " and ref = " << value2 << std::endl;
+    //std::cout << result_LD(i, j) << " and ref = " << value2 << std::endl;
     if (!equal(result_LD(i, j), expected_LD))
     {
       std::cout << RED << "Error: result_LD at (" << i << "," << j << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << RESET << std::endl;
@@ -683,7 +738,7 @@ void testsuite()
   }
   if (total[3])
   {
-    std::cout << GREEN << "Test for LD values on all SNPs passed!" << RESET << std::endl;
+    if (verbose) std::cout << GREEN << "Test for LD values on all SNPs passed!" << RESET << std::endl;
   }
 
   // still need to check modes (how do i get them in gaston ??)
@@ -731,11 +786,11 @@ void testsuite()
   }
   if (total[4])
   {
-    std::cout << GREEN << "Test for centered values on all SNPs passed!" << RESET << std::endl;
+    if (verbose) std::cout << GREEN << "Test for centered values on all SNPs passed!" << RESET << std::endl;
   }
   if (total[5])
   {
-    std::cout << GREEN << "Test for centered_reduced values on all SNPs passed!" << RESET << std::endl;
+    if (verbose) std::cout << GREEN << "Test for centered_reduced values on all SNPs passed!" << RESET << std::endl;
   }
 
   // Now checking stats computed for individuals
@@ -759,7 +814,7 @@ void testsuite()
     IntegerVector result_stats_ind = test_stats_matrix(i);
     if (j == 0)
     {
-      // std::cout << RESET << "Calculating 607..." << std::endl;
+      //std::cout << RESET << "Calculating 607..." << std::endl;
       int six_cent_sept = result_stats_ind(0) + result_stats_ind(1) + result_stats_ind(2) + result_stats_ind(3);
       if (six_cent_sept != 607)
       {
@@ -782,7 +837,7 @@ void testsuite()
 
   if (total[6])
   {
-    std::cout << GREEN << "Test for N0s N1s N2s and N3s on inds passed!" << RESET << std::endl;
+    if (verbose) std::cout << GREEN << "Test for N0s N1s N2s and N3s on inds passed!" << RESET << std::endl;
   }
 
 conclusion:

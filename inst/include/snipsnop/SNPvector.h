@@ -80,17 +80,17 @@ public:
    *
    * @return uint8_t*
    */
-  virtual uint8_t *data() = 0;
+  //virtual uint8_t *data() = 0;
   virtual const uint8_t *data() const = 0;
   // nombre d'individus
-  virtual size_t nbInds() = 0;
+  virtual size_t nbInds() const = 0;
 
   // BY DEFAULT, PLINK format, with 01 = missing genotype
   double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}};
 
   virtual void setMode(Mode mode) = 0;
-  virtual double *mode() = 0;
-  virtual double mode(unsigned int n) = 0;
+  virtual const double *mode() const = 0;
+  virtual const double mode(unsigned int n) const = 0;
 
   /**
    * @brief function calculating the size of the vector
@@ -98,18 +98,18 @@ public:
    *
    * @return size_t
    */
-  size_t nbChars()
+  size_t nbChars() const
   {
     const size_t n = nbInds();
     return n / 4 + ((n % 4 == 0u) ? 0 : 1);
   }
 
-  unsigned int *getStats()
+  const unsigned int *getStats() const
   {
     return stats_;
   }
 
-  double getMu()
+  double getMu() const
   {
     return mu_;
   }
@@ -120,7 +120,7 @@ public:
     compute_mode();
   }
 
-  double getSigma()
+  double getSigma() const
   {
     return sigma_;
   }
@@ -135,7 +135,7 @@ public:
   double sum(int n = -1)
   {
     double S = 0;
-    uint8_t *d = data();
+    const uint8_t *d = data();
     size_t nc = nbChars(); // max nb of bytes
     int cptr = 0;
     if (n == -1)
@@ -232,8 +232,7 @@ public:
   // TODO : think on what are the limits (error checking) => what calls in gaston ?
   double LD(const SNPvector &other)
   {
-    // if (nbInds() != other.nbInds()) // CAUSES PROBLEMS WITH CONST
-    //  TODO : check that read using same mode ?
+    if (nbInds() != other.nbInds()) throw std::runtime_error("Mismatch in the nb of individuals between the 2 SNPs !");
     double LD = 0;
     double gg[16];
     gg[1] = gg[4] = gg[5] = gg[6] = gg[7] = gg[9] = gg[13] = 0;
@@ -277,11 +276,10 @@ public:
   {
     std::vector<int> table(16);
     // #pragma omp declare reduction(vec_incr : std::vector<int> : \
-//   std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
-//   initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+    //std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
+    // initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
     // #pragma omp parallel for reduction(vec_incr : table)
-    for (size_t i = 0; i < nbChars(); i++)
-    {
+    for (size_t i = 0; i < nbChars(); i++) {
       uint8_t snp1 = data()[i]; // je récup les ièmes char
       const uint8_t snp2_const = other.data()[i];
       uint8_t snp2 = snp2_const;
@@ -317,8 +315,7 @@ public:
     }
 
     // operateur * const : renvoie la valeur 2bits par 2bits
-    double operator*()
-    {
+    double operator*() {
       uint8_t byte = iterated.data()[currentChar];
       byte >>= (2 * current2bits);   // pour avoir les 2bits de poids faible
       unsigned int val = (byte & 3); // mtn on les isole
@@ -326,8 +323,7 @@ public:
     }
 
     // Operateur ++ : passe à la valeur suivante, PRE-INCRÉMENTATION
-    Iterator &operator++()
-    {
+    Iterator &operator++() {
       current2bits++;
       if (current2bits > 3)
       {
@@ -338,24 +334,15 @@ public:
     }
 
     // Opérateur de comparaison entre deux itérateurs
-    bool operator!=(const Iterator &other) const
-    {
-      return (currentChar != other.currentChar) || (current2bits != other.current2bits);
-    }
+    bool operator!=(const Iterator &other) const { return (currentChar != other.currentChar) || (current2bits != other.current2bits); }
   };
 
   // begin() : renvoie un itérateur
-  Iterator begin()
-  {
-    return Iterator(*this);
-  }
+  Iterator begin() { return Iterator(*this); }
 
   /* end() : renvoie un itérateur qui "pointe vers la fin"
   aka après le dernier individu*/
-  Iterator end()
-  {
-    return Iterator(nbInds(), *this);
-  }
+  Iterator end() { return Iterator(nbInds(), *this); }
 };
 
 #endif
