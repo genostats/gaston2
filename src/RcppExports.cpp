@@ -231,13 +231,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_all_stats_matrix
+IntegerVector test_all_stats_matrix();
+RcppExport SEXP _snipsnop_test_all_stats_matrix() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(test_all_stats_matrix());
+    return rcpp_result_gen;
+END_RCPP
+}
 // test_extract_Matrix
-IntegerMatrix test_extract_Matrix(std::vector<int> keep);
+IntegerMatrix test_extract_Matrix(std::vector<size_t> keep);
 RcppExport SEXP _snipsnop_test_extract_Matrix(SEXP keepSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<int> >::type keep(keepSEXP);
+    Rcpp::traits::input_parameter< std::vector<size_t> >::type keep(keepSEXP);
     rcpp_result_gen = Rcpp::wrap(test_extract_Matrix(keep));
     return rcpp_result_gen;
 END_RCPP
@@ -293,6 +303,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_LD", (DL_FUNC) &_snipsnop_test_LD, 2},
     {"_snipsnop_test_contingency", (DL_FUNC) &_snipsnop_test_contingency, 2},
     {"_snipsnop_test_stats_matrix", (DL_FUNC) &_snipsnop_test_stats_matrix, 1},
+    {"_snipsnop_test_all_stats_matrix", (DL_FUNC) &_snipsnop_test_all_stats_matrix, 0},
     {"_snipsnop_test_extract_Matrix", (DL_FUNC) &_snipsnop_test_extract_Matrix, 1},
     {"_snipsnop_test_first_scnd_ind", (DL_FUNC) &_snipsnop_test_first_scnd_ind, 0},
     {"_snipsnop_set_num_thread", (DL_FUNC) &_snipsnop_set_num_thread, 1},

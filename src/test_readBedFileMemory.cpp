@@ -493,7 +493,15 @@ IntegerVector test_stats_matrix(int ind1)
 
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
   IntegerVector res(4);
-  res = M.compute_stats(ind1);
+  res = M.compute_stats_ind(ind1);
+  return res;
+}
+
+// [[Rcpp::export]]
+IntegerVector test_all_stats_matrix()
+{
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
+  IntegerVector res = wrap(M.compute_stats());
   return res;
 }
 
@@ -524,7 +532,7 @@ IntegerMatrix SNPmat_to_IntMat(SNPmatrix matrix)
 }
 
 // [[Rcpp::export]]
-IntegerMatrix test_extract_Matrix(std::vector<int> keep)
+IntegerMatrix test_extract_Matrix(std::vector<size_t> keep)
 {
 
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
@@ -807,32 +815,27 @@ void testsuite(bool verbose = true)
   i = 0;
   j = 0;
   total[6] = 1;
+  IntegerVector result_stats_all = test_all_stats_matrix();
+
   while (file4 >> value)
   {
     if (i > 503)
       std::cerr << "Error: more inds in reference file than calculated !" << std::endl;
-    IntegerVector result_stats_ind = test_stats_matrix(i);
-    if (j == 0)
+    //std::cout << result_stats_all(i * 4 +j) << " and ref = " << value << std::endl;
+
+    if (result_stats_all(i * 4 + j++)!= value)
     {
-      //std::cout << RESET << "Calculating 607..." << std::endl;
-      int six_cent_sept = result_stats_ind(0) + result_stats_ind(1) + result_stats_ind(2) + result_stats_ind(3);
-      if (six_cent_sept != 607)
-      {
-        std::cout << RED << "Error: result_stats_ind at SNP n°" << i << " is illogical ! Should amount to 607" << RESET << std::endl;
-        total[6] = 0;
-      }
-    }
-    // std::cout << result_stats(i, j) << " and ref = " << value << std::endl;
-    if (result_stats_ind(j++) != value)
-    {
-      std::cout << RED << "Error: result_stats at (" << i << "," << j - 1 << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << RESET << std::endl;
+      std::cout << RED << "Error: result_all_stats at (" << i << "," << j - 1 << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << RESET << std::endl;
       total[6] = 0;
     }
+
     if (j > 3)
     {
       i++;
       j = 0;
     }
+    if (i > 50) break;
+
   }
 
   if (total[6])

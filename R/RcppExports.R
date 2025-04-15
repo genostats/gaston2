@@ -77,6 +77,10 @@ test_stats_matrix <- function(ind1) {
     .Call(`_snipsnop_test_stats_matrix`, ind1)
 }
 
+test_all_stats_matrix <- function() {
+    .Call(`_snipsnop_test_all_stats_matrix`)
+}
+
 test_extract_Matrix <- function(keep) {
     .Call(`_snipsnop_test_extract_Matrix`, keep)
 }

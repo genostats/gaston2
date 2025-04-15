@@ -44,6 +44,11 @@ public:
     SNPs.pop_back();
   }
 
+
+//   #pragma omp declare reduction(vec_int_plus : std::vector<float> : \
+//     std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<float>())) \
+// initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+
   /**
    * @brief A member function calculating N0s, N1s, N2s and NAs (in Plink format) for one individual
    * in the SNPmatrix.
@@ -51,7 +56,7 @@ public:
    * @param Indnb the individual to look for in every snps
    * @return std::array<int, 4> with [0] = N0s, [1] = N1s, [2] = N2s and [3] = NAs
    */
-  std::array<int, 4> compute_stats(int Indnb)
+  std::array<int, 4> compute_stats_ind(size_t Indnb)
   {
     int total = SNPs.size();
     if (total == 0)
@@ -60,7 +65,12 @@ public:
       throw std::out_of_range("You're trying to access an out-of bound indiviual.");
     std::array<int, 4> stats = {{0, 0, 0, 0}};
 
-#pragma omp parallel for
+    //#pragma omp parallel for reduction(vec_int_plus : res)
+    //#pragma omp parallel for reduction(+:stats[:4])
+    #pragma omp parallel 
+    {
+    std::array<int, 4> thread_stats = {0, 0, 0, 0};
+    #pragma omp for
     for (int i = 0; i < total; i++)
     { // parcourt tous les SNPs
       auto vec = SNPs[i];
@@ -74,18 +84,70 @@ public:
 means every thread will synchronize for this
 + not a scalar (array), so false
 but I guess it's fine when after a condition (relatively) rarely met ? */
-#pragma omp atomic
-          stats[(int)*pa]++;
+//#pragma omp atomic
+          thread_stats[(int)*pa]++;
+          //stats[(int)*pa]++;
           break;
         }
         j++;
       }
     }
+    #pragma omp critical
+    {
+        for (int i = 0; i < 4; ++i)
+            stats[i] += thread_stats[i];
+    }
+
+  }
     return stats;
   }
 
+  // ADD A STATS_ MEMBER 
+  std::vector<int> compute_stats() {
+    int total = SNPs.size();
+    if (total == 0)
+      throw std::out_of_range("No SNPs loaded into the SNPMatrix !");
+
+    size_t nbInds = SNPs[0]->nbInds();
+    std::vector<int> stats(nbInds * 4, 0); //DO NOT USE nbCHars ! rounded up !
+
+    for (int i = 0; i < total; i++)
+    { // parcourt tous les SNPs
+      auto snp = SNPs[i];
+      size_t nbBytes = snp->nbChars();
+      for (size_t byte = 0; byte < nbBytes; byte++)
+      { // parcourt le SNP[i], byte by byte
+          uint8_t d = snp->data()[byte];
+
+          // READING LAST BYTE
+          if (byte == nbBytes - 1) {
+            int nbBits = nbInds % 4;
+
+            while (nbBits > 0) {
+              /* hardcoded to be plink */
+              unsigned int val_plink = snp->currentMode_[0][(d & 3)];
+              stats[byte * 4 + val_plink]++;
+              nbBits--;
+              d >>= 2; // 1 shift par loop
+            }
+            break;
+          }
+        // READING a FULL BYTE
+        for (int ind = 0; ind < 4; ind++) {
+        unsigned int val_plink = snp->currentMode_[0][(d >> 2*ind) & 3];
+        //if ( i == 1 )
+        //std::cout << "On the " << byte << " byte for the " << ind << " th ind, val = " << val_plink << "\n";
+        stats[(byte * 4 + ind) * 4 + val_plink]++;
+        }
+      }
+
+    }
+    return stats;
+  }
+
+
   // WIP : NEED TO TEST THOROUGHLY, FIND A WAY FOR SNPVECTORDISK
-  SNPmatrix extract_ind(const std::vector<int> &keep)
+  SNPmatrix extract_ind(const std::vector<size_t> &keep)
   {
 
     if (SNPs.empty())
@@ -195,6 +257,7 @@ but I guess it's fine when after a condition (relatively) rarely met ? */
   }
 
 private:
+  std::vector<int> stats;
   std::vector<std::shared_ptr<SNPvector>> SNPs;
 };
 

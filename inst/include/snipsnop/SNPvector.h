@@ -52,7 +52,8 @@ enum Mode
   PLINK = 0,                 // .bed file : (g = {0, 1, 3 and 2 = NA})
   CENTERED = 1,              // (g -= mu)
   STANDARDIZED_MU_SIGMA = 2, // (g = (g-mu)/sd)
-  NUMERIC = 3                // (g = {0, 1, 2 and 3 = NA}) (almost never used)
+  NUMERIC = 3,               // (g = {0, 1, 2 and 3 = NA}) (almost never used)
+  PERSONALIZED = 4
 };
 
 /**
@@ -86,9 +87,13 @@ public:
   virtual size_t nbInds() const = 0;
 
   // BY DEFAULT, PLINK format, with 01 = missing genotype
-  double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}};
+  double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}, {0, 0, 0, 0}};
 
+  //To use xhen changing to a mode already computed 
   virtual void setMode(Mode mode) = 0;
+  //To use when you want to give an array
+  virtual void setMode(Mode mode, double personnalized[4]) = 0;
+
   virtual const double *mode() const = 0;
   virtual const double mode(unsigned int n) const = 0;
 
@@ -169,6 +174,31 @@ public:
     sigma_ = sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
   }
 
+  void compute_mu()
+  {
+    double N = nbInds(); // equal to ncols in gaston
+
+    unsigned int N1s = stats_[1];
+    unsigned int N2s = stats_[2];
+    unsigned int NAs = stats_[3];
+    double n = N - NAs;
+
+    mu_ = (2 * N2s + N1s) / n;
+  }
+
+  void compute_sigma()
+  {
+    double N = nbInds(); // equal to ncols in gaston
+
+    unsigned int N1s = stats_[1];
+    unsigned int N2s = stats_[2];
+    unsigned int NAs = stats_[3];
+    double n = N - NAs;
+
+    double mu2 = mu_ * mu_;
+    sigma_ = sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
+  }
+
   void compute_mode()
   {
 
@@ -194,9 +224,7 @@ public:
 
     /* FIRST : filling up stats_ with N0s, N1s, N2s, and NAs with PLINK translation*/
 
-    // restarting with blank stats_ :
     stats_[0] = stats_[1] = stats_[2] = stats_[3] = 0;
-
     for (size_t i = 0; i < nbByte; i++)
     {
       uint8_t d = data()[i];
@@ -210,8 +238,16 @@ public:
           BitsInLastByte--;
           d >>= 2; // 1 shift par loop
         }
-        if (!mu_ || !sigma_)
-          compute_mu_sigma(); // compute mu & sd ONLY IF == 0
+    /*stopping mid-byte if necessary,
+    THEN : computing mu and sigma checking if no value given*/
+        if (!mu_ && !sigma_)
+          compute_mu_sigma(); // compute mu & sd ONLY IF BOTH == 0
+        else if (!mu_)
+          compute_mu(); // only compute mu, implied sigma_ was given 
+        else if (!sigma_)
+          compute_sigma(); //sigma will be calculated from given mu_
+        /* FINALLY : updating the "mode" enum that acts as a filter 
+        to get calculated via mu_and sigma_*/
         return compute_mode();
       }
       // sinon, fini pile à la fin d'une byte je peux return
@@ -219,6 +255,10 @@ public:
       {
         if (!mu_ || !sigma_)
           compute_mu_sigma();
+        else if (!mu_)
+          compute_mu(); // only compute mu, implied sigma_ was given 
+        else if (!sigma_)
+          compute_sigma();
         return compute_mode();
       }
       stats_[0] += N0[d];

@@ -44,6 +44,11 @@ public:
   const uint8_t *data() const { return &data_[0]; }
 
   void setMode(Mode mode) { mode_ = mode; }
+  void setMode(Mode mode, double personalized[4]) { 
+    mode_ = mode;
+    for (int i = 0; i< 4; i++)
+    currentMode_[4][i] = personalized[i];
+  }
 
   // returns the array used to translate datas 
   const double *mode() const { return currentMode_[mode_]; } // considered as const cos double *mode() const
