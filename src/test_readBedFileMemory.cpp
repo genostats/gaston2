@@ -8,6 +8,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <omp.h>
+//#include "Datastruct.h"
 
 using namespace Rcpp;
 
@@ -482,26 +483,94 @@ IntegerMatrix test_contingency(int SNPnb1, int SNPnb2)
 }
 
 // [[Rcpp::export]]
-IntegerVector test_stats_matrix(int ind1)
+bool test_performance_stats_matrix()
 {
-  if (ind1 > 503)
-  {
-    std::cerr << "Please ju stop calling individuals that don't exist \n"
-              << std::endl;
-    return 0;
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+  M.compute_stats();
+  DataStruct st = M.getStats();
+
+  //std::cout << "Stats loaded. Vector size: " << st.cols.size() << "\n";
+
+  if (st.cols.size() != 4) {
+    std::cerr << "Error: expected 4 stat columns (N0, N1, N2, NA), got " << st.cols.size() << "\n";
+    return false;
   }
 
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
-  IntegerVector res(4);
-  res = M.compute_stats_ind(ind1);
-  return res;
+  std::ifstream file4("./inst/extdata/ind_counts.txt");
+  int value;
+  int i = 0;
+  int j = 0;
+  if (!file4)
+  { 
+    std::cout << "Pb with file\n";
+    return false;
+  }
+
+  bool success = 1;
+
+  // auto test1col = st.at(0);
+  // std::cout << test1col.type << "\n";
+  // std::cout << test1col.get<int>() << "\n"; // THIS is a PTR to a vec of type int
+  // std::cout << test1col.get<int>()->size();
+  // std::cout << test1col.get<int>()->at(0);
+
+  // sleep(2);
+
+  while (file4 >> value)
+  {
+    //std::cout << " j = " << j << " and i = "<< i << "\n";
+    //std::cout << "value " << value << "\n"; 
+    if (i >= 503) {
+      std::cerr << "Error: more inds in reference file than calculated !" << std::endl;
+      return false;
+    }
+    
+    auto computed = st.at(j).get<int>()->at(i);
+    //std::cout << "this is computed val : " << computed << "\n";
+    if ( computed != value)
+    {
+      std::cout << "Error: result_all_stats at (" << i << "," << j - 1 << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value! " <<  st.at(j -1).get<int>()->at(i) << " != " << value<< std::endl;
+      success = 0;
+    }
+    j++;
+
+    //if (i > 500) sleep(1);
+
+    if (j > 3) {
+      i++;
+      j = 0;
+    }
+
+  }
+  if (!success) return false;
+  return true;
+
 }
 
 // [[Rcpp::export]]
-IntegerVector test_all_stats_matrix()
+IntegerMatrix test_all_stats_matrix()
 {
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
-  IntegerVector res = wrap(M.compute_stats());
+  //return wrap(M.compute_stats());
+
+  M.compute_stats();
+  auto st = M.getStats();
+  auto N0s = st.at(0).get<int>(); // a vec
+  auto N1s = st.at(1).get<int>();
+  auto N2s = st.at(2).get<int>();
+  auto NAs = st.at(3).get<int>();
+
+  IntegerMatrix res(503, 4);
+
+
+  for (int i = 0; i < 503; i++)
+  {
+    int j = 0;
+    res(i, j++) = N0s->at(i);
+    res(i, j++) = N1s->at(i);
+    res(i, j++) = N2s->at(i);
+    res(i, j++) = NAs->at(i);
+  }
   return res;
 }
 
@@ -539,10 +608,24 @@ IntegerMatrix test_extract_Matrix(std::vector<size_t> keep)
 
   SNPmatrix M_subset = M.extract_ind(keep);
 
-  std::cout << "Number of SNPs in the new matrix (607): " << M_subset.getSNPs().size() << "\n";
-  std::cout << "Number of inds in a SNP : " << M_subset.getSNP(0)->nbInds() << "\n";
+  //std::cout << "Number of SNPs in the new matrix (607): " << M_subset.getSNPs().size() << "\n";
+  //std::cout << "Number of inds in the new SNPs : " << M_subset.getSNP(0)->nbInds() << "\n";
 
   IntegerMatrix m = SNPmat_to_IntMat(M_subset);
+  colnames(m) = wrap(keep);
+
+  return m;
+}
+
+// [[Rcpp::export]]
+IntegerMatrix test_extract_Matrix_disk(std::vector<size_t> keep)
+{
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+
+  SNPmatrix M_sub = M.extract_ind(keep, false);
+
+
+  IntegerMatrix m = SNPmat_to_IntMat(M_sub);
   colnames(m) = wrap(keep);
 
   return m;
@@ -568,11 +651,17 @@ IntegerMatrix test_first_scnd_ind()
 void set_num_thread(int num)
 {
   omp_set_num_threads(num);
+
+
+
+
 }
 
 /****************************
  *        TESTSUITE         *
  ****************************/
+
+
 
 #define GREEN "\033[1;32m"
 #define RESET "\033[0m"
@@ -585,9 +674,9 @@ std::vector<std::string> tests_names = {
     "Computing LD",
     "Computing values in centered mode",
     "Computing values in centered reduced mode",
-    "Computing stats for all individuals"
-    // Will need to add modes here
-};
+    "Computing stats for all individuals", 
+    "Computing extracted individuals"
+  };
 
 // helper to compare to doubles (surely very time consuming)
 bool equal(double val1, double val2)
@@ -605,7 +694,7 @@ void testsuite(bool verbose = true)
 
   if (verbose) std::cout << "Using " << omp_get_max_threads() << " thread(s).\n";
 
-  std::vector<int> total = {0, 0, 0, 0, 0, 0, 0};
+  std::vector<int> total = {0, 0, 0, 0, 0, 0, 0, 0};
 
   // test_readBedFileMemory
   std::vector<int> expected = {804, 771, 982, 873, 399, 968, 976, 976, 976, 976, 976, 397, 873, 976, 873, 981, 976, 981, 843, 976, 804,
@@ -801,8 +890,8 @@ void testsuite(bool verbose = true)
     if (verbose) std::cout << GREEN << "Test for centered_reduced values on all SNPs passed!" << RESET << std::endl;
   }
 
-  // Now checking stats computed for individuals
-  // snp_stats_all with ref file (snp_counts)
+  // Now checking stats computed by individuals for full matrix
+  // SNPmatrix::compute_stats with ref file (ind_counts)
   std::ifstream file4("./inst/extdata/ind_counts.txt");
   value = 0;
 
@@ -815,17 +904,18 @@ void testsuite(bool verbose = true)
   i = 0;
   j = 0;
   total[6] = 1;
-  IntegerVector result_stats_all = test_all_stats_matrix();
+  IntegerMatrix result_stats_all = test_all_stats_matrix();
 
   while (file4 >> value)
   {
     if (i > 503)
       std::cerr << "Error: more inds in reference file than calculated !" << std::endl;
-    //std::cout << result_stats_all(i * 4 +j) << " and ref = " << value << std::endl;
+    
+      //std::cout << result_stats_all(i * 4 +j) << " and ref = " << value << std::endl;
 
-    if (result_stats_all(i * 4 + j++)!= value)
+    if (result_stats_all(i,j++)!= value)
     {
-      std::cout << RED << "Error: result_all_stats at (" << i << "," << j - 1 << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value!" << RESET << std::endl;
+      std::cout << RED << "Error: result_all_stats at (" << i << "," << j - 1 << ")  (line " << i + 1 << " and col n° " << j << " in the file) does not match reference value! " <<  result_stats_all(i,j-1) << " != " << value<< RESET << std::endl;
       total[6] = 0;
     }
 
@@ -834,13 +924,52 @@ void testsuite(bool verbose = true)
       i++;
       j = 0;
     }
-    if (i > 50) break;
 
   }
 
   if (total[6])
   {
     if (verbose) std::cout << GREEN << "Test for N0s N1s N2s and N3s on inds passed!" << RESET << std::endl;
+  }
+
+  std::ifstream file5("./inst/extdata/extracted_snps.txt");
+  value = 0;
+  total[7] = 1;
+  i = 0;
+  j = 0;
+
+  if (!file5)
+  {
+    std::cerr << "Problem, failed to open reference file extracted_snps.txt" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  std::vector<size_t> to_keep = { 2, 6, 229, 230, 231, 232, 233, 234, 235, 236, 237 };
+  IntegerMatrix res = test_extract_Matrix(to_keep);
+
+  while (file5 >> value)
+  {
+    if (i > 607) {
+      std::cerr << "Error: more inds in reference file than calculated !" << std::endl;
+      break;
+    }
+    
+    if (res(i,j++)!= value)
+    {
+      std::cout << RED << "Error: new extracted matrix at (" << i << "," << j - 1 << ") does not match reference value! " <<  res(i,j - 1) << " != " << value << RESET << std::endl;
+      total[7] = 0;
+    }
+
+    if (j > 10) // SNPs on rows, ind in cols
+    {
+      i++;
+      j = 0;
+    }
+
+  }
+  if (total[7])
+  {
+    if (verbose) std::cout << GREEN << "Test for selected inds to extract in new matrix passed!" << RESET << std::endl;
   }
 
 conclusion:

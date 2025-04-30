@@ -10,6 +10,15 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// test_column
+void test_column();
+RcppExport SEXP _snipsnop_test_column() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    test_column();
+    return R_NilValue;
+END_RCPP
+}
 // test_readBedFileMemory
 IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, bool verbose);
 RcppExport SEXP _snipsnop_test_readBedFileMemory(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP, SEXP verboseSEXP) {
@@ -220,19 +229,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// test_stats_matrix
-IntegerVector test_stats_matrix(int ind1);
-RcppExport SEXP _snipsnop_test_stats_matrix(SEXP ind1SEXP) {
+// test_performance_stats_matrix
+bool test_performance_stats_matrix();
+RcppExport SEXP _snipsnop_test_performance_stats_matrix() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type ind1(ind1SEXP);
-    rcpp_result_gen = Rcpp::wrap(test_stats_matrix(ind1));
+    rcpp_result_gen = Rcpp::wrap(test_performance_stats_matrix());
     return rcpp_result_gen;
 END_RCPP
 }
 // test_all_stats_matrix
-IntegerVector test_all_stats_matrix();
+IntegerMatrix test_all_stats_matrix();
 RcppExport SEXP _snipsnop_test_all_stats_matrix() {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -249,6 +257,17 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::vector<size_t> >::type keep(keepSEXP);
     rcpp_result_gen = Rcpp::wrap(test_extract_Matrix(keep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_extract_Matrix_disk
+IntegerMatrix test_extract_Matrix_disk(std::vector<size_t> keep);
+RcppExport SEXP _snipsnop_test_extract_Matrix_disk(SEXP keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<size_t> >::type keep(keepSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_extract_Matrix_disk(keep));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -284,6 +303,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_snipsnop_test_column", (DL_FUNC) &_snipsnop_test_column, 0},
     {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 4},
     {"_snipsnop_test_readBedFileDisk", (DL_FUNC) &_snipsnop_test_readBedFileDisk, 3},
     {"_snipsnop_test_delete", (DL_FUNC) &_snipsnop_test_delete, 3},
@@ -302,9 +322,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_modes_setsigma_one", (DL_FUNC) &_snipsnop_test_modes_setsigma_one, 1},
     {"_snipsnop_test_LD", (DL_FUNC) &_snipsnop_test_LD, 2},
     {"_snipsnop_test_contingency", (DL_FUNC) &_snipsnop_test_contingency, 2},
-    {"_snipsnop_test_stats_matrix", (DL_FUNC) &_snipsnop_test_stats_matrix, 1},
+    {"_snipsnop_test_performance_stats_matrix", (DL_FUNC) &_snipsnop_test_performance_stats_matrix, 0},
     {"_snipsnop_test_all_stats_matrix", (DL_FUNC) &_snipsnop_test_all_stats_matrix, 0},
     {"_snipsnop_test_extract_Matrix", (DL_FUNC) &_snipsnop_test_extract_Matrix, 1},
+    {"_snipsnop_test_extract_Matrix_disk", (DL_FUNC) &_snipsnop_test_extract_Matrix_disk, 1},
     {"_snipsnop_test_first_scnd_ind", (DL_FUNC) &_snipsnop_test_first_scnd_ind, 0},
     {"_snipsnop_set_num_thread", (DL_FUNC) &_snipsnop_set_num_thread, 1},
     {"_snipsnop_testsuite", (DL_FUNC) &_snipsnop_testsuite, 1},

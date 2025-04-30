@@ -21,7 +21,9 @@ class SNPVectorDisk : public SNPvector {
 
   public:
   
-  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::mmap_source> file_ref, size_t SNP_index,int modeInt = 0) : data_((const uint8_t *) (file_ref->data() + 3 + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index) ), nbInds_(nbInds), file_ref_(file_ref), mode_((modeInt > 3)? static_cast<Mode>(0) : static_cast<Mode>(modeInt)) {
+  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::mmap_source> file_ref, size_t SNP_index,int modeInt = 0) : 
+  data_((const uint8_t *) (file_ref->data() + 3 /* offset from the 3 first magic bytes) */ + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index) ), 
+  nbInds_(nbInds), file_ref_(file_ref), mode_((modeInt > 3)? static_cast<Mode>(0) : static_cast<Mode>(modeInt)) {
     if (modeInt > 3 || modeInt < 0) throw std::runtime_error("Wrong mode chosen for reading SNP");
 
      // data_ is a ptr IN the file, it depends on how many SNPs were read. The 3 offset is to account to the magic nbr in bed file

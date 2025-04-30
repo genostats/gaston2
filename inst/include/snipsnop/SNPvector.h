@@ -81,7 +81,7 @@ public:
    *
    * @return uint8_t*
    */
-  //virtual uint8_t *data() = 0;
+  // virtual uint8_t *data() = 0;
   virtual const uint8_t *data() const = 0;
   // nombre d'individus
   virtual size_t nbInds() const = 0;
@@ -89,9 +89,9 @@ public:
   // BY DEFAULT, PLINK format, with 01 = missing genotype
   double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}, {0, 0, 0, 0}};
 
-  //To use xhen changing to a mode already computed 
+  // To use xhen changing to a mode already computed
   virtual void setMode(Mode mode) = 0;
-  //To use when you want to give an array
+  // To use when you want to give an array
   virtual void setMode(Mode mode, double personnalized[4]) = 0;
 
   virtual const double *mode() const = 0;
@@ -215,20 +215,21 @@ public:
     currentMode_[2][3] = currentMode_[1][3] / sigma_;
   }
 
-  // TODO : redo this funciton
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
   void compute_stats()
   {
     size_t nbByte = nbChars();
     size_t BitsInLastByte = (nbInds() % 4); // number of bits to read on last byte
+    if (!BitsInLastByte)
+      BitsInLastByte = 4; // to read entire last byte
 
     /* FIRST : filling up stats_ with N0s, N1s, N2s, and NAs with PLINK translation*/
-
     stats_[0] = stats_[1] = stats_[2] = stats_[3] = 0;
+
     for (size_t i = 0; i < nbByte; i++)
     {
       uint8_t d = data()[i];
-      if ((i == nbByte - 1) && BitsInLastByte > 0)
+      if (i == (nbByte - 1))
       {
         while (BitsInLastByte > 0)
         {
@@ -238,29 +239,19 @@ public:
           BitsInLastByte--;
           d >>= 2; // 1 shift par loop
         }
-    /*stopping mid-byte if necessary,
-    THEN : computing mu and sigma checking if no value given*/
+        /*stopping mid-byte if necessary,
+        THEN : computing mu and sigma checking if no value given*/
         if (!mu_ && !sigma_)
           compute_mu_sigma(); // compute mu & sd ONLY IF BOTH == 0
         else if (!mu_)
-          compute_mu(); // only compute mu, implied sigma_ was given 
+          compute_mu(); // only compute mu, implied sigma_ was given
         else if (!sigma_)
-          compute_sigma(); //sigma will be calculated from given mu_
-        /* FINALLY : updating the "mode" enum that acts as a filter 
+          compute_sigma(); // sigma will be calculated from given mu_
+        /* FINALLY : updating the "mode" enum that acts as a filter
         to get calculated via mu_and sigma_*/
         return compute_mode();
       }
-      // sinon, fini pile à la fin d'une byte je peux return
-      else if (i == nbByte - 1)
-      {
-        if (!mu_ || !sigma_)
-          compute_mu_sigma();
-        else if (!mu_)
-          compute_mu(); // only compute mu, implied sigma_ was given 
-        else if (!sigma_)
-          compute_sigma();
-        return compute_mode();
-      }
+
       stats_[0] += N0[d];
       stats_[2] += N0[255 - d]; // raw = 3
       stats_[3] += N1[d];       // raw = 1
@@ -272,7 +263,8 @@ public:
   // TODO : think on what are the limits (error checking) => what calls in gaston ?
   double LD(const SNPvector &other)
   {
-    if (nbInds() != other.nbInds()) throw std::runtime_error("Mismatch in the nb of individuals between the 2 SNPs !");
+    if (nbInds() != other.nbInds())
+      throw std::runtime_error("Mismatch in the nb of individuals between the 2 SNPs !");
     double LD = 0;
     double gg[16];
     gg[1] = gg[4] = gg[5] = gg[6] = gg[7] = gg[9] = gg[13] = 0;
@@ -319,7 +311,8 @@ public:
     //std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
     // initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
     // #pragma omp parallel for reduction(vec_incr : table)
-    for (size_t i = 0; i < nbChars(); i++) {
+    for (size_t i = 0; i < nbChars(); i++)
+    {
       uint8_t snp1 = data()[i]; // je récup les ièmes char
       const uint8_t snp2_const = other.data()[i];
       uint8_t snp2 = snp2_const;
@@ -355,7 +348,8 @@ public:
     }
 
     // operateur * const : renvoie la valeur 2bits par 2bits
-    double operator*() {
+    double operator*()
+    {
       uint8_t byte = iterated.data()[currentChar];
       byte >>= (2 * current2bits);   // pour avoir les 2bits de poids faible
       unsigned int val = (byte & 3); // mtn on les isole
@@ -363,7 +357,8 @@ public:
     }
 
     // Operateur ++ : passe à la valeur suivante, PRE-INCRÉMENTATION
-    Iterator &operator++() {
+    Iterator &operator++()
+    {
       current2bits++;
       if (current2bits > 3)
       {

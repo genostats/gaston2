@@ -84,7 +84,6 @@ SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, int mode
   // DON'T USE FILE_ FROM NOW ON COS IT'S NULL, WAS MOVED
   const char* data = reinterpret_cast<const char*>(file_ptr->data());// const necessary bcos read only 
   
-  // magic byte not checked cos messed with offset I think
   // check magic number
   char magic[3];
   for (int i = 0; i < 3; i++)
