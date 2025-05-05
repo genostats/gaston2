@@ -622,7 +622,9 @@ IntegerMatrix test_extract_Matrix_disk(std::vector<size_t> keep)
 {
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
 
-  SNPmatrix M_sub = M.extract_ind(keep, false);
+  SNPmatrix M_sub = M.extract_ind(keep, false, "tmp_mat");
+
+  // SNPmatrix M_file = readBedFileMemory("tmp_mat", 11, 607);
 
 
   IntegerMatrix m = SNPmat_to_IntMat(M_sub);
@@ -651,11 +653,14 @@ IntegerMatrix test_first_scnd_ind()
 void set_num_thread(int num)
 {
   omp_set_num_threads(num);
-
-
-
-
 }
+
+
+
+
+
+
+
 
 /****************************
  *        TESTSUITE         *
@@ -946,6 +951,7 @@ void testsuite(bool verbose = true)
 
   std::vector<size_t> to_keep = { 2, 6, 229, 230, 231, 232, 233, 234, 235, 236, 237 };
   IntegerMatrix res = test_extract_Matrix(to_keep);
+  IntegerMatrix res_disk = test_extract_Matrix_disk(to_keep);
 
   while (file5 >> value)
   {
@@ -954,9 +960,15 @@ void testsuite(bool verbose = true)
       break;
     }
     
-    if (res(i,j++)!= value)
+    if (res(i,j)!= value)
     {
       std::cout << RED << "Error: new extracted matrix at (" << i << "," << j - 1 << ") does not match reference value! " <<  res(i,j - 1) << " != " << value << RESET << std::endl;
+      total[7] = 0;
+    }
+       
+    if (res_disk(i,j++)!= value)
+    {
+      std::cout << RED << "Error: new extracted matrix on disk at (" << i << "," << j - 1 << ") does not match reference value! " <<  res(i,j - 1) << " != " << value << RESET << std::endl;
       total[7] = 0;
     }
 
@@ -967,6 +979,7 @@ void testsuite(bool verbose = true)
     }
 
   }
+  std::remove("tmp_mat");
   if (total[7])
   {
     if (verbose) std::cout << GREEN << "Test for selected inds to extract in new matrix passed!" << RESET << std::endl;
