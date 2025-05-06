@@ -2,10 +2,7 @@
 #include "SNPvectorDisk.h"
 #include <vector>
 #include <memory>
-#include <array>      // for compute stats function
 #include <stdexcept>  // for out of range exceptions
-#include <filesystem> // for checking existence bedore writing
-#include <fstream>    // std::ofstream
 
 #include "Datastruct.h"
 
@@ -228,10 +225,13 @@ public:
 
       int nb_snps = SNPs_.size();
       std::error_code error;
-      // TODO : see why filesystem not recognized
-      // !! IMPORTANT to check if it exists without loading it !!
-      // if (std::filesystem::exists(path)) throw std::runtime_error("The new matrix will overwrite an existing file, Aborting !");
-
+      // check if file exists
+      FILE *check = fopen(path.c_str(), "rb");
+      if (check) {
+          fclose(check);
+          throw std::runtime_error("The new matrix will overwrite an existing file, Aborting !");
+      }
+      
       FILE *f = fopen(path.c_str(), "wb");
       if (!f)
       {

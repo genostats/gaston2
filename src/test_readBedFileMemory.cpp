@@ -622,7 +622,7 @@ IntegerMatrix test_extract_Matrix_disk(std::vector<size_t> keep)
 {
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
 
-  SNPmatrix M_sub = M.extract_ind(keep, false, "tmp_mat");
+  SNPmatrix M_sub = M.extract_ind(keep, false, "tmp_mat.txt"); // careful !! with no extension will core dump :/
 
   // SNPmatrix M_file = readBedFileMemory("tmp_mat", 11, 607);
 
@@ -979,7 +979,7 @@ void testsuite(bool verbose = true)
     }
 
   }
-  std::remove("tmp_mat");
+  std::remove("tmp_mat.txt");
   if (total[7])
   {
     if (verbose) std::cout << GREEN << "Test for selected inds to extract in new matrix passed!" << RESET << std::endl;
