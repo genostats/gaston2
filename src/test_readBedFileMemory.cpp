@@ -471,7 +471,7 @@ IntegerMatrix test_contingency(int SNPnb1, int SNPnb2)
               << std::endl;
     return 0;
   }
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps ?
   IntegerVector res(16);
   SNPvector &snp1 = *M.getSNP(SNPnb1);
   SNPvector &snp2 = *M.getSNP(SNPnb2);
@@ -681,6 +681,7 @@ std::vector<std::string> tests_names = {
     "Computing values in centered reduced mode",
     "Computing stats for all individuals", 
     "Computing extracted individuals"
+    // TODO : add a contingency test
   };
 
 // helper to compare to doubles (surely very time consuming)

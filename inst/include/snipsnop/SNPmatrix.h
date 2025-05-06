@@ -1,7 +1,7 @@
 #include "SNPvector.h"
 #include "SNPvectorDisk.h"
-#include <vector>
-#include <memory>
+#include <vector> // for omp reduction
+#include <memory> // for shared_ptr
 #include <stdexcept>  // for out of range exceptions
 
 #include "Datastruct.h"
@@ -150,22 +150,26 @@ public:
         }
         filtered_stats.push_back(filtered);
       }
-      else
+      else //find out how to add a custom type ? 
       {
-        throw std::runtime_error("Unsupported column type in stats.");
+        throw std::runtime_error("No an existing type yet");
       }
     }
 
     return filtered_stats;
   }
 
-
+  // just a small helper f° to clrify extract_ind, not sure if usefull
   int read_ind(uint8_t byte, size_t ind_idx) {
     byte >>= (2 * (ind_idx % 4));
     return byte & 3; // extraction des bits correspondant
   }
 
-  // WIP : NEED TO TEST THOROUGHLY, FIND A WAY FOR SNPVECTORDISK
+
+  // creating a new SNPmatrix containing only the individuals with theiur index specified in "keep"
+  // This new SNPmatrix can exists in memory (inMemory = true) or be filled with SNPvectorDisk. In the 
+  // latter case, it's backed up by a file written with path and mapped with mio. 
+  // In both cases the function returns the new matrix.
   SNPmatrix extract_ind(const std::vector<size_t> &keep, bool inMemory = true, std::string path = "default")
   {
 
@@ -188,10 +192,7 @@ public:
     if (inMemory)
     {
       for (const auto &snp : SNPs_)
-      { // parcours de tous les snps de la matrices d'origine
-
-        size_t i = 0;
-
+      {
         // to feed to new matrix
         std::shared_ptr<SNPvectorMemory> new_snp = std::make_shared<SNPvectorMemory>(new_nb_inds);
         const uint8_t *refdata = snp->data();
@@ -203,26 +204,20 @@ public:
         for (size_t i = 0; i < new_nb_inds; ++i)
         {
           int ind_idx = keep[i];
-          // recherche de l'individus
           size_t currentChar = ind_idx / 4;    // index du byte
-          size_t current2bits = (ind_idx % 4); // where bits dans le byte
+          int ind_gen = read_ind(refdata[currentChar], ind_idx);
 
           size_t new_byte = i / 4;
           size_t new_2bits = (i % 4) * 2;
+          ind_gen <<= (new_2bits); // shifter pour le mettre au bon endroit dans le nv byte
 
-          int ind_val = read_ind(refdata[currentChar], ind_idx);
-
-          ind_val <<= (new_2bits); // shifter pour le mettre au bon endroit dans le nv byte
-
-          new_snp->data()[new_byte] |= ind_val; // le || pour ne pas toucher au bits déjà set
+          new_snp->data()[new_byte] |= ind_gen; // le || pour ne pas toucher au bits déjà set
         }
         new_matrix.SNPs_.push_back(new_snp);
       }
     }
     else
     {
-      // std::cout << "You are trying to extract SNPs vectors on disk, which is currently being implemented\n";
-
       int nb_snps = SNPs_.size();
       std::error_code error;
       // check if file exists
@@ -231,7 +226,7 @@ public:
           fclose(check);
           throw std::runtime_error("The new matrix will overwrite an existing file, Aborting !");
       }
-      
+
       FILE *f = fopen(path.c_str(), "wb");
       if (!f)
       {
@@ -245,18 +240,15 @@ public:
       fputc(1, f);
       // + 3 for the 3 magic bytes, + 1 for the one written ?
       int to_add = (new_nb_inds / 4 + ((new_nb_inds % 4 == 0u) ? 0 : 1)) * nb_snps + 3 + 1;
-
-      // Resize file by writing
       if (fseek(f, to_add - 1, SEEK_SET) != 0)
       {
         fclose(f);
         throw std::runtime_error("Error when resizing file");
       }
-      fputc(0, f);
-
+      fputc(0, f); // this is what will size it up
       fclose(f);
 
-      // maybe try to map to_add + 3 ?
+      // will write using mio
       mio::mmap_sink file_ = mio::make_mmap_sink(path, 3, mio::map_entire_file, error);
       if (error)
       {
@@ -273,31 +265,22 @@ public:
         const uint8_t *refdata = snp->data();
         uint8_t newdata = 0; // exactly 1 byte
 
-        // WRITING BYTE BY BYTE (once every 4 individuals)
         for (size_t i = 0; i < new_nb_inds; ++i)
-        { // parcours de keep pour isoler lees individus
+        {
           int ind_idx = keep[i];
-          // recherche de l'individus
           size_t currentChar = ind_idx / 4;    // index du byte
-          uint8_t byte = refdata[currentChar]; // je récup la byte
-          size_t current2bits = (ind_idx % 4); // where bits dans le byte
-          // byte >>= (2 * current2bits);
+          int ind_gen = read_ind(refdata[currentChar], ind_idx);
 
-          // int val1 = (byte & 3); // extraction des bits correspondant
-          // uint8_t val = val1;    // pour avoir la bonne taille pour le ||
-
-          int val = read_ind(byte, ind_idx);
-          size_t new_byte = (i / 4); // no need to account for offset if given during
+          size_t new_byte = (i / 4);
           size_t new_2bits = (i % 4) * 2;
 
-          val <<= (new_2bits); // shifter pour le mettre au bon endroit dans le nv byte
-
-          newdata |= val;
+          ind_gen <<= (new_2bits); // shifter pour le mettre au bon endroit dans le nv byte
+          newdata |= ind_gen;
 
           size_t snp_offset = snp_idx * ((new_nb_inds + 3) / 4); // ensure rounding up
-
+          // once every 4 inds BYTE BY BYTE
           if (i % 4 == 3 || i == new_nb_inds - 1)
-          {                           // once every 4 inds BYTE BY BYTE
+          {
             data[snp_offset + new_byte] = newdata;
             newdata = 0;
           }
@@ -309,7 +292,7 @@ public:
           std::string errMsg = "Error code " + std::to_string(error.value()) + ", Failed to map the file : " + error.message();
           throw std::runtime_error(errMsg);
         }
-        ++snp_idx;
+        snp_idx++;
       }
       // this and the above call to `sync` have the same
       // effect as if the destructor had been invoked.
@@ -324,7 +307,6 @@ public:
         new_matrix.push_back(snpVec);
       }
     }
-
 
 
     new_matrix.setStats(extract_stats(keep)); //passing N0s N1s N2s and NAs for 

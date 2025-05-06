@@ -303,7 +303,7 @@ public:
     return r * r;
   }
 
-  // function returning a 16 int vector holding frequency distribution
+  // function returning a 16 int vector holding frequency distribution over 2 vectors
   std::vector<int> contingency(const SNPvector &other)
   {
     std::vector<int> table(16);
