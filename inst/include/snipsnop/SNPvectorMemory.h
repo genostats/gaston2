@@ -16,11 +16,7 @@ class SNPvectorMemory : public SNPvector
 {
 public:
   // un constructeur, taille nbInds
-  SNPvectorMemory(size_t nbInds, int modeInt = 0) : data_(nbInds / 4 + ((nbInds % 4 == 0u) ? 0 : 1)), nbInds_(nbInds), mode_((modeInt > 3) ? static_cast<Mode>(0) : static_cast<Mode>(modeInt))
-  {
-    if (modeInt > 3 || modeInt < 0)
-      throw std::runtime_error("Wrong mode chosen for reading SNP");
-  }
+  SNPvectorMemory(size_t nbInds, Mode mode = PLINK) : data_(nbInds / 4 + ((nbInds % 4 == 0u) ? 0 : 1)), nbInds_(nbInds), mode_(mode) {}
 
   // un constructeur à partir d'un vecteur de char
   // !! ce constructeur fait un move et donc "vide" son argument

@@ -38,6 +38,7 @@ public:
   }
 
   int size() { return SNPs_.size(); }
+  int nSNP() { return SNPs_.size(); }
 
   // temporary func to test d°
   void deleteSNP()

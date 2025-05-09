@@ -81,23 +81,20 @@ IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp)
 {
   std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
   std::cout << " reading in Numeric Mode \n";
-  int Num = 3;
-  SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, Num);
+  SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp, NUMERIC);
   IntegerVector res = loop_sum(M);
   std::cout << " reading in Centered (not implemented yet) Mode \n";
-  int Cent = 1;
-  M = readBedFileMemory(filename, n_ind, n_snp, Cent);
+  M = readBedFileMemory(filename, n_ind, n_snp, CENTERED);
   IntegerVector res2 = loop_sum(M);
   for (auto i : res2)
     res.push_back(i);
   std::cout << " reading in Standardized (not implemented yet) Mode \n";
-  int Std = 2;
-  M = readBedFileMemory(filename, n_ind, n_snp, Std);
+  M = readBedFileMemory(filename, n_ind, n_snp, STANDARDIZED_MU_SIGMA);
   IntegerVector res3 = loop_sum(M);
   for (auto i : res3)
     res.push_back(i);
   std::cout << " reading in PLINK Mode \n";
-  M = readBedFileMemory(filename, n_ind, n_snp);
+  M = readBedFileMemory(filename, n_ind, n_snp, PLINK);
   IntegerVector res4 = loop_sum(M);
   for (auto i : res4)
     res.push_back(i);
@@ -403,7 +400,8 @@ NumericVector test_modes_setsigma_one(int mode)
 {
   std::vector<double> res;
 
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607, mode);
+  Mode mode_ = (Mode) mode;
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607, mode_);
   for (auto v : M.getSNPs())
   {
     v->compute_stats();
