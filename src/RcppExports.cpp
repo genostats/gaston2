@@ -10,15 +10,6 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// test_column
-void test_column();
-RcppExport SEXP _snipsnop_test_column() {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    test_column();
-    return R_NilValue;
-END_RCPP
-}
 // test_readBedFileMemory
 IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, bool verbose);
 RcppExport SEXP _snipsnop_test_readBedFileMemory(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP, SEXP verboseSEXP) {
@@ -303,7 +294,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_snipsnop_test_column", (DL_FUNC) &_snipsnop_test_column, 0},
     {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 4},
     {"_snipsnop_test_readBedFileDisk", (DL_FUNC) &_snipsnop_test_readBedFileDisk, 3},
     {"_snipsnop_test_delete", (DL_FUNC) &_snipsnop_test_delete, 3},
