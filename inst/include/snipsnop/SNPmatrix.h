@@ -35,20 +35,21 @@ public:
       throw std::out_of_range("Attempting to load a SNP with a different nb of individuals");
     }
     SNPs_.push_back(v);
+    indStatsComputed_ = false; // si on ajoute des SNP les stats individuelles doivent être recalculées
   }
 
   /**
    * @brief get number of SNPs (see also nbSNPs)
    */
-  unsigned int size() { return SNPs_.size(); }
+  unsigned int size() const { return SNPs_.size(); }
   /**
    * @brief get number of SNPs (see also size)
    */
-  unsigned int nbSNPs() { return SNPs_.size(); }
+  unsigned int nbSNPs() const { return SNPs_.size(); }
   /**
-   * get number of Inds
+   * @brief get number of Inds
    */
-  unsigned int nbInds() {
+  unsigned int nbInds() const {
     if(nbSNPs() == 0) {
       return 0;
     }
@@ -64,8 +65,9 @@ public:
 #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
     initializer(omp_priv = decltype(omp_orig)(omp_orig.size(), 0))
 
-  void compute_stats()
-  {
+  void compute_indStats()  {
+    if(indStatsComputed_) return; // stats déjà calculées, on ne recalcule pas
+                                  
     int total = SNPs_.size();
     if (total == 0)
       throw std::out_of_range("No SNPs loaded into the SNPMatrix !");
@@ -121,19 +123,20 @@ public:
     Column N2s(vecN2s);
     Column NAs(vecNAs);
 
-    stats_.push_back(N0s);
-    stats_.push_back(N1s);
-    stats_.push_back(N2s);
-    stats_.push_back(NAs);
+    indStats_.push_back(N0s, "N0");
+    indStats_.push_back(N1s, "N1");
+    indStats_.push_back(N2s, "N2");
+    indStats_.push_back(NAs, "NAs");
 
+    indStatsComputed_ = true;
     // TODO : could add a checksum ?
   }
 
-  DataStruct extract_stats(const std::vector<size_t> &keep)
+  DataStruct extract_indStats(const std::vector<size_t> &keep)
   {
     DataStruct filtered_stats;
 
-    for (Column &col : stats_.cols)
+    for (Column &col : indStats_.cols)
     {
       auto type = col.type;
       if (type == datatype::INT)
@@ -325,7 +328,7 @@ public:
     }
 
 
-    new_matrix.setStats(extract_stats(keep)); //passing N0s N1s N2s and NAs for 
+    new_matrix.setIndStats(extract_indStats(keep)); //passing N0s N1s N2s and NAs for 
     return new_matrix;
   }
 
@@ -354,25 +357,26 @@ public:
     return SNPs_[i];
   }
 
-  const DataStruct getStats() const { return stats_; }
+  const DataStruct getIndStats() const { return indStats_; }
 
   // TODO : see if by default possible ?
   // they need to be ordered !!!!
-  void setStats(Column N0s, Column N1s, Column N2s, Column NAs)
+  void setIndStats(Column N0s, Column N1s, Column N2s, Column NAs)
   {
-    stats_.push_back(N0s);
-    stats_.push_back(N1s);
-    stats_.push_back(N2s);
-    stats_.push_back(NAs);
+    indStats_.push_back(N0s);
+    indStats_.push_back(N1s);
+    indStats_.push_back(N2s);
+    indStats_.push_back(NAs);
   }
 
-  void setStats(DataStruct new_stats) {
-    stats_ = new_stats;
+  void setIndStats(DataStruct new_stats) {
+    indStats_ = new_stats;
   }
 
 private:
-  DataStruct stats_;
+  DataStruct indStats_;
   std::vector<std::shared_ptr<SNPvector>> SNPs_;
+  bool indStatsComputed_ = false;
 };
 
 #endif

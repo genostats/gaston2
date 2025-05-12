@@ -5,6 +5,10 @@ SNPMatrixToIntegerMatrix <- function(pM) {
     .Call(`_snipsnop_SNPMatrixToIntegerMatrix`, pM)
 }
 
+getIndStats <- function(pM) {
+    .Call(`_snipsnop_getIndStats`, pM)
+}
+
 readBedFileMemory <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_readBedFileMemory`, filename, n_ind, n_snp)
 }

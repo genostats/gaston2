@@ -484,8 +484,8 @@ IntegerMatrix test_contingency(int SNPnb1, int SNPnb2)
 bool test_performance_stats_matrix()
 {
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
-  M.compute_stats();
-  DataStruct st = M.getStats();
+  M.compute_indStats();
+  DataStruct st = M.getIndStats();
 
   //std::cout << "Stats loaded. Vector size: " << st.cols.size() << "\n";
 
@@ -551,8 +551,8 @@ IntegerMatrix test_all_stats_matrix()
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
   //return wrap(M.compute_stats());
 
-  M.compute_stats();
-  auto st = M.getStats();
+  M.compute_indStats();
+  auto st = M.getIndStats();
   auto N0s = st.at(0).get<int>(); // a vec
   auto N1s = st.at(1).get<int>();
   auto N2s = st.at(2).get<int>();

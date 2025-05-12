@@ -14,9 +14,11 @@ struct Column {
     datatype type;
     std::shared_ptr<void> handler = nullptr;
 
+  private:
     template <typename T>
     void setType();
 
+  public:
     template <typename T>
     Column(std::vector<T> vec) : handler( std::make_shared<std::vector<T>>(vec) ) {
         setType<T>();
@@ -87,8 +89,36 @@ inline std::vector<std::string> * Column::get() {
 
 struct DataStruct {
     std::vector<Column> cols;
-    void push_back(Column newcol) { cols.push_back(newcol); }
-    Column at(size_t pos) { return cols.at(pos); }
+    std::vector<std::string> colNames;
+
+    size_t size() const {
+      return cols.size();
+    }
+
+    void push_back(Column newcol) { 
+      cols.push_back(newcol);
+      colNames.push_back("");
+    }
+
+    void push_back(Column newcol, std::string name) {
+      cols.push_back(newcol);
+      colNames.push_back(name);
+    }
+
+    Column at(size_t pos) const { 
+      return cols.at(pos); 
+    }
+
+    Column getColumn(std::string name) const {
+      size_t pos = colNames.size(); // default value = out of range
+      for(size_t i = 0; i < colNames.size(); i++) {
+        if(colNames[i] == name) {
+          pos = i;
+          break;
+        }
+      }
+      return at(pos);
+    }
 };
 
 #endif
