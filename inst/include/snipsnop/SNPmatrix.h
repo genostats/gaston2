@@ -37,8 +37,23 @@ public:
     SNPs_.push_back(v);
   }
 
-  int size() { return SNPs_.size(); }
-  int nSNP() { return SNPs_.size(); }
+  /**
+   * @brief get number of SNPs (see also nbSNPs)
+   */
+  unsigned int size() { return SNPs_.size(); }
+  /**
+   * @brief get number of SNPs (see also size)
+   */
+  unsigned int nbSNPs() { return SNPs_.size(); }
+  /**
+   * get number of Inds
+   */
+  unsigned int nbInds() {
+    if(nbSNPs() == 0) {
+      return 0;
+    }
+    return SNPs_[0]->nbInds();
+  }
 
   // temporary func to test d°
   void deleteSNP()

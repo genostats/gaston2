@@ -4,13 +4,8 @@
 
 // [[Rcpp::export]]
 Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix> pM) {
-  unsigned int nbSNPs = pM->nSNP();
-  if(nbSNPs == 0) {
-    Rcpp::IntegerMatrix R(0, 0);
-    return R;
-  }
-  auto SNP0 = pM->getSNP(0);
-  unsigned int nbInds = SNP0->nbInds();
+  unsigned int nbSNPs = pM->nbSNPs();
+  unsigned int nbInds = pM->nbInds();
   Rcpp::IntegerMatrix R(nbInds, nbSNPs);
   for(unsigned int j = 0; j < nbSNPs; j++) {
     auto SNP = pM->getSNP(j);
