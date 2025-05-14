@@ -29,7 +29,7 @@ public:
   void push_back(std::shared_ptr<SNPvector> v)
   {
     // if at least one loaded, everySNPs must have same size
-    if (SNPs_.size() && (SNPs_[0]->nbInds() != v->nbInds()))
+    if (nbInds() != v->nbInds())
     {
       std::cerr << "Pb loading SNP" << std::endl;
       throw std::out_of_range("Attempting to load a SNP with a different nb of individuals");
@@ -132,6 +132,7 @@ public:
     // TODO : could add a checksum ?
   }
 
+  // TODO à déplacer dans la classe DataStruct (fonction extractLines par exemple)
   DataStruct extract_indStats(const std::vector<size_t> &keep)
   {
     DataStruct filtered_stats;

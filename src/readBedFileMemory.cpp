@@ -81,7 +81,7 @@ std::ifstream file(filename, std::ifstream::binary);
   Rcpp::XPtr<SNPmatrix> pM(new SNPmatrix);
   for(size_t i = 0; i < n_snp; i++) {
     //makes a shared_ptr on a vector of snips 
-    std::shared_ptr<SNPvectorMemory> snpVec(new SNPvectorMemory(n_ind, PLINK));
+    std::shared_ptr<SNPvectorMemory> snpVec(new SNPvectorMemory(n_ind));
     size_t n = snpVec->nbChars();
     uint8_t * data = snpVec->data();
     file.read(reinterpret_cast<char *>(data), n);

@@ -105,6 +105,9 @@ struct DataStruct {
       colNames.push_back(name);
     }
 
+    // TODO 
+    // function setColumn(Column, std::string) qui vérifie si la colonne existe et remplace, et sinon fait un push_back
+
     Column at(size_t pos) const { 
       return cols.at(pos); 
     }
