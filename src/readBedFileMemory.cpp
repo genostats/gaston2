@@ -33,7 +33,7 @@
 SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, Mode modeArray = PLINK) {
   std::ifstream file(filename, std::ifstream::binary);
   if(!file.is_open()) {
-    throw std::runtime_error("Cannot open file");
+    throw std::runtime_error("Cannot open file " + filename);
   }
 
   // check magic number

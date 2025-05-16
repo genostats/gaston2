@@ -29,7 +29,7 @@ public:
   void push_back(std::shared_ptr<SNPvector> v)
   {
     // if at least one loaded, everySNPs must have same size
-    if (nbInds() != v->nbInds())
+    if (nbSNPs() > 0 && nbInds() != v->nbInds())
     {
       std::cerr << "Pb loading SNP" << std::endl;
       throw std::out_of_range("Attempting to load a SNP with a different nb of individuals");
@@ -258,8 +258,8 @@ public:
       fputc(108, f);
       fputc(27, f);
       fputc(1, f);
-      // + 3 for the 3 magic bytes, + 1 for the one written ?
-      int to_add = (new_nb_inds / 4 + ((new_nb_inds % 4 == 0u) ? 0 : 1)) * nb_snps + 3 + 1;
+      // + 3 for the 3 magic bytes
+      int to_add = (new_nb_inds / 4 + ((new_nb_inds % 4 == 0u) ? 0 : 1)) * nb_snps + 3 ;
       if (fseek(f, to_add - 1, SEEK_SET) != 0)
       {
         fclose(f);
@@ -323,7 +323,7 @@ public:
       std::shared_ptr<mio::mmap_source> file_ptr = std::make_shared<mio::mmap_source>(std::move(file_for_snps)); // don't know if good idea, creates a NEW sink
       for (size_t i = 0; i < nb_snps; i++)
       {
-        std::shared_ptr<SNPVectorDisk> snpVec(new SNPVectorDisk(new_nb_inds, file_ptr, i)); // no mode array fr now
+        std::shared_ptr<SNPVectorDisk<mio::access_mode::read>> snpVec(new SNPVectorDisk<mio::access_mode::read>(new_nb_inds, file_ptr, i)); // no mode array fr now
         new_matrix.push_back(snpVec);
       }
     }
@@ -343,7 +343,7 @@ public:
    */
   bool onDisk(size_t index)
   { // TODO  check why was that written ????doesn't work, will see later
-    if (std::shared_ptr<SNPVectorDisk> test = std::dynamic_pointer_cast<SNPVectorDisk>(SNPs_[index]))
+    if (std::shared_ptr<SNPVectorDisk<mio::access_mode::read>> test = std::dynamic_pointer_cast<SNPVectorDisk<mio::access_mode::read>>(SNPs_[index]))
       return true;
     return false; // test was a null ptr, not castable to a SNPVectorDisk
   }

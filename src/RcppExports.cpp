@@ -298,6 +298,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_copyConstructor
+void test_copyConstructor();
+RcppExport SEXP _snipsnop_test_copyConstructor() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    test_copyConstructor();
+    return R_NilValue;
+END_RCPP
+}
 // test_first_scnd_ind
 IntegerMatrix test_first_scnd_ind();
 RcppExport SEXP _snipsnop_test_first_scnd_ind() {
@@ -355,6 +364,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_all_stats_matrix", (DL_FUNC) &_snipsnop_test_all_stats_matrix, 0},
     {"_snipsnop_test_extract_Matrix", (DL_FUNC) &_snipsnop_test_extract_Matrix, 1},
     {"_snipsnop_test_extract_Matrix_disk", (DL_FUNC) &_snipsnop_test_extract_Matrix_disk, 1},
+    {"_snipsnop_test_copyConstructor", (DL_FUNC) &_snipsnop_test_copyConstructor, 0},
     {"_snipsnop_test_first_scnd_ind", (DL_FUNC) &_snipsnop_test_first_scnd_ind, 0},
     {"_snipsnop_set_num_thread", (DL_FUNC) &_snipsnop_set_num_thread, 1},
     {"_snipsnop_testsuite", (DL_FUNC) &_snipsnop_testsuite, 1},

@@ -13,17 +13,37 @@
  * @brief Another class derived from SNPvector abstract class 
  * 
  * Different from SNPvectorMemory because it keeps a shared_ptr
- * to a mio::mmap_source object managing the memory mapped file.
- * Should the data_ be also a pointer to the data in the file ?
+ * to either a mio::mmap_source object or a mio::mmap_sink object
+ * depending on the template 'accessMode' parameter (either mio::access_mode::read
+ * or mio::access_mode::write), managing the memory mapped file.
  * @emoji smile
  */
+
+template<mio::access_mode accessMode>
 class SNPVectorDisk : public SNPvector {
 
   public:
-  
-  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::mmap_source> file_ref, size_t SNP_index, Mode mode = PLINK) : 
-    data_((const uint8_t *) (file_ref->data() + 3 /* offset from the 3 first magic bytes) */ + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index) ), 
+ 
+  // on donne à ce constructeur un shared ptr vers fichier ouvert par mio + le nb d'individus, et le SNP index à pointer
+  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref, size_t SNP_index, Mode mode = PLINK) : 
+    data_((uint8_t *) (file_ref->data() + 3 /* offset from the 3 first magic bytes) */ + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index) ), 
     nbInds_(nbInds), file_ref_(file_ref), mode_(mode) {}
+
+  // constructeur par copie d'un SNPVector quelconque
+  // il va échouer si on n'a pas accessMode == mio::access_mode::write
+  // le but est d'écrire dans un fichier .bed *qu'on a créé nous-même* et qui est encore vide (à part les 3 magic bytes)
+  // (ou pas forcément vide, ça va la modifier en place)
+  // toujours créé en mode PLINK
+  SNPVectorDisk(const std::shared_ptr<SNPvector> source, std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> file_ref, size_t SNP_index) : 
+      data_((uint8_t *) (file_ref->data() + 3 + (source->nbInds()/4 + ((source->nbInds()%4 == 0u)?0:1)) * SNP_index)), nbInds_(source->nbInds()), file_ref_(file_ref), mode_(PLINK) {
+    // on copie les données de source dans le fichier, à la bonne place qui est pointée par data_a
+    size_t nbChars = source->nbChars();
+    const uint8_t * sourceData = source->data();
+    std::cout << "coucou " << SNP_index << " (" << nbChars << ")\n";
+    for(size_t i = 0; i < nbChars; i++) {
+      data_[i] = sourceData[i];
+    }
+  } 
 
   ~SNPVectorDisk() {
     //std::cout << "Destroying a SNP, here's the count of file_ref_ : " << file_ref_.use_count() << "\n";
@@ -61,13 +81,13 @@ class SNPVectorDisk : public SNPvector {
   //std::vector<uint8_t> data_;
   /** @brief a ptr in the mio file, pointing to the bits composing the SNP
    * It's constness is imposed by mio, that openned a read only file */
-  const uint8_t *data_;
+  uint8_t *data_;
    /** @brief to help parse SNP*/
   const size_t nbInds_;
   /** @brief an enum keeping track on how to read datas */
   enum Mode mode_;
   /** @brief a shared_ptr to the object handling the file, 
   when the last SNP from the same file is deleted, the file is unmapped and closed */
-  std::shared_ptr<mio::mmap_source> file_ref_;
+  std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref_;
 };
 #endif // SNPMMATRIX

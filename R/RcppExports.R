@@ -101,6 +101,10 @@ test_extract_Matrix_disk <- function(keep) {
     .Call(`_snipsnop_test_extract_Matrix_disk`, keep)
 }
 
+test_copyConstructor <- function() {
+    invisible(.Call(`_snipsnop_test_copyConstructor`))
+}
+
 test_first_scnd_ind <- function() {
     .Call(`_snipsnop_test_first_scnd_ind`)
 }

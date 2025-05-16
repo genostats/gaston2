@@ -107,7 +107,7 @@ IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp)
 
 // TODO : to test with numerous SNPs, so other rows in the bed matrix
 
-const char file_hardcode[68] = "/home/ju/R/x86_64-pc-linux-gnu-library/4.4/snipsnop/extdata/LCT.bed";
+const char file_hardcode[68] = "inst/extdata/LCT.bed";
 
 // ON MEMORY, mean = 4.5 microseconds on average
 
@@ -630,6 +630,50 @@ IntegerMatrix test_extract_Matrix_disk(std::vector<size_t> keep)
 
   return m;
 }
+
+// [[Rcpp::export]]
+void test_copyConstructor() 
+{
+      int nbInds = 503;
+      int nbSNPs = 607;
+      SNPmatrix M = readBedFileMemory(file_hardcode, nbInds, nbSNPs);
+
+      FILE *f = fopen("/tmp/test.bed", "wb");
+      if (!f)
+      {
+        throw std::runtime_error("Failed to open file for writing");
+      }
+
+      // Adding magic numbers to
+      // Identify a bed file in SNP major mode
+      fputc(108, f);
+      fputc(27, f);
+      fputc(1, f);
+      // + 3 for the 3 magic bytes
+      int to_add = (nbInds / 4 + ((nbInds % 4 == 0u) ? 0 : 1)) * nbSNPs + 3 ;
+      if(fseek(f, to_add - 1, SEEK_SET) != 0)
+      {
+        fclose(f);
+        throw std::runtime_error("Error when resizing file");
+      }
+      fputc(0, f); // this is what will size it up
+      fclose(f);
+
+      // will write using mio
+      std::error_code error;
+      mio::mmap_sink file_ = mio::make_mmap_sink("/tmp/test.bed", 0, mio::map_entire_file, error);
+      if(error) throw std::runtime_error(error.message());
+
+      std::shared_ptr<mio::mmap_sink> file_ptr = std::make_shared<mio::mmap_sink>(std::move(file_));
+      // file_ can't be used anymore
+
+      for(size_t snp = 0; snp < nbSNPs; snp++) {
+        // j'ai pas besoin d'en garder trace pour ce test
+        SNPVectorDisk<mio::access_mode::write>( M.getSNP(snp), file_ptr, snp);
+      }
+      std::cout << "created /tmp/test.bed, should be identical to " << file_hardcode << "\n";
+}
+
 
 //[[Rcpp::export]]
 IntegerMatrix test_first_scnd_ind()
