@@ -4,7 +4,7 @@
 
 
 SEXP ColumnToSEXP(Column col) {
-  datatype dt = col.type;
+  datatype dt = col.type();
   if(dt == INT) 
     return Rcpp::wrap(*col.get<int>());
    else if(dt == DOUBLE)

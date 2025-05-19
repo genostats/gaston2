@@ -139,7 +139,7 @@ public:
 
     for (Column &col : indStats_.cols)
     {
-      auto type = col.type;
+      auto type = col.type();
       if (type == datatype::INT)
       {
         const auto &values = col.get<int>();

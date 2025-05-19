@@ -507,7 +507,7 @@ bool test_performance_stats_matrix()
   bool success = 1;
 
   // auto test1col = st.at(0);
-  // std::cout << test1col.type << "\n";
+  // std::cout << test1col.type() << "\n";
   // std::cout << test1col.get<int>() << "\n"; // THIS is a PTR to a vec of type int
   // std::cout << test1col.get<int>()->size();
   // std::cout << test1col.get<int>()->at(0);

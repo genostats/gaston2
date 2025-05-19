@@ -13,6 +13,10 @@ readBedFileMemory <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_readBedFileMemory`, filename, n_ind, n_snp)
 }
 
+test_ds <- function(DF, In) {
+    .Call(`_snipsnop_test_ds`, DF, In)
+}
+
 test_readBedFileMemory <- function(filename, n_ind, n_snp, verbose = TRUE) {
     .Call(`_snipsnop_test_readBedFileMemory`, filename, n_ind, n_snp, verbose)
 }
