@@ -1,13 +1,12 @@
 Package: snipsnop
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
+Title: 3 classes for SNPs manipulations, that can also be on disk.
 Version: 1.0
 Date: 2023-11-16
 Encoding: UTF-8
-Author: Your Name
+Author: Juju
 Maintainer: Your Name <your@email.com>
-Description: One paragraph description of what the package does as one
-        or more full sentences.
+Description: 3 classes keeping SNPs, possibly header only ? 
 License: GPL (>= 2)
 Imports: Rcpp (>= 1.0.11)
 LinkingTo: Rcpp
