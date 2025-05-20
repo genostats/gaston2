@@ -21,6 +21,10 @@ test_ds2 <- function() {
     .Call(`_snipsnop_test_ds2`)
 }
 
+test_ds3 <- function(famFile) {
+    .Call(`_snipsnop_test_ds3`, famFile)
+}
+
 test_readBedFileMemory <- function(filename, n_ind, n_snp, verbose = TRUE) {
     .Call(`_snipsnop_test_readBedFileMemory`, filename, n_ind, n_snp, verbose)
 }

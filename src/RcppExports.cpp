@@ -68,6 +68,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_ds3
+Rcpp::DataFrame test_ds3(std::string famFile);
+RcppExport SEXP _snipsnop_test_ds3(SEXP famFileSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type famFile(famFileSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_ds3(famFile));
+    return rcpp_result_gen;
+END_RCPP
+}
 // test_readBedFileMemory
 IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, bool verbose);
 RcppExport SEXP _snipsnop_test_readBedFileMemory(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP, SEXP verboseSEXP) {
@@ -366,6 +377,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_readBedFileMemory", (DL_FUNC) &_snipsnop_readBedFileMemory, 3},
     {"_snipsnop_test_ds", (DL_FUNC) &_snipsnop_test_ds, 2},
     {"_snipsnop_test_ds2", (DL_FUNC) &_snipsnop_test_ds2, 0},
+    {"_snipsnop_test_ds3", (DL_FUNC) &_snipsnop_test_ds3, 1},
     {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 4},
     {"_snipsnop_test_readBedFileDisk", (DL_FUNC) &_snipsnop_test_readBedFileDisk, 3},
     {"_snipsnop_test_delete", (DL_FUNC) &_snipsnop_test_delete, 3},

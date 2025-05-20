@@ -4,6 +4,9 @@
 #include <stdexcept>
 #include <memory> // for shared_ptr
 #include "datatype.h"
+#include <stdlib.h>
+#include "strtoi.h"
+#include "strtos.h"
 
 #ifndef _Column_
 #define _Column_
@@ -17,6 +20,11 @@ struct Column {
     template<typename T>
     void checkType() const {
       if (whichType<T>() != type_) throw std::runtime_error("Trying to access with wrong type !");
+      if(type_ == NONE) throw std::runtime_error("Trying to access column with type NONE"); // est-ce que c'est possible que ça arrive ?
+    }
+
+    void checkHandler() const {
+      if (!handler) throw std::runtime_error("Handler was not instanciated");
     }
 
  public:
@@ -25,51 +33,37 @@ struct Column {
     template <typename T>
     Column(std::vector<T> vec) : handler( std::make_shared<std::vector<T>>(vec) ) {
       type_ = whichType<T>();
+      checkHandler();
     }
 
     // un constructeur qui prend juste un datatype et initialise avec un vecteur vide
     Column(datatype ty) : type_(ty) {
-      if(ty == INT) {
-        std::vector<int> vec;
-        handler = std::make_shared<std::vector<int>>(vec);
-      } else if(ty == FLOAT) {
-        std::vector<float> vec;
-        handler = std::make_shared<std::vector<float>>(vec);
-      } else if(ty == DOUBLE) {
-        std::vector<double> vec;
-        handler = std::make_shared<std::vector<double>>(vec);
-      } else if(ty == STRING) {
-        std::vector<std::string> vec;
-        handler = std::make_shared<std::vector<std::string>>(vec);
-      } else {
-        throw std::runtime_error("Can't initialize with type NONE");
+      switch(ty) {
+        case INT : { 
+            std::vector<int> vec;
+            handler = std::make_shared<std::vector<int>>(vec);
+            break;
+          }
+        case FLOAT : {
+          std::vector<float> vec;
+          handler = std::make_shared<std::vector<float>>(vec);
+          break;
+        } 
+        case DOUBLE : {
+          std::vector<double> vec;
+          handler = std::make_shared<std::vector<double>>(vec);
+          break;
+        }
+        case STRING : {
+          std::vector<std::string> vec;
+          handler = std::make_shared<std::vector<std::string>>(vec);
+          break;
+        }
+        default :
+          throw std::runtime_error("Can't initialize with type NONE");
       }
+      checkHandler();
     }
-
-    // getter pour type_
-    datatype type() const {
-      return type_;
-    }
-
-    // renvoie un pointer vers le std::vector...
-    template <typename T>
-    std::vector<T> * get() const {
-      if (!handler) throw std::runtime_error("Handler was never instanciated");
-      checkType<T>();
-      return static_cast<std::vector<T>*>(handler.get());
-    }
-
-    // une fonction push_back 
-    // obligation de faire un check_type... 
-    template <typename T>
-    void push_back(T x) {
-      checkType<T>();
-      ((std::vector<T> *) handler.get())->push_back(x);
-    }
-
-    // ~Column() {
-    //     std::cout << "D° called for a Column of type " << type << " (0=INT,DOUBLE,FLOAT,3=STRING), before destr°, "<< handler.use_count() <<" ref to underliying data\n"; 
-    // }
 
     // un constructeur qui fait une extraction
     // équivaut à vec[keep] en R
@@ -77,20 +71,30 @@ struct Column {
     template<typename intVec>
     Column(const Column col, const intVec & keep) {
       datatype ty = col.type();
-      if(ty == INT)
-        *this = ColumnExtract<int>(col, keep);
-      else if(ty == FLOAT)
-        *this = ColumnExtract<float>(col, keep);
-      else if(ty == DOUBLE)
-        *this = ColumnExtract<double>(col, keep);
-      else if(ty == STRING)
-        *this = ColumnExtract<std::string>(col, keep);
-      else
-        throw std::runtime_error("Can't extract from type NONE");
+      switch(ty) {
+        case INT : { 
+          *this = ColumnExtract<int>(col, keep);
+           break;
+        }
+        case FLOAT : {
+          *this = ColumnExtract<float>(col, keep);
+          break;
+        } 
+        case DOUBLE : {
+          *this = ColumnExtract<double>(col, keep);
+          break;
+        }
+        case STRING : {
+          *this = ColumnExtract<std::string>(col, keep);
+          break;
+        }
+        default :
+          throw std::runtime_error("Can't extract from type NONE");
+      }
     }
 
     // ceci fait le boulot pour le constructeur ci dessus
-    // c'est privé puisqu'il suffit d'appeller le constructeur (qui n'a pas besoin
+    // c'est privé puisque l'utilisateur peut appeller le constructeur (qui n'a pas besoin
     // d'etre templaté pour le type de la colonne)
   private:
     template<typename T, typename intVec>
@@ -102,6 +106,115 @@ struct Column {
         filtered.push_back(vec->at(i));
       return Column(filtered);
     }
+
+  public:
+    // getter pour type_
+    datatype type() const {
+      return type_;
+    }
+
+    // renvoie un pointer vers le std::vector...
+    template <typename T>
+    std::vector<T> * get() const {
+      // a priori si handler = null alors type_ = NONE : géré par checkType
+      checkType<T>();
+      return static_cast<std::vector<T>*>(handler.get());
+    }
+
+    // une fonction push_back 
+    // on fait un check_type... 
+    template <typename T>
+    void push_back(T x) {
+      checkType<T>();
+      ((std::vector<T> *) handler.get())->push_back(x);
+    }
+
+    // une fonction push_back qui va convertir une chaine de caractères
+    // dans le type cible
+    void push_back_convert(const std::string & x) {
+      switch(type_) {
+        case INT : { 
+           ((std::vector<int> *) handler.get())->push_back(std::stoi(x));
+           break;
+        }
+        case FLOAT : {
+          ((std::vector<float> *) handler.get())->push_back(std::stof(x));
+          break;
+        } 
+        case DOUBLE : {
+          ((std::vector<double> *) handler.get())->push_back(std::stod(x));
+          break;
+        }
+        case STRING : {
+          ((std::vector<std::string> *) handler.get())->push_back(x);
+          break;
+        }
+        default :
+          throw std::runtime_error("Can't convert string to type NONE");
+      }
+    }
+
+    // la même qui prend un char *
+    void push_back_convert(const char * x) {
+      switch(type_) {
+        case INT : { 
+           ((std::vector<int> *) handler.get())->push_back(atoi(x));
+           break;
+        }
+        case FLOAT : {
+          char * end = NULL;
+          ((std::vector<float> *) handler.get())->push_back(strtof(x, &end));
+          break;
+        } 
+        case DOUBLE : {
+          char * end = NULL;
+          ((std::vector<double> *) handler.get())->push_back(strtod(x, &end));
+          break;
+        }
+        case STRING : {
+          std::string s(x);
+          ((std::vector<std::string> *) handler.get())->push_back(s);
+          break;
+        }
+        default :
+          throw std::runtime_error("Can't convert char * to type NONE");
+      }
+    }
+
+
+    // et la même qui prend un char * et s'arrête au premier blanc ; renvoie 
+    // le pointeur vers le premier caractère non lu. Ceci pour pouvoir lire une 
+    // ligne morceau par morceau (utile lors de la lecture de "white delimited values"
+    // dans une DataStruct)
+    char * push_back_token(const char * x) {
+      char * end = NULL;
+      switch(type_) {
+        case INT : { 
+           ((std::vector<int> *) handler.get())->push_back(strtoi(x, &end));
+           break;
+        }
+        case FLOAT : {
+          ((std::vector<float> *) handler.get())->push_back(strtof(x, &end));
+          break;
+        } 
+        case DOUBLE : {
+          ((std::vector<double> *) handler.get())->push_back(strtod(x, &end));
+          break;
+        }
+        case STRING : {
+          ((std::vector<std::string> *) handler.get())->push_back(strtos(x, &end));
+          break;
+        }
+        default :
+          throw std::runtime_error("Can't convert char * to type NONE");
+      }
+      return end;
+    }
+
+    // ~Column() {
+    //     std::cout << "D° called for a Column of type " << type << " (0=INT,DOUBLE,FLOAT,3=STRING), before destr°, "<< handler.use_count() <<" ref to underliying data\n"; 
+    // }
+
 };
 
 #endif

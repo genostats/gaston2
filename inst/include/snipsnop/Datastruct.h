@@ -3,6 +3,7 @@
 #include <string>
 #include <stdexcept>
 #include <memory> // for shared_ptr
+#include <istream>
 #include "Column.h"
 
 #ifndef _DataStruct_
@@ -44,14 +45,41 @@ struct DataStruct {
       return at(pos);
     }
 
+    // constructeur vide...
     DataStruct() {}
 
+    // constructeur qui fait une extraction
     template<typename intVec>
     DataStruct(DataStruct & DS, intVec & keep) {
       for(size_t i = 0; i < DS.size(); i++) {
         push_back(Column(DS.at(i), keep), DS.colNames[i]);
       }
     }
+
+    // constructeur qui lit un fichier sans header
+    // il faut donner les types des colonnes et leur nom
+    // pas très perfectionné (uniquement space delimited values,
+    // pas de prise en compte de quotes, pas bcp de check de format...) 
+    // mais ça ira pour lire des fichiers bim / fam
+    DataStruct(std::istream & in, std::vector<datatype> & colTypes, std::vector<std::string> & colNames) {
+      size_t nb_cols = colTypes.size();
+      if(nb_cols != colNames.size()) 
+        throw std::runtime_error("colTypes and colNames have different sizes");
+      // créations colonnes vides
+      for(size_t i = 0; i < nb_cols; i++) 
+        push_back(Column(colTypes[i]), colNames[i]);
+
+      // lecture fichier ligne par ligne
+      std::string line;
+      while(std::getline(in, line)) {
+        char * c = (char *) line.c_str();
+        for(size_t i = 0; i < nb_cols; i++) {
+          c = at(i).push_back_token(c);
+          if(*c == 0) break; // fin de ligne
+        }
+      }
+    }
+
 };
 
 #endif
