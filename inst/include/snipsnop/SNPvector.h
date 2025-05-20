@@ -74,6 +74,13 @@ protected: // can be accessed also by class inheriting
   double mu_ = 0;
   double sigma_ = 0;
 
+
+  // just a small helper f° to extract an individual genotype from a byte
+  int read_ind(uint8_t byte, size_t ind_idx) {
+    byte >>= (2 * (ind_idx % 4));
+    return byte & 3; // extraction des bits correspondant
+  }
+
 public:
   /**
    * @brief pure virtual function,

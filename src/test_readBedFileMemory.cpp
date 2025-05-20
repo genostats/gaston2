@@ -616,6 +616,79 @@ IntegerMatrix test_extract_Matrix(std::vector<size_t> keep)
 }
 
 // [[Rcpp::export]]
+IntegerMatrix test_extract_SNP1(std::vector<size_t> keep)
+{
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+  SNPmatrix X;
+  for(size_t snp = 0; snp < 607; snp++)
+  {
+    std::shared_ptr<SNPvectorMemory> copied_snp = std::make_shared<SNPvectorMemory>(M.getSNP(snp), keep);
+    X.push_back(copied_snp);
+  }
+
+  IntegerMatrix x = SNPmat_to_IntMat(X);
+  colnames(x) = wrap(keep);
+  return x;
+}
+
+// [[Rcpp::export]]
+IntegerMatrix test_extract_SNP2(std::vector<size_t> keep)
+{
+  int nbInds = keep.size();
+  int nbSNPs = 607;
+  SNPmatrix M = readBedFileDisk(file_hardcode, 503, 607);
+  SNPmatrix X;  
+
+  FILE *f = fopen("/tmp/test2.bed", "wb");
+  if (!f)
+  {
+    throw std::runtime_error("Failed to open file for writing");
+  }
+  // Adding magic numbers to
+  // Identify a bed file in SNP major mode
+  fputc(108, f);
+  fputc(27, f);
+  fputc(1, f);
+  // + 3 for the 3 magic bytes
+  int to_add = (nbInds / 4 + ((nbInds % 4 == 0u) ? 0 : 1)) * nbSNPs + 3 ;
+  if(fseek(f, to_add - 1, SEEK_SET) != 0)
+  {
+    fclose(f);
+    throw std::runtime_error("Error when resizing file");
+  }
+  fputc(0, f); // this is what will size it up
+  fclose(f);
+  // will write using mio
+  std::error_code error;
+  mio::mmap_sink file_ = mio::make_mmap_sink("/tmp/test2.bed", 0, mio::map_entire_file, error);
+  if(error) throw std::runtime_error(error.message());
+
+  std::shared_ptr<mio::mmap_sink> file_ptr = std::make_shared<mio::mmap_sink>(std::move(file_));
+  // file_ can't be used anymore
+
+  for (size_t snp = 0; snp < nbSNPs; snp++)
+  {
+    // v is a SNPvectorDisk
+    std::shared_ptr<SNPvectorDisk<mio::access_mode::write>> copied_snp = std::make_shared<SNPvectorDisk<mio::access_mode::write>>(M.getSNP(snp), file_ptr, snp, keep);
+    X.push_back(copied_snp);
+  }
+  IntegerMatrix x = SNPmat_to_IntMat(X);
+  colnames(x) = wrap(keep);
+  std::cout << "created /tmp/test2.bed, should be identical to " << file_hardcode << "\n";
+
+  return x;
+}
+
+// [[Rcpp::export]]
+IntegerMatrix test_matrix_file(std::string path, size_t nbInds, size_t nbSNPs)
+{
+  SNPmatrix M = readBedFileDisk(path, nbInds, nbSNPs);
+  IntegerMatrix x = SNPmat_to_IntMat(M);
+  return x;
+}
+
+
+// [[Rcpp::export]]
 IntegerMatrix test_extract_Matrix_disk(std::vector<size_t> keep)
 {
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
@@ -669,7 +742,7 @@ void test_copyConstructor()
 
       for(size_t snp = 0; snp < nbSNPs; snp++) {
         // j'ai pas besoin d'en garder trace pour ce test
-        SNPVectorDisk<mio::access_mode::write>( M.getSNP(snp), file_ptr, snp);
+        SNPvectorDisk<mio::access_mode::write>( M.getSNP(snp), file_ptr, snp);
       }
       std::cout << "created /tmp/test.bed, should be identical to " << file_hardcode << "\n";
 }

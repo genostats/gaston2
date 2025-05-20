@@ -287,6 +287,41 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_extract_SNP1
+IntegerMatrix test_extract_SNP1(std::vector<size_t> keep);
+RcppExport SEXP _snipsnop_test_extract_SNP1(SEXP keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<size_t> >::type keep(keepSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_extract_SNP1(keep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_extract_SNP2
+IntegerMatrix test_extract_SNP2(std::vector<size_t> keep);
+RcppExport SEXP _snipsnop_test_extract_SNP2(SEXP keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::vector<size_t> >::type keep(keepSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_extract_SNP2(keep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// test_matrix_file
+IntegerMatrix test_matrix_file(std::string path, size_t nbInds, size_t nbSNPs);
+RcppExport SEXP _snipsnop_test_matrix_file(SEXP pathSEXP, SEXP nbIndsSEXP, SEXP nbSNPsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< size_t >::type nbInds(nbIndsSEXP);
+    Rcpp::traits::input_parameter< size_t >::type nbSNPs(nbSNPsSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_matrix_file(path, nbInds, nbSNPs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // test_extract_Matrix_disk
 IntegerMatrix test_extract_Matrix_disk(std::vector<size_t> keep);
 RcppExport SEXP _snipsnop_test_extract_Matrix_disk(SEXP keepSEXP) {
@@ -363,6 +398,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_performance_stats_matrix", (DL_FUNC) &_snipsnop_test_performance_stats_matrix, 0},
     {"_snipsnop_test_all_stats_matrix", (DL_FUNC) &_snipsnop_test_all_stats_matrix, 0},
     {"_snipsnop_test_extract_Matrix", (DL_FUNC) &_snipsnop_test_extract_Matrix, 1},
+    {"_snipsnop_test_extract_SNP1", (DL_FUNC) &_snipsnop_test_extract_SNP1, 1},
+    {"_snipsnop_test_extract_SNP2", (DL_FUNC) &_snipsnop_test_extract_SNP2, 1},
+    {"_snipsnop_test_matrix_file", (DL_FUNC) &_snipsnop_test_matrix_file, 3},
     {"_snipsnop_test_extract_Matrix_disk", (DL_FUNC) &_snipsnop_test_extract_Matrix_disk, 1},
     {"_snipsnop_test_copyConstructor", (DL_FUNC) &_snipsnop_test_copyConstructor, 0},
     {"_snipsnop_test_first_scnd_ind", (DL_FUNC) &_snipsnop_test_first_scnd_ind, 0},

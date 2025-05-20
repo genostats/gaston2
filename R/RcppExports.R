@@ -97,6 +97,18 @@ test_extract_Matrix <- function(keep) {
     .Call(`_snipsnop_test_extract_Matrix`, keep)
 }
 
+test_extract_SNP1 <- function(keep) {
+    .Call(`_snipsnop_test_extract_SNP1`, keep)
+}
+
+test_extract_SNP2 <- function(keep) {
+    .Call(`_snipsnop_test_extract_SNP2`, keep)
+}
+
+test_matrix_file <- function(path, nbInds, nbSNPs) {
+    .Call(`_snipsnop_test_matrix_file`, path, nbInds, nbSNPs)
+}
+
 test_extract_Matrix_disk <- function(keep) {
     .Call(`_snipsnop_test_extract_Matrix_disk`, keep)
 }
