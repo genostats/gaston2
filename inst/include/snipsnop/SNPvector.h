@@ -74,7 +74,6 @@ protected: // can be accessed also by class inheriting
   double mu_ = 0;
   double sigma_ = 0;
 
-
   // just a small helper f° to extract an individual genotype from a byte
   int read_ind(uint8_t byte, size_t ind_idx) {
     byte >>= (2 * (ind_idx % 4));
@@ -268,12 +267,12 @@ public:
 
   // for scalar product :
   // TODO : think on what are the limits (error checking) => what calls in gaston ?
-  double LD(const SNPvector &other)
-  {
+  template<typename scalar_t = double>
+  scalar_t LD(const SNPvector &other) {
     if (nbInds() != other.nbInds())
       throw std::runtime_error("Mismatch in the nb of individuals between the 2 SNPs !");
-    double LD = 0;
-    double gg[16];
+    scalar_t LD = 0;
+    scalar_t gg[16];
     gg[1] = gg[4] = gg[5] = gg[6] = gg[7] = gg[9] = gg[13] = 0;
 
     gg[0] = (-mu_) * (-(other.mu_));
@@ -288,9 +287,8 @@ public:
     gg[14] = (2. - mu_) * (1. - (other.mu_));
     gg[15] = (2. - mu_) * (2. - (other.mu_));
 
-    double v = sigma_ * other.sigma_;
+    scalar_t v = sigma_ * other.sigma_;
 
-#pragma omp parallel for reduction(+ : LD)
     for (size_t i = 0; i < nbChars(); i++)
     {
       uint8_t g1 = data()[i]; // je récup les ièmes char
@@ -306,7 +304,7 @@ public:
         g2 >>= 2;
       }
     }
-    double r = LD / (v * (nbInds() - 1)); // nbInds should be the same for both
+    scalar_t r = LD / (v * (nbInds() - 1)); // nbInds should be the same for both
     return r * r;
   }
 

@@ -11,6 +11,32 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// LD_pair
+double LD_pair(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2);
+RcppExport SEXP _snipsnop_LD_pair(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_pair(pM, i1, i2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// LD
+Rcpp::NumericMatrix LD(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2);
+RcppExport SEXP _snipsnop_LD(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
+    rcpp_result_gen = Rcpp::wrap(LD(pM, i1, i2));
+    return rcpp_result_gen;
+END_RCPP
+}
 // SNPMatrixToIntegerMatrix
 Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix> pM);
 RcppExport SEXP _snipsnop_SNPMatrixToIntegerMatrix(SEXP pMSEXP) {
@@ -374,6 +400,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_snipsnop_LD_pair", (DL_FUNC) &_snipsnop_LD_pair, 3},
+    {"_snipsnop_LD", (DL_FUNC) &_snipsnop_LD, 3},
     {"_snipsnop_SNPMatrixToIntegerMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToIntegerMatrix, 1},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 1},
     {"_snipsnop_readBedFileMemory", (DL_FUNC) &_snipsnop_readBedFileMemory, 3},
