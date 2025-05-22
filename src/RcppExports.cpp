@@ -24,16 +24,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// LD
-Rcpp::NumericMatrix LD(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2);
-RcppExport SEXP _snipsnop_LD(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
+// LD_square
+Rcpp::NumericMatrix LD_square(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2);
+RcppExport SEXP _snipsnop_LD_square(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
-    rcpp_result_gen = Rcpp::wrap(LD(pM, i1, i2));
+    rcpp_result_gen = Rcpp::wrap(LD_square(pM, i1, i2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// LD_chunk
+Rcpp::NumericMatrix LD_chunk(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, size_t j1, size_t j2);
+RcppExport SEXP _snipsnop_LD_chunk(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
+    Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type j2(j2SEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_chunk(pM, i1, i2, j1, j2));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -401,7 +416,8 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_LD_pair", (DL_FUNC) &_snipsnop_LD_pair, 3},
-    {"_snipsnop_LD", (DL_FUNC) &_snipsnop_LD, 3},
+    {"_snipsnop_LD_square", (DL_FUNC) &_snipsnop_LD_square, 3},
+    {"_snipsnop_LD_chunk", (DL_FUNC) &_snipsnop_LD_chunk, 5},
     {"_snipsnop_SNPMatrixToIntegerMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToIntegerMatrix, 1},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 1},
     {"_snipsnop_readBedFileMemory", (DL_FUNC) &_snipsnop_readBedFileMemory, 3},

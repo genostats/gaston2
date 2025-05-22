@@ -9,7 +9,7 @@ double LD_pair(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2) {
 }
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix LD(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2) {
+Rcpp::NumericMatrix LD_square(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2) {
   Rcpp::NumericMatrix LD(i2 - i1 + 1, i2 - i1 + 1);
   LD_matrix(*pM, i1, i2, LD);
   return LD;

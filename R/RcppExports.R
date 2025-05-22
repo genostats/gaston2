@@ -5,8 +5,12 @@ LD_pair <- function(pM, i1, i2) {
     .Call(`_snipsnop_LD_pair`, pM, i1, i2)
 }
 
-LD <- function(pM, i1, i2) {
-    .Call(`_snipsnop_LD`, pM, i1, i2)
+LD_square <- function(pM, i1, i2) {
+    .Call(`_snipsnop_LD_square`, pM, i1, i2)
+}
+
+LD_chunk <- function(pM, i1, i2, j1, j2) {
+    .Call(`_snipsnop_LD_chunk`, pM, i1, i2, j1, j2)
 }
 
 SNPMatrixToIntegerMatrix <- function(pM) {
