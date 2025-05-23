@@ -230,7 +230,6 @@ public:
   {
     // if already called, do nothing
     if(stats_set_) return;
- std::cout << "."; 
     size_t nbByte = nbChars();
     size_t BitsInLastByte = (nbInds() % 4); // number of bits to read on last byte
     if (!BitsInLastByte)

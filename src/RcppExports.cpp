@@ -303,15 +303,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// test_LD
-NumericMatrix test_LD(int SNPnb1, int SNPnb2);
-RcppExport SEXP _snipsnop_test_LD(SEXP SNPnb1SEXP, SEXP SNPnb2SEXP) {
+// test_LD_square
+NumericMatrix test_LD_square(int SNPnb1, int SNPnb2);
+RcppExport SEXP _snipsnop_test_LD_square(SEXP SNPnb1SEXP, SEXP SNPnb2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< int >::type SNPnb1(SNPnb1SEXP);
     Rcpp::traits::input_parameter< int >::type SNPnb2(SNPnb2SEXP);
-    rcpp_result_gen = Rcpp::wrap(test_LD(SNPnb1, SNPnb2));
+    rcpp_result_gen = Rcpp::wrap(test_LD_square(SNPnb1, SNPnb2));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -451,7 +451,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_computeSNPStats", (DL_FUNC) &_snipsnop_computeSNPStats, 1},
     {"_snipsnop_SNPMatrixToIntegerMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToIntegerMatrix, 1},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 1},
-    {"_snipsnop_readBedFileMemory", (DL_FUNC) &_snipsnop_readBedFileMemory, 3},
+    {"_snipsnop_readBedFileMemory_", (DL_FUNC) &_snipsnop_readBedFileMemory_, 3},
     {"_snipsnop_test_ds", (DL_FUNC) &_snipsnop_test_ds, 2},
     {"_snipsnop_test_ds2", (DL_FUNC) &_snipsnop_test_ds2, 0},
     {"_snipsnop_test_ds3", (DL_FUNC) &_snipsnop_test_ds3, 1},
@@ -470,7 +470,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_sums", (DL_FUNC) &_snipsnop_test_sums, 1},
     {"_snipsnop_test_mu_sigma", (DL_FUNC) &_snipsnop_test_mu_sigma, 1},
     {"_snipsnop_test_modes_setsigma_one", (DL_FUNC) &_snipsnop_test_modes_setsigma_one, 1},
-    {"_snipsnop_test_LD", (DL_FUNC) &_snipsnop_test_LD, 2},
+    {"_snipsnop_test_LD_square", (DL_FUNC) &_snipsnop_test_LD_square, 2},
     {"_snipsnop_test_contingency", (DL_FUNC) &_snipsnop_test_contingency, 2},
     {"_snipsnop_test_performance_stats_matrix", (DL_FUNC) &_snipsnop_test_performance_stats_matrix, 0},
     {"_snipsnop_test_all_stats_matrix", (DL_FUNC) &_snipsnop_test_all_stats_matrix, 0},

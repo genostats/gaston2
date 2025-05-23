@@ -421,7 +421,7 @@ NumericVector test_modes_setsigma_one(int mode)
  ********************************/
 
 // [[Rcpp::export]]
-NumericMatrix test_LD(int SNPnb1, int SNPnb2)
+NumericMatrix test_LD_square(int SNPnb1, int SNPnb2)
 {
   if (SNPnb1 > 503 || SNPnb2 > 503)
   {
@@ -456,7 +456,8 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2)
         // snp2.compute_mu_sigma();
       }
 
-      res(i, j) = snp1.LD(snp2);
+       double r = snp1.LD(snp2); // parce que double par défaut dans template
+       res(i, j) = r * r; // plus carré dans la fonction
     }
   }
   return res;
@@ -924,7 +925,7 @@ void testsuite(bool verbose = true)
   std::ifstream file2("./inst/extdata/LD_ref.txt");
   double expected_LD;
 
-  NumericMatrix result_LD = test_LD(0, 503);
+  NumericMatrix result_LD = test_LD_square(0, 503);
   // if (result_LD == 0) goto conclusion;
 
   if (!file2)

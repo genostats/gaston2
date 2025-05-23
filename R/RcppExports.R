@@ -101,8 +101,8 @@ test_modes_setsigma_one <- function(mode) {
     .Call(`_snipsnop_test_modes_setsigma_one`, mode)
 }
 
-test_LD <- function(SNPnb1, SNPnb2) {
-    .Call(`_snipsnop_test_LD`, SNPnb1, SNPnb2)
+test_LD_square <- function(SNPnb1, SNPnb2) {
+    .Call(`_snipsnop_test_LD_square`, SNPnb1, SNPnb2)
 }
 
 test_contingency <- function(SNPnb1, SNPnb2) {
