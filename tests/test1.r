@@ -1,6 +1,6 @@
 require(snipsnop)
 require(gaston)
-a <- readBedFileMemory("inst/extdata/LCT.bed", 503, 607)
+a <- readBedFileMemory_("inst/extdata/LCT.bed", 503, 607)
 A <- SNPMatrixToIntegerMatrix(a)
 cp <- table(A , LCT.gen, useNA = "always")
 

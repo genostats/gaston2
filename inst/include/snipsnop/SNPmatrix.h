@@ -374,6 +374,27 @@ public:
     indStats_ = new_stats;
   }
 
+  // compute all SNP stats
+  void computeSNPStats() {
+    for(auto & snp : SNPs_) {
+      snp->compute_stats();
+    }
+  }
+
+  // comute SNP stats for snp i with i1 <= i <= i2
+  // SHOULD THIS CHANGE TO i1 <= i < i2 ?
+  void computeSNPStats(size_t i1, size_t i2) {
+    for(size_t i = i1; i <= i2; i++) {
+      SNPs_[i]->compute_stats();
+    }
+  }
+
+  
+  void setMode(Mode mode) {
+    for(auto & snp : SNPs_) {
+      snp->setMode(mode);
+    }
+  }
 private:
   DataStruct indStats_;
   std::vector<std::shared_ptr<SNPvector>> SNPs_;

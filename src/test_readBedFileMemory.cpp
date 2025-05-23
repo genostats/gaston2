@@ -76,7 +76,7 @@ IntegerVector loop_sum(SNPmatrix matrix)
   return wrap(res);
 }
 
-// [[Rcpp::export]]
+/*
 IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp)
 {
   std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
@@ -100,6 +100,7 @@ IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp)
     res.push_back(i);
   return wrap(res);
 }
+*/
 
 /************************
  *    Test SNP reading  *
@@ -401,7 +402,8 @@ NumericVector test_modes_setsigma_one(int mode)
   std::vector<double> res;
 
   Mode mode_ = (Mode) mode;
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607, mode_);
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+  M.setMode(mode_);
   for (auto v : M.getSNPs())
   {
     v->compute_stats();

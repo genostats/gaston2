@@ -11,12 +11,12 @@
 template<typename scalar_t = double>
 inline scalar_t LD_pair(SNPmatrix & M, size_t i1, size_t i2) {
   SNPvector & snp1 = *(M.getSNP(i1));
-  snp1.compute_stats();  // TODO a déplacer dans la fonction de calcul du LD, en ne recalculant pas si c'est déjà calculé. 
+  // snp1.compute_stats();  // TODO a déplacer dans la fonction de calcul du LD, en ne recalculant pas si c'est déjà calculé. 
                          // Je laisse comme ça mais ça ralentit énormément, les stats sont recalculées plein de fois. Il faut revoir un peu la gestion de mu, sigma, etc.
                          // NOTE : je ne me souviens plus pourquoi dans le calcul de sigma le nbre de NAs intervient dans le calcul ?!
 
   SNPvector & snp2 = *(M.getSNP(i2));
-  snp2.compute_stats();
+  // snp2.compute_stats();
 
   return snp1.LD<scalar_t>(snp2);
 }
@@ -25,6 +25,7 @@ inline scalar_t LD_pair(SNPmatrix & M, size_t i1, size_t i2) {
 // remplit une matrice carrée de LD des SNPS i avec c1 <= i <= c2 
 // doit être ok avec n'importe quelle classe de matrice qui a des membres nrow() ncol() et l'affectation par M(i,j) = ...
 // (column major mode matrix)
+ 
 template<typename scalar_t = double, typename matrixType>
 void LD_matrix(SNPmatrix & A, size_t c1, size_t c2, matrixType & M) {
   if(c1 >= A.size() || c2 >= A.size()) throw std::runtime_error("Bad bound in LD_matrix");
@@ -49,7 +50,6 @@ void LD_matrix(SNPmatrix & A, size_t c1, size_t c2, matrixType & M) {
     }
   }
 }
-
 
 /***********************************************************************
  *

@@ -13,6 +13,10 @@ LD_chunk <- function(pM, i1, i2, j1, j2) {
     .Call(`_snipsnop_LD_chunk`, pM, i1, i2, j1, j2)
 }
 
+computeSNPStats <- function(pM) {
+    invisible(.Call(`_snipsnop_computeSNPStats`, pM))
+}
+
 SNPMatrixToIntegerMatrix <- function(pM) {
     .Call(`_snipsnop_SNPMatrixToIntegerMatrix`, pM)
 }
@@ -21,8 +25,8 @@ getIndStats <- function(pM) {
     .Call(`_snipsnop_getIndStats`, pM)
 }
 
-readBedFileMemory <- function(filename, n_ind, n_snp) {
-    .Call(`_snipsnop_readBedFileMemory`, filename, n_ind, n_snp)
+readBedFileMemory_ <- function(filename, n_ind, n_snp) {
+    .Call(`_snipsnop_readBedFileMemory_`, filename, n_ind, n_snp)
 }
 
 test_readBedFileMemory <- function(filename, n_ind, n_snp, verbose = TRUE) {
@@ -35,10 +39,6 @@ test_readBedFileDisk <- function(filename, n_ind, n_snp) {
 
 test_delete <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_test_delete`, filename, n_ind, n_snp)
-}
-
-test_readModes <- function(filename, n_ind, n_snp) {
-    .Call(`_snipsnop_test_readModes`, filename, n_ind, n_snp)
 }
 
 test_performance_iterator_default <- function(n) {

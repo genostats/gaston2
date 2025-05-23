@@ -52,6 +52,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// computeSNPStats
+void computeSNPStats(Rcpp::XPtr<SNPmatrix> pM);
+RcppExport SEXP _snipsnop_computeSNPStats(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    computeSNPStats(pM);
+    return R_NilValue;
+END_RCPP
+}
 // SNPMatrixToIntegerMatrix
 Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix> pM);
 RcppExport SEXP _snipsnop_SNPMatrixToIntegerMatrix(SEXP pMSEXP) {
@@ -74,16 +84,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// readBedFileMemory
-Rcpp::XPtr<SNPmatrix> readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp);
-RcppExport SEXP _snipsnop_readBedFileMemory(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
+// readBedFileMemory_
+Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string filename, size_t n_ind, size_t n_snp);
+RcppExport SEXP _snipsnop_readBedFileMemory_(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
     Rcpp::traits::input_parameter< size_t >::type n_ind(n_indSEXP);
     Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
-    rcpp_result_gen = Rcpp::wrap(readBedFileMemory(filename, n_ind, n_snp));
+    rcpp_result_gen = Rcpp::wrap(readBedFileMemory_(filename, n_ind, n_snp));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -124,19 +134,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type n_ind(n_indSEXP);
     Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
     rcpp_result_gen = Rcpp::wrap(test_delete(filename, n_ind, n_snp));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_readModes
-IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp);
-RcppExport SEXP _snipsnop_test_readModes(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
-    Rcpp::traits::input_parameter< size_t >::type n_ind(n_indSEXP);
-    Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_readModes(filename, n_ind, n_snp));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -418,13 +415,13 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_LD_pair", (DL_FUNC) &_snipsnop_LD_pair, 3},
     {"_snipsnop_LD_square", (DL_FUNC) &_snipsnop_LD_square, 3},
     {"_snipsnop_LD_chunk", (DL_FUNC) &_snipsnop_LD_chunk, 5},
+    {"_snipsnop_computeSNPStats", (DL_FUNC) &_snipsnop_computeSNPStats, 1},
     {"_snipsnop_SNPMatrixToIntegerMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToIntegerMatrix, 1},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 1},
-    {"_snipsnop_readBedFileMemory", (DL_FUNC) &_snipsnop_readBedFileMemory, 3},
+    {"_snipsnop_readBedFileMemory_", (DL_FUNC) &_snipsnop_readBedFileMemory_, 3},
     {"_snipsnop_test_readBedFileMemory", (DL_FUNC) &_snipsnop_test_readBedFileMemory, 4},
     {"_snipsnop_test_readBedFileDisk", (DL_FUNC) &_snipsnop_test_readBedFileDisk, 3},
     {"_snipsnop_test_delete", (DL_FUNC) &_snipsnop_test_delete, 3},
-    {"_snipsnop_test_readModes", (DL_FUNC) &_snipsnop_test_readModes, 3},
     {"_snipsnop_test_performance_iterator_default", (DL_FUNC) &_snipsnop_test_performance_iterator_default, 1},
     {"_snipsnop_test_performance_iterator_1", (DL_FUNC) &_snipsnop_test_performance_iterator_1, 1},
     {"_snipsnop_test_performance_iterator_2", (DL_FUNC) &_snipsnop_test_performance_iterator_2, 1},
