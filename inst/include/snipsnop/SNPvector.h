@@ -204,7 +204,6 @@ public:
     unsigned int N1s = stats_[1];
     unsigned int N2s = stats_[2];
     unsigned int NAs = stats_[3];
-    double n = N - NAs;
 
     double mu2 = mu_ * mu_;
     sigma_ = sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
@@ -278,10 +277,8 @@ public:
 
   // for scalar product :
   // CAVEAT: stats are supposed set! 
-  // cette fonction pourrait être déclarée const mais je constate que ça fait perdre
-  // un peu de temps d'exécution. Donc on laisse comme ça pour le moment
   template<typename scalar_t = double>
-  inline scalar_t LD(const SNPvector &other) {
+  inline scalar_t LD(const SNPvector &other) const {
      
     size_t nbi = nbInds(); 
     if (nbi != other.nbInds())
@@ -313,7 +310,7 @@ public:
       uint8_t g1 = data1[i]; // je récup les ièmes char
       uint8_t g2 = data2[i];
 
-      for (int ss = 0; ss < 4; ss++) { 
+      for (unsigned int ss = 0; ss < 4; ss++) { 
         LD += gg[ ((g1&3)*4) + (g2&3) ];
         g1 >>= 2;
         g2 >>= 2;
@@ -329,7 +326,7 @@ public:
 
     uint8_t g1 = data1[nbc_m1];
     uint8_t g2 = data2[nbc_m1];
-    for (int ss = 0; ss < BitsInLastByte; ss++) {
+    for (unsigned int ss = 0; ss < BitsInLastByte; ss++) {
       LD += gg[ ((g1&3)*4) + (g2&3) ];
       g1 >>= 2;
       g2 >>= 2;
@@ -352,7 +349,7 @@ public:
     for (size_t i = 0; i < nbc_m1; i++) {
       uint8_t g1 = data1[i]; 
       uint8_t g2 = data2[i];
-      for (int ss = 0; ss < 4; ss++) {
+      for (unsigned int ss = 0; ss < 4; ss++) {
         table[ (g1&3)*4 + (g2&3) ]++;
         g1 >>= 2;
         g2 >>= 2;
@@ -363,7 +360,7 @@ public:
     unsigned int BitsInLastByte = (nbi & 3)?(nbi & 3):4;
     uint8_t g1 = data1[nbc_m1];
     uint8_t g2 = data2[nbc_m1];
-    for (int ss = 0; ss < BitsInLastByte; ss++) {
+    for (unsigned int ss = 0; ss < BitsInLastByte; ss++) {
       table[ (g1&3)*4 + (g2&3) ]++;
       g1 >>= 2;
       g2 >>= 2;

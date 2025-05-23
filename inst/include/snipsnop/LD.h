@@ -60,14 +60,12 @@ void LD_matrix(SNPmatrix & A, size_t c1, size_t c2, matrixType & M) {
 // Intervalles c1 c2 et d1 d2 disjoints [sauf possiblement un point sur la diagonale, mais pas de calculs en double]
 template<typename scalar_t = double, typename matrixType>
 void LD_chunk_0(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
-  const int n = c2-c1+1;
-  const int m = d2-d1+1;
-  if(n != M.nrow() || m != M.ncol()) 
+  if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_0");
 
 #pragma omp parallel for
-  for(int x2 = d1; x2 <= d2; x2++) {
-    for(int x1 = c1; x1 <= c2; x1++) {
+  for(size_t x2 = d1; x2 <= d2; x2++) {
+    for(size_t x1 = c1; x1 <= c2; x1++) {
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
     }
   }
@@ -80,24 +78,24 @@ void LD_chunk_1(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matri
     throw std::runtime_error("dimension mismatch in LD_chunk_1");
 
 #pragma omp parallel for
-  for(int x2 = d1; x2 <= d2; x2++) 
-    for(int x1 = c1; x1 < d1; x1++) 
+  for(size_t x2 = d1; x2 <= d2; x2++) 
+    for(size_t x1 = c1; x1 < d1; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
 
 #pragma omp parallel for
-  for(int x2 = d1; x2 <= c2; x2++) 
-    for(int x1 = d1; x1 <= x2; x1++) 
+  for(size_t x2 = d1; x2 <= c2; x2++) 
+    for(size_t x1 = d1; x1 <= x2; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
 
   // symetriser ce morceau
 #pragma omp parallel for
-  for(int x1 = d1; x1 <= c2; x1++) 
-    for(int x2 = d1; x2 < x1; x2++) 
+  for(size_t x1 = d1; x1 <= c2; x1++) 
+    for(size_t x2 = d1; x2 < x1; x2++) 
       M(x1 - c1, x2 - d1) = M(x2 - c1, x1 - d1);
 
 #pragma omp parallel for
-  for(int x2 = c2+1; x2 <= d2; x2++) 
-    for(int x1 = d1; x1 <= c2; x1++) 
+  for(size_t x2 = c2+1; x2 <= d2; x2++) 
+    for(size_t x1 = d1; x1 <= c2; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
 }
 
@@ -109,24 +107,24 @@ void LD_chunk_2(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matri
     throw std::runtime_error("dimension mismatch in LD_chunk_2");
 
 #pragma omp parallel for
-  for(int x2 = d1; x2 < c1; x2++) 
-    for(int x1 = c1; x1 <= c2; x1++) 
+  for(size_t x2 = d1; x2 < c1; x2++) 
+    for(size_t x1 = c1; x1 <= c2; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
   
 #pragma omp parallel for
-  for(int x2 = c1; x2 <= d2; x2++) 
-    for(int x1 = c1; x1 <= x2; x1++) 
+  for(size_t x2 = c1; x2 <= d2; x2++) 
+    for(size_t x1 = c1; x1 <= x2; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
   
   // symetriser ce morceau
 #pragma omp parallel for
-  for(int x1 = c1; x1 <= d2; x1++) 
-    for(int x2 = c1; x2 < x1; x2++) 
+  for(size_t x1 = c1; x1 <= d2; x1++) 
+    for(size_t x2 = c1; x2 < x1; x2++) 
       M(x1 - c1, x2 - d1) = M(x2 - c1, x1 - d1);
 
 #pragma omp parallel for
-  for(int x2 = c1; x2 <= d2; x2++) 
-    for(int x1 = d2+1; x1 <= c2; x1++) 
+  for(size_t x2 = c1; x2 <= d2; x2++) 
+    for(size_t x1 = d2+1; x1 <= c2; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
 }
 
@@ -137,24 +135,24 @@ void LD_chunk_3(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matri
     throw std::runtime_error("dimension mismatch in LD_chunk_3");
 
 #pragma omp parallel for
-  for(int x2 = d1; x2 < c1; x2++) 
-    for(int x1 = c1; x1 <= c2; x1++) 
+  for(size_t x2 = d1; x2 < c1; x2++) 
+    for(size_t x1 = c1; x1 <= c2; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
   
 #pragma omp parallel for
-  for(int x2 = c1; x2 <= c2; x2++) 
-    for(int x1 = c1; x1 <= x2; x1++) 
+  for(size_t x2 = c1; x2 <= c2; x2++) 
+    for(size_t x1 = c1; x1 <= x2; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
 
   // symmetriser ce morceau
 #pragma omp parallel for
-  for(int x1 = c1; x1 <= c2; x1++) 
-    for(int x2 = c1; x2 < x1; x2++) 
+  for(size_t x1 = c1; x1 <= c2; x1++) 
+    for(size_t x2 = c1; x2 < x1; x2++) 
       M(x1 - c1, x2 - d1) = M(x2 - c1, x1 - d1);
 
 #pragma omp parallel for
-  for(int x2 = c2+1; x2 <= d2; x2++) 
-    for(int x1 = c1; x1 <= c2; x1++) 
+  for(size_t x2 = c2+1; x2 <= d2; x2++) 
+    for(size_t x1 = c1; x1 <= c2; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
 }
 
@@ -166,24 +164,24 @@ void LD_chunk_4(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matri
     throw std::runtime_error("dimension mismatch in LD_chunk_4");
 
 #pragma omp parallel for
-  for(int x2 = d1; x2 <= d2; x2++) 
-    for(int x1 = c1; x1 < d1; x1++) 
+  for(size_t x2 = d1; x2 <= d2; x2++) 
+    for(size_t x1 = c1; x1 < d1; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
   
 #pragma omp parallel for
-  for(int x2 = d1; x2 <= d2; x2++) 
-    for(int x1 = d1; x1 <= x2; x1++) 
+  for(size_t x2 = d1; x2 <= d2; x2++) 
+    for(size_t x1 = d1; x1 <= x2; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
 
   // symetriser ce morceau
 #pragma omp parallel for
-  for(int x1 = d1; x1 <= d2; x1++) 
-    for(int x2 = d1; x2 < x1; x2++) 
+  for(size_t x1 = d1; x1 <= d2; x1++) 
+    for(size_t x2 = d1; x2 < x1; x2++) 
       M(x1 - c1, x2 - d1) = M(x2 - c1, x1 - d1);
   
 #pragma omp parallel for
-  for(int x2 = d1; x2 <= d2; x2++) 
-    for(int x1 = d2+1; x1 <= c2; x1++) 
+  for(size_t x2 = d1; x2 <= d2; x2++) 
+    for(size_t x1 = d2+1; x1 <= c2; x1++) 
       M(x1 - c1, x2 - d1) = LD_pair<scalar_t>(A, x1, x2);
 }
 
