@@ -283,7 +283,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // test_contingency
-IntegerMatrix test_contingency(int SNPnb1, int SNPnb2);
+SEXP test_contingency(int SNPnb1, int SNPnb2);
 RcppExport SEXP _snipsnop_test_contingency(SEXP SNPnb1SEXP, SEXP SNPnb2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

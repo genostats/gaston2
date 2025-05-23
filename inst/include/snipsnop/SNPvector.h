@@ -278,10 +278,12 @@ public:
 
   // for scalar product :
   // CAVEAT: stats are supposed set! 
+  // cette fonction pourrait être déclarée const mais je constate que ça fait perdre
+  // un peu de temps d'exécution. Donc on laisse comme ça pour le moment
   template<typename scalar_t = double>
   inline scalar_t LD(const SNPvector &other) {
      
-    size_t nbi = nbInds(); // même 
+    size_t nbi = nbInds(); 
     if (nbi != other.nbInds())
        throw std::runtime_error("Mismatch in the nb of individuals between the 2 SNPs !");
     scalar_t LD = 0;
@@ -337,31 +339,47 @@ public:
     return r;
   }
 
-  // function returning a 16 int vector holding frequency distribution over 2 vectors
-  std::vector<int> contingency(const SNPvector &other)
-  {
-    std::vector<int> table(16);
-    // #pragma omp declare reduction(vec_incr : std::vector<int> : \
-    //std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
-    // initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
-    // #pragma omp parallel for reduction(vec_incr : table)
-    for (size_t i = 0; i < nbChars(); i++)
-    {
-      uint8_t snp1 = data()[i]; // je récup les ièmes char
-      const uint8_t snp2_const = other.data()[i];
-      uint8_t snp2 = snp2_const;
-      for (int ss = 0; ss < 4; ss++)
-      { // que je vais lire 2bits par 2bits
-        // Hardcoded to only use Plink here, without touching mode
-        int ind1 = currentMode_[0][snp1 & 3];
-        int ind2 = currentMode_[0][snp2 & 3];
-        table[ind1 * 4 + ind2]++;
-        // std::cout << "ind1 = " << ind1 << " ind2 = " << ind2 << ", " << "Table[" << ind1*4 + ind2 << "] = " << table[ind1*4 + ind2] << "\n";
-        ind1 >>= 2;
-        ind2 >>= 2;
+  // function filling a 9 (unsigned) int vector corresponding to a contigency table of genotypes over 2 SNPs
+  // intVec must have members size() and []
+  template<typename intVec>
+  void contingency(const SNPvector &other, intVec & contingencyTable) {
+    if(contingencyTable.size() < 9) throw std::runtime_error("In contingency, contigencyTable is too short");
+    // the "raw" contigency table, 4x4 seen as a long 16 elts array
+    unsigned int table[16] = {0}; // initialisée à 0
+    size_t nbc_m1 = nbChars() - 1;
+    auto data1 = data();
+    auto data2 = other.data();
+    for (size_t i = 0; i < nbc_m1; i++) {
+      uint8_t g1 = data1[i]; 
+      uint8_t g2 = data2[i];
+      for (int ss = 0; ss < 4; ss++) {
+        table[ (g1&3)*4 + (g2&3) ]++;
+        g1 >>= 2;
+        g2 >>= 2;
       }
     }
-    return table;
+    // idem LD(), dernier char traité à part
+    size_t nbi = nbInds();
+    unsigned int BitsInLastByte = (nbi & 3)?(nbi & 3):4;
+    uint8_t g1 = data1[nbc_m1];
+    uint8_t g2 = data2[nbc_m1];
+    for (int ss = 0; ss < BitsInLastByte; ss++) {
+      table[ (g1&3)*4 + (g2&3) ]++;
+      g1 >>= 2;
+      g2 >>= 2;
+    }
+    // on recopie les résultats en virant les 7 valeurs
+    // où un des deux génotypes au moins est à NA -> table 3x3
+    // linéarisée
+    contingencyTable[0] = table[0];
+    contingencyTable[1] = table[2];
+    contingencyTable[2] = table[3];
+    contingencyTable[3] = table[8];
+    contingencyTable[4] = table[10];
+    contingencyTable[5] = table[11];
+    contingencyTable[6] = table[12];
+    contingencyTable[7] = table[14];
+    contingencyTable[8] = table[15];
   }
 
   class Iterator

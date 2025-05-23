@@ -35,13 +35,13 @@ stopifnot( all(M[3:5, 1:6] == M3) )
 M4 <- LD_chunk(a, 167, 172, 168, 171)
 stopifnot( all(M[1:6, 2:5] == M4) )
 
-
+if(TRUE) {
 data("LCT", package = "gaston")
 x <- gaston::as.bed.matrix(LCT.gen, LCT.fam, LCT.bim)
 
-microbenchmark::microbenchmark(M1 <- gaston::LD(x, c(1, 607), measure = "r"), M2 <- LD_square(a, 0, 606), times = 10)
-range(M1- M2)
+mb1 <-microbenchmark::microbenchmark(M1 <- gaston::LD(x, c(1, 607), measure = "r"), M2 <- LD_square(a, 0, 606), times = 10)
+stopifnot( max(abs(M1- M2)) < 1e-12 )
 
-microbenchmark::microbenchmark(M1 <- .Call(gaston:::`_gaston_LD`, PACKAGE = "gaston", x@bed, x@mu, x@sigma, 0, 606), M2 <- LD_square(a, 0, 606), times = 40)
-range(M1 - M2)
-
+mb2 <- microbenchmark::microbenchmark(M1 <- .Call(gaston:::`_gaston_LD`, PACKAGE = "gaston", x@bed, x@mu, x@sigma, 0, 606), M2 <- LD_square(a, 0, 606), times = 40)
+stopifnot( max(abs(M1- M2)) < 1e-12 )
+}

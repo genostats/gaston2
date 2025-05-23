@@ -463,7 +463,7 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2)
 }
 
 // [[Rcpp::export]]
-IntegerMatrix test_contingency(int SNPnb1, int SNPnb2)
+SEXP test_contingency(int SNPnb1, int SNPnb2)
 {
   if (SNPnb1 > 503 || SNPnb2 > 503)
   {
@@ -472,14 +472,15 @@ IntegerMatrix test_contingency(int SNPnb1, int SNPnb2)
     return 0;
   }
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps ?
-  IntegerVector res(16);
+
+  IntegerVector res(9);
   SNPvector &snp1 = *M.getSNP(SNPnb1);
   SNPvector &snp2 = *M.getSNP(SNPnb2);
-  res = snp1.contingency(snp2);
-  res.attr("dim") = Dimension(4, 4);
-  IntegerMatrix m = as<IntegerMatrix>(res);
-  
-  return m;
+  snp1.contingency(snp2, res);
+  res.attr("dim") = Dimension(3, 3);
+  // IntegerMatrix m = as<IntegerMatrix>(res);
+  // return m;
+  return res;
 }
 
 // [[Rcpp::export]]
