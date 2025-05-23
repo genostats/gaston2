@@ -29,6 +29,18 @@ readBedFileMemory_ <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_readBedFileMemory_`, filename, n_ind, n_snp)
 }
 
+test_ds <- function(DF, In) {
+    .Call(`_snipsnop_test_ds`, DF, In)
+}
+
+test_ds2 <- function() {
+    .Call(`_snipsnop_test_ds2`)
+}
+
+test_ds3 <- function(famFile) {
+    .Call(`_snipsnop_test_ds3`, famFile)
+}
+
 test_readBedFileMemory <- function(filename, n_ind, n_snp, verbose = TRUE) {
     .Call(`_snipsnop_test_readBedFileMemory`, filename, n_ind, n_snp, verbose)
 }
