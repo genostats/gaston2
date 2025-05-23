@@ -2,6 +2,7 @@
 #include "SNPmatrix.h"
 #include "SNPvector.h"
 #include "readBedFileMemory.h"
+#include "extractSNPmatrix.h"
 #include "debug.h"
 #include <vector>
 #include <iostream>
@@ -599,109 +600,11 @@ IntegerMatrix SNPmat_to_IntMat(SNPmatrix matrix)
 }
 
 // [[Rcpp::export]]
-IntegerMatrix test_extract_Matrix(std::vector<size_t> keep)
-{
-
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
-
-  SNPmatrix M_subset = M.extract_ind(keep);
-
-  //std::cout << "Number of SNPs in the new matrix (607): " << M_subset.getSNPs().size() << "\n";
-  //std::cout << "Number of inds in the new SNPs : " << M_subset.getSNP(0)->nbInds() << "\n";
-
-  IntegerMatrix m = SNPmat_to_IntMat(M_subset);
-  colnames(m) = wrap(keep);
-
-  return m;
-}
-
-// [[Rcpp::export]]
-IntegerMatrix test_extract_SNP1(std::vector<size_t> keep)
-{
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
-  SNPmatrix X;
-  for(size_t snp = 0; snp < 607; snp++)
-  {
-    std::shared_ptr<SNPvectorMemory> copied_snp = std::make_shared<SNPvectorMemory>(M.getSNP(snp), keep);
-    X.push_back(copied_snp);
-  }
-
-  IntegerMatrix x = SNPmat_to_IntMat(X);
-  colnames(x) = wrap(keep);
-  return x;
-}
-
-// [[Rcpp::export]]
-IntegerMatrix test_extract_SNP2(std::vector<size_t> keep)
-{
-  int nbInds = keep.size();
-  int nbSNPs = 607;
-  SNPmatrix M = readBedFileDisk(file_hardcode, 503, 607);
-  SNPmatrix X;  
-
-  FILE *f = fopen("/tmp/test2.bed", "wb");
-  if (!f)
-  {
-    throw std::runtime_error("Failed to open file for writing");
-  }
-  // Adding magic numbers to
-  // Identify a bed file in SNP major mode
-  fputc(108, f);
-  fputc(27, f);
-  fputc(1, f);
-  // + 3 for the 3 magic bytes
-  int to_add = (nbInds / 4 + ((nbInds % 4 == 0u) ? 0 : 1)) * nbSNPs + 3 ;
-  if(fseek(f, to_add - 1, SEEK_SET) != 0)
-  {
-    fclose(f);
-    throw std::runtime_error("Error when resizing file");
-  }
-  fputc(0, f); // this is what will size it up
-  fclose(f);
-  // will write using mio
-  std::error_code error;
-  mio::mmap_sink file_ = mio::make_mmap_sink("/tmp/test2.bed", 0, mio::map_entire_file, error);
-  if(error) throw std::runtime_error(error.message());
-
-  std::shared_ptr<mio::mmap_sink> file_ptr = std::make_shared<mio::mmap_sink>(std::move(file_));
-  // file_ can't be used anymore
-
-  for (size_t snp = 0; snp < nbSNPs; snp++)
-  {
-    // v is a SNPvectorDisk
-    std::shared_ptr<SNPvectorDisk<mio::access_mode::write>> copied_snp = std::make_shared<SNPvectorDisk<mio::access_mode::write>>(M.getSNP(snp), file_ptr, snp, keep);
-    X.push_back(copied_snp);
-  }
-  IntegerMatrix x = SNPmat_to_IntMat(X);
-  colnames(x) = wrap(keep);
-  std::cout << "created /tmp/test2.bed, should be identical to " << file_hardcode << "\n";
-
-  return x;
-}
-
-// [[Rcpp::export]]
-IntegerMatrix test_matrix_file(std::string path, size_t nbInds, size_t nbSNPs)
+IntegerMatrix get_matrix_from_file(std::string path, size_t nbInds, size_t nbSNPs)
 {
   SNPmatrix M = readBedFileDisk(path, nbInds, nbSNPs);
   IntegerMatrix x = SNPmat_to_IntMat(M);
   return x;
-}
-
-
-// [[Rcpp::export]]
-IntegerMatrix test_extract_Matrix_disk(std::vector<size_t> keep)
-{
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
-
-  SNPmatrix M_sub = M.extract_ind(keep, false, "tmp_mat.txt"); // careful !! with no extension will core dump :/
-
-  // SNPmatrix M_file = readBedFileMemory("tmp_mat", 11, 607);
-
-
-  IntegerMatrix m = SNPmat_to_IntMat(M_sub);
-  colnames(m) = wrap(keep);
-
-  return m;
 }
 
 // [[Rcpp::export]]
@@ -813,6 +716,9 @@ bool equal(double val1, double val2)
 void testsuite(bool verbose = true)
 {
 
+  // if using valgrind, important
+  set_num_thread(1);
+
   if (verbose) std::cout << "Using " << omp_get_max_threads() << " thread(s).\n";
 
   std::vector<int> total = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -911,6 +817,7 @@ void testsuite(bool verbose = true)
       i++;
       j = 0;
     }
+    
   }
   if (total[2])
   {
@@ -1065,9 +972,12 @@ void testsuite(bool verbose = true)
     exit(EXIT_FAILURE);
   }
 
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
   std::vector<size_t> to_keep = { 2, 6, 229, 230, 231, 232, 233, 234, 235, 236, 237 };
-  IntegerMatrix res = test_extract_Matrix(to_keep);
-  IntegerMatrix res_disk = test_extract_Matrix_disk(to_keep);
+  IntegerMatrix res = SNPmat_to_IntMat(extractSNPmatrixMemory<std::vector<size_t>>(M, to_keep));
+  IntegerMatrix res_disk = SNPmat_to_IntMat(extractSNPmatrixDisk<std::vector<size_t>>(M, to_keep, "/tmp/extracted_mat_testsuite.bed"));
+  
+  IntegerMatrix from_file = get_matrix_from_file("/tmp/extracted_mat_testsuite.bed", 11, 607);
 
   while (file5 >> value)
   {
@@ -1076,9 +986,15 @@ void testsuite(bool verbose = true)
       break;
     }
     
+    if (from_file(i, j) != value) 
+    {
+      std::cout << RED << "Error: new extracted file with matrix at (" << i << "," << j << ") does not match reference value! " <<  from_file(i, j) << " != " << value << RESET << std::endl;
+      total[7] = 0;
+    }
+       
     if (res(i,j)!= value)
     {
-      std::cout << RED << "Error: new extracted matrix at (" << i << "," << j - 1 << ") does not match reference value! " <<  res(i,j - 1) << " != " << value << RESET << std::endl;
+      std::cout << RED << "Error: new extracted matrix at (" << i << "," << j << ") does not match reference value! " <<  res(i,j) << " != " << value << RESET << std::endl;
       total[7] = 0;
     }
        
@@ -1093,9 +1009,8 @@ void testsuite(bool verbose = true)
       i++;
       j = 0;
     }
-
   }
-  std::remove("tmp_mat.txt");
+  std::remove("/tmp/extracted_mat_testsuite.bed");
   if (total[7])
   {
     if (verbose) std::cout << GREEN << "Test for selected inds to extract in new matrix passed!" << RESET << std::endl;

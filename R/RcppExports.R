@@ -5,6 +5,14 @@ SNPMatrixToIntegerMatrix <- function(pM) {
     .Call(`_snipsnop_SNPMatrixToIntegerMatrix`, pM)
 }
 
+extractSNPmatrixMemory_ <- function(other, keep) {
+    .Call(`_snipsnop_extractSNPmatrixMemory_`, other, keep)
+}
+
+extractSNPmatrixDisk_ <- function(other, keep, path_str) {
+    .Call(`_snipsnop_extractSNPmatrixDisk_`, other, keep, path_str)
+}
+
 getIndStats <- function(pM) {
     .Call(`_snipsnop_getIndStats`, pM)
 }
@@ -93,24 +101,8 @@ test_all_stats_matrix <- function() {
     .Call(`_snipsnop_test_all_stats_matrix`)
 }
 
-test_extract_Matrix <- function(keep) {
-    .Call(`_snipsnop_test_extract_Matrix`, keep)
-}
-
-test_extract_SNP1 <- function(keep) {
-    .Call(`_snipsnop_test_extract_SNP1`, keep)
-}
-
-test_extract_SNP2 <- function(keep) {
-    .Call(`_snipsnop_test_extract_SNP2`, keep)
-}
-
-test_matrix_file <- function(path, nbInds, nbSNPs) {
-    .Call(`_snipsnop_test_matrix_file`, path, nbInds, nbSNPs)
-}
-
-test_extract_Matrix_disk <- function(keep) {
-    .Call(`_snipsnop_test_extract_Matrix_disk`, keep)
+get_matrix_from_file <- function(path, nbInds, nbSNPs) {
+    .Call(`_snipsnop_get_matrix_from_file`, path, nbInds, nbSNPs)
 }
 
 test_copyConstructor <- function() {
