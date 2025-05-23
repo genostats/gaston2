@@ -70,9 +70,16 @@ protected: // can be accessed also by class inheriting
   following Plink format
   populated by compute_stats()*/
   unsigned int stats_[4] = {0, 0, 0, 0};
+  bool stats_set_ = false;
 
   double mu_ = 0;
   double sigma_ = 0;
+
+  // just a small helper f° to extract an individual genotype from a byte
+  int read_ind(uint8_t byte, size_t ind_idx) {
+    byte >>= (2 * (ind_idx % 4));
+    return byte & 3; // extraction des bits correspondant
+  }
 
 public:
   /**
@@ -96,6 +103,10 @@ public:
 
   virtual const double *mode() const = 0;
   virtual const double mode(unsigned int n) const = 0;
+
+  bool stats_set() const {
+    return stats_set_;
+  }
 
   /**
    * @brief function calculating the size of the vector
@@ -193,7 +204,6 @@ public:
     unsigned int N1s = stats_[1];
     unsigned int N2s = stats_[2];
     unsigned int NAs = stats_[3];
-    double n = N - NAs;
 
     double mu2 = mu_ * mu_;
     sigma_ = sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
@@ -218,6 +228,9 @@ public:
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
   void compute_stats()
   {
+    // if already called, do nothing
+    if(stats_set_) return;
+ std::cout << "."; 
     size_t nbByte = nbChars();
     size_t BitsInLastByte = (nbInds() % 4); // number of bits to read on last byte
     if (!BitsInLastByte)
@@ -226,47 +239,52 @@ public:
     /* FIRST : filling up stats_ with N0s, N1s, N2s, and NAs with PLINK translation*/
     stats_[0] = stats_[1] = stats_[2] = stats_[3] = 0;
 
-    for (size_t i = 0; i < nbByte; i++)
-    {
+    // all bytes excepted last byte
+    for (size_t i = 0; i < nbByte - 1; i++) {
       uint8_t d = data()[i];
-      if (i == (nbByte - 1))
-      {
-        while (BitsInLastByte > 0)
-        {
-          unsigned int val = (d & 3);
-          unsigned int val_plink = currentMode_[0][val];
-          stats_[val_plink]++;
-          BitsInLastByte--;
-          d >>= 2; // 1 shift par loop
-        }
-        /*stopping mid-byte if necessary,
-        THEN : computing mu and sigma checking if no value given*/
-        if (!mu_ && !sigma_)
-          compute_mu_sigma(); // compute mu & sd ONLY IF BOTH == 0
-        else if (!mu_)
-          compute_mu(); // only compute mu, implied sigma_ was given
-        else if (!sigma_)
-          compute_sigma(); // sigma will be calculated from given mu_
-        /* FINALLY : updating the "mode" enum that acts as a filter
-        to get calculated via mu_and sigma_*/
-        return compute_mode();
-      }
-
       stats_[0] += N0[d];
       stats_[2] += N0[255 - d]; // raw = 3
       stats_[3] += N1[d];       // raw = 1
       stats_[1] += N1[255 - d]; // raw = 2
     }
+
+    // last byte
+    uint8_t d = data()[nbByte - 1];
+    // stopping mid-byte if necessary:
+    while (BitsInLastByte > 0) {
+      unsigned int val = (d & 3);
+      unsigned int val_plink = currentMode_[0][val];
+      stats_[val_plink]++;
+      BitsInLastByte--;
+      d >>= 2; // 1 shift par loop
+    }
+
+    // THEN : computing mu and sigma checking if no value given
+    if (!mu_ && !sigma_)
+      compute_mu_sigma(); // compute mu & sd ONLY IF BOTH == 0
+    else if (!mu_)
+      compute_mu(); // only compute mu, implied sigma_ was given
+    else if (!sigma_)
+      compute_sigma(); // sigma will be calculated from given mu_
+
+    // stats are set !!
+    stats_set_ = true;
+
+    /* FINALLY : updating the "mode" enum that acts as a filter
+     to get calculated via mu_and sigma_*/
+    return compute_mode();
   }
 
   // for scalar product :
-  // TODO : think on what are the limits (error checking) => what calls in gaston ?
-  double LD(const SNPvector &other)
-  {
-    if (nbInds() != other.nbInds())
-      throw std::runtime_error("Mismatch in the nb of individuals between the 2 SNPs !");
-    double LD = 0;
-    double gg[16];
+  // CAVEAT: stats are supposed set! 
+  template<typename scalar_t = double>
+  inline scalar_t LD(const SNPvector &other) const {
+     
+    size_t nbi = nbInds(); 
+    if (nbi != other.nbInds())
+       throw std::runtime_error("Mismatch in the nb of individuals between the 2 SNPs !");
+    scalar_t LD = 0;
+    scalar_t gg[16];
     gg[1] = gg[4] = gg[5] = gg[6] = gg[7] = gg[9] = gg[13] = 0;
 
     gg[0] = (-mu_) * (-(other.mu_));
@@ -281,53 +299,84 @@ public:
     gg[14] = (2. - mu_) * (1. - (other.mu_));
     gg[15] = (2. - mu_) * (2. - (other.mu_));
 
-    double v = sigma_ * other.sigma_;
+    scalar_t v = sigma_ * other.sigma_;
 
-#pragma omp parallel for reduction(+ : LD)
-    for (size_t i = 0; i < nbChars(); i++)
-    {
-      uint8_t g1 = data()[i]; // je récup les ièmes char
-      const uint8_t g2_const = other.data()[i];
-      uint8_t g2 = g2_const;
-      for (int ss = 0; ss < 4; ss++)
-      { // que je vais lire 2bits par 2bits
-        // NOT using mode here cos gg modified to fit
-        int g1val = g1 & 3;
-        int g2val = g2 & 3;
-        LD += gg[(g1val * 4) + g2val];
+    // don't recall functions at each loop turn !!
+    auto data1 = data();
+    auto data2 = other.data();
+    size_t nbc_m1 = nbChars() - 1;
+
+    for (size_t i = 0; i < nbc_m1; i++) {
+      uint8_t g1 = data1[i]; // je récup les ièmes char
+      uint8_t g2 = data2[i];
+
+      for (unsigned int ss = 0; ss < 4; ss++) { 
+        LD += gg[ ((g1&3)*4) + (g2&3) ];
         g1 >>= 2;
         g2 >>= 2;
       }
     }
-    double r = LD / (v * (nbInds() - 1)); // nbInds should be the same for both
-    return r * r;
+
+    // gaston pouvait supposer que le dernier char était borné par des NA
+    // on ne peut pas le faire ici : on traite le dernier char à part
+    // (étonnament ça fait perdre plusieurs microsecondes)
+    // number of bits to read on last byte
+    // cette cabriole gagne un peu de temps... 
+    unsigned int BitsInLastByte = (nbi & 3)?(nbi & 3):4;
+
+    uint8_t g1 = data1[nbc_m1];
+    uint8_t g2 = data2[nbc_m1];
+    for (unsigned int ss = 0; ss < BitsInLastByte; ss++) {
+      LD += gg[ ((g1&3)*4) + (g2&3) ];
+      g1 >>= 2;
+      g2 >>= 2;
+    }
+
+    scalar_t r = LD / (v * (nbi - 1)); // nbInds should be the same for both
+    return r;
   }
 
-  // function returning a 16 int vector holding frequency distribution over 2 vectors
-  std::vector<int> contingency(const SNPvector &other)
-  {
-    std::vector<int> table(16);
-    // #pragma omp declare reduction(vec_incr : std::vector<int> : \
-    //std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
-    // initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
-    // #pragma omp parallel for reduction(vec_incr : table)
-    for (size_t i = 0; i < nbChars(); i++)
-    {
-      uint8_t snp1 = data()[i]; // je récup les ièmes char
-      const uint8_t snp2_const = other.data()[i];
-      uint8_t snp2 = snp2_const;
-      for (int ss = 0; ss < 4; ss++)
-      { // que je vais lire 2bits par 2bits
-        // Hardcoded to only use Plink here, without touching mode
-        int ind1 = currentMode_[0][snp1 & 3];
-        int ind2 = currentMode_[0][snp2 & 3];
-        table[ind1 * 4 + ind2]++;
-        // std::cout << "ind1 = " << ind1 << " ind2 = " << ind2 << ", " << "Table[" << ind1*4 + ind2 << "] = " << table[ind1*4 + ind2] << "\n";
-        ind1 >>= 2;
-        ind2 >>= 2;
+  // function filling a 9 (unsigned) int vector corresponding to a contigency table of genotypes over 2 SNPs
+  // intVec must have members size() and []
+  template<typename intVec>
+  void contingency(const SNPvector &other, intVec & contingencyTable) {
+    if(contingencyTable.size() < 9) throw std::runtime_error("In contingency, contigencyTable is too short");
+    // the "raw" contigency table, 4x4 seen as a long 16 elts array
+    unsigned int table[16] = {0}; // initialisée à 0
+    size_t nbc_m1 = nbChars() - 1;
+    auto data1 = data();
+    auto data2 = other.data();
+    for (size_t i = 0; i < nbc_m1; i++) {
+      uint8_t g1 = data1[i]; 
+      uint8_t g2 = data2[i];
+      for (unsigned int ss = 0; ss < 4; ss++) {
+        table[ (g1&3)*4 + (g2&3) ]++;
+        g1 >>= 2;
+        g2 >>= 2;
       }
     }
-    return table;
+    // idem LD(), dernier char traité à part
+    size_t nbi = nbInds();
+    unsigned int BitsInLastByte = (nbi & 3)?(nbi & 3):4;
+    uint8_t g1 = data1[nbc_m1];
+    uint8_t g2 = data2[nbc_m1];
+    for (unsigned int ss = 0; ss < BitsInLastByte; ss++) {
+      table[ (g1&3)*4 + (g2&3) ]++;
+      g1 >>= 2;
+      g2 >>= 2;
+    }
+    // on recopie les résultats en virant les 7 valeurs
+    // où un des deux génotypes au moins est à NA -> table 3x3
+    // linéarisée
+    contingencyTable[0] = table[0];
+    contingencyTable[1] = table[2];
+    contingencyTable[2] = table[3];
+    contingencyTable[3] = table[8];
+    contingencyTable[4] = table[10];
+    contingencyTable[5] = table[11];
+    contingencyTable[6] = table[12];
+    contingencyTable[7] = table[14];
+    contingencyTable[8] = table[15];
   }
 
   class Iterator

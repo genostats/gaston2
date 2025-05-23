@@ -20,32 +20,65 @@
  */
 
 template<mio::access_mode accessMode>
-class SNPVectorDisk : public SNPvector {
+class SNPvectorDisk : public SNPvector {
 
   public:
  
   // on donne à ce constructeur un shared ptr vers fichier ouvert par mio + le nb d'individus, et le SNP index à pointer
-  SNPVectorDisk(size_t nbInds, std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref, size_t SNP_index, Mode mode = PLINK) : 
+  SNPvectorDisk(size_t nbInds, std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref, size_t SNP_index, Mode mode = PLINK) : 
     data_((uint8_t *) (file_ref->data() + 3 /* offset from the 3 first magic bytes) */ + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index) ), 
     nbInds_(nbInds), file_ref_(file_ref), mode_(mode) {}
+
+  // TODO !! : check what happens with empty SNP ? 
 
   // constructeur par copie d'un SNPVector quelconque
   // il va échouer si on n'a pas accessMode == mio::access_mode::write
   // le but est d'écrire dans un fichier .bed *qu'on a créé nous-même* et qui est encore vide (à part les 3 magic bytes)
   // (ou pas forcément vide, ça va la modifier en place)
   // toujours créé en mode PLINK
-  SNPVectorDisk(const std::shared_ptr<SNPvector> source, std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> file_ref, size_t SNP_index) : 
+  SNPvectorDisk(const std::shared_ptr<SNPvector> source, std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> file_ref, size_t SNP_index) : 
       data_((uint8_t *) (file_ref->data() + 3 + (source->nbInds()/4 + ((source->nbInds()%4 == 0u)?0:1)) * SNP_index)), nbInds_(source->nbInds()), file_ref_(file_ref), mode_(PLINK) {
     // on copie les données de source dans le fichier, à la bonne place qui est pointée par data_a
     size_t nbChars = source->nbChars();
     const uint8_t * sourceData = source->data();
-    std::cout << "coucou " << SNP_index << " (" << nbChars << ")\n";
     for(size_t i = 0; i < nbChars; i++) {
       data_[i] = sourceData[i];
     }
-  } 
+  }
 
-  ~SNPVectorDisk() {
+  // constructeur par sélection des individus spécifiés : 
+  // to_keep contient les indexs des individus à conserver dans le SNP
+  SNPvectorDisk(const std::shared_ptr<SNPvector> source, std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> newfile, size_t SNP_index, const std::vector<size_t> &keep) : 
+    nbInds_(keep.size()), file_ref_(newfile), mode_(PLINK) {
+    
+    data_ = (uint8_t *) newfile->data() + (3 + (nbInds_/4 + ((nbInds_%4 == 0u)?0:1)) * SNP_index); // bcos mio sends back a char *
+    const uint8_t * sourceData = source->data();
+    uint8_t newdata = 0;
+
+    for(size_t i = 0; i < nbInds_; i++) {
+
+      int ind_idx = keep[i];
+      size_t currentChar = ind_idx / 4;    // index du byte
+      int ind_gen = read_ind(sourceData[currentChar], ind_idx);
+
+      size_t new_byte = (i / 4);
+      size_t new_2bits = (i % 4) * 2;
+
+      ind_gen <<= (new_2bits); // shifter pour le mettre au bon endroit dans le nv byte
+      newdata |= ind_gen;
+
+      //size_t snp_offset = SNP_index * ((nbInds_ + 3) / 4); // ensure rounding up
+      /* If i want to write byte by byte instead of 2bits by 2bits, this is the way*/
+      // once every 4 inds BYTE BY BYTE
+      if (i % 4 == 3 || i == nbInds_ - 1)
+      {
+        data_[new_byte] = newdata;
+        newdata = 0;
+      }
+    }
+  }
+
+  ~SNPvectorDisk() {
     //std::cout << "Destroying a SNP, here's the count of file_ref_ : " << file_ref_.use_count() << "\n";
   }
 

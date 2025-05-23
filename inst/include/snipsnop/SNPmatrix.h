@@ -318,12 +318,12 @@ public:
       // effect as if the destructor had been invoked.
       file_.unmap(); // so I can open it again
 
-      // no need to take into account offset here cos done in SNPVectorDisk constructor
+      // no need to take into account offset here cos done in SNPvectorDisk constructor
       mio::mmap_source file_for_snps = mio::make_mmap_source(path, 0, mio::map_entire_file, error);
       std::shared_ptr<mio::mmap_source> file_ptr = std::make_shared<mio::mmap_source>(std::move(file_for_snps)); // don't know if good idea, creates a NEW sink
       for (size_t i = 0; i < nb_snps; i++)
       {
-        std::shared_ptr<SNPVectorDisk<mio::access_mode::read>> snpVec(new SNPVectorDisk<mio::access_mode::read>(new_nb_inds, file_ptr, i)); // no mode array fr now
+        std::shared_ptr<SNPvectorDisk<mio::access_mode::read>> snpVec(new SNPvectorDisk<mio::access_mode::read>(new_nb_inds, file_ptr, i)); // no mode array fr now
         new_matrix.push_back(snpVec);
       }
     }
@@ -335,7 +335,7 @@ public:
 
   /**
    * @brief A member function testing whether the SNP at index
-   * is a SNPVectorDisk or a SNPVectorMemory
+   * is a SNPvectorDisk or a SNPVectorMemory
    *
    * @param index
    * @return true
@@ -343,9 +343,9 @@ public:
    */
   bool onDisk(size_t index)
   { // TODO  check why was that written ????doesn't work, will see later
-    if (std::shared_ptr<SNPVectorDisk<mio::access_mode::read>> test = std::dynamic_pointer_cast<SNPVectorDisk<mio::access_mode::read>>(SNPs_[index]))
+    if (std::shared_ptr<SNPvectorDisk<mio::access_mode::read>> test = std::dynamic_pointer_cast<SNPvectorDisk<mio::access_mode::read>>(SNPs_[index]))
       return true;
-    return false; // test was a null ptr, not castable to a SNPVectorDisk
+    return false; // test was a null ptr, not castable to a SNPvectorDisk
   }
 
   const std::vector<std::shared_ptr<SNPvector>> &getSNPs() const
@@ -374,6 +374,27 @@ public:
     indStats_ = new_stats;
   }
 
+  // compute all SNP stats
+  void computeSNPStats() {
+    for(auto & snp : SNPs_) {
+      snp->compute_stats();
+    }
+  }
+
+  // comute SNP stats for snp i with i1 <= i <= i2
+  // SHOULD THIS CHANGE TO i1 <= i < i2 ?
+  void computeSNPStats(size_t i1, size_t i2) {
+    for(size_t i = i1; i <= i2; i++) {
+      SNPs_[i]->compute_stats();
+    }
+  }
+
+  
+  void setMode(Mode mode) {
+    for(auto & snp : SNPs_) {
+      snp->setMode(mode);
+    }
+  }
 private:
   DataStruct indStats_;
   std::vector<std::shared_ptr<SNPvector>> SNPs_;

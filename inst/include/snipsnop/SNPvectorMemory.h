@@ -18,12 +18,28 @@ public:
   // un constructeur, taille nbInds
   SNPvectorMemory(size_t nbInds, Mode mode = PLINK) : data_(nbInds / 4 + ((nbInds % 4 == 0u) ? 0 : 1)), nbInds_(nbInds), mode_(mode) {}
 
-  // un constructeur à partir d'un vecteur de char
-  // !! ce constructeur fait un move et donc "vide" son argument
-  // !! est-ce qu'on en a besoin ?! -> commenté pour le moment
-  /*
-  SNPvectorMemory(std::vector<uint8_t> & data) : data_(std::move(data)) {}
-  */
+  // constructeur par copie
+  SNPvectorMemory(const std::shared_ptr<SNPvector> source) : data_(source->data(), source->data() + source->nbInds()), nbInds_(source->nbInds()), mode_(PLINK) {}
+
+  // constructeur par copie avec une sélection des individus,
+  // par un vecteur d'index 
+  SNPvectorMemory(const std::shared_ptr<SNPvector> source, const std::vector<size_t> &keep) : nbInds_(keep.size()), mode_(PLINK) {
+    const uint8_t *refdata = source->data();
+    // check the keep (no idx to far or impossible)
+    data_.assign((nbInds_ / 4 + ((nbInds_ % 4 == 0u) ? 0 : 1)), 0); // creating with nbChars of 0
+
+    for (size_t i = 0; i < nbInds_; ++i) {
+      int ind_idx = keep[i];
+      size_t currentChar = ind_idx / 4;
+      int ind_gen = read_ind(refdata[currentChar], ind_idx);
+      size_t new_byte = i / 4;
+      size_t new_2bits = (i % 4) * 2;
+      ind_gen <<= (new_2bits); // shifter pour le mettre au bon endroit dans le nv byte
+
+      data_[new_byte] |= ind_gen; // le || pour ne pas toucher au bits déjà set
+    }
+  }
+
 
   // nb of individuals
   size_t nbInds() const { return nbInds_; }

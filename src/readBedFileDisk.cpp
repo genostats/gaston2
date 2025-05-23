@@ -61,7 +61,7 @@ SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, Mode mod
   SNPmatrix M;
   auto file_offset = 3; // BCOS MAGIC BYTES 
   for(size_t i = 0; i < n_snp; i++) {
-    std::shared_ptr<SNPVectorDisk<mio::access_mode::read>> snpVec(new SNPVectorDisk<mio::access_mode::read>(n_ind,file_ptr, i, modeArray));
+    std::shared_ptr<SNPvectorDisk<mio::access_mode::read>> snpVec(new SNPvectorDisk<mio::access_mode::read>(n_ind,file_ptr, i, modeArray));
     //data should be taken by file_ptr
 
     size_t n = snpVec->nbChars(); // func inherited from SNPVec, gives back size used by SNP
