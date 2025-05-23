@@ -73,6 +73,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// extractSNPmatrixMemory_
+Rcpp::XPtr<SNPmatrix> extractSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep);
+RcppExport SEXP _snipsnop_extractSNPmatrixMemory_(SEXP otherSEXP, SEXP keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type keep(keepSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractSNPmatrixMemory_(other, keep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// extractSNPmatrixDisk_
+Rcpp::XPtr<SNPmatrix> extractSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep, std::string path_str);
+RcppExport SEXP _snipsnop_extractSNPmatrixDisk_(SEXP otherSEXP, SEXP keepSEXP, SEXP path_strSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type keep(keepSEXP);
+    Rcpp::traits::input_parameter< std::string >::type path_str(path_strSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractSNPmatrixDisk_(other, keep, path_str));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getIndStats
 Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix> pM);
 RcppExport SEXP _snipsnop_getIndStats(SEXP pMSEXP) {
@@ -347,60 +372,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// test_extract_Matrix
-IntegerMatrix test_extract_Matrix(std::vector<size_t> keep);
-RcppExport SEXP _snipsnop_test_extract_Matrix(SEXP keepSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<size_t> >::type keep(keepSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_extract_Matrix(keep));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_extract_SNP1
-IntegerMatrix test_extract_SNP1(std::vector<size_t> keep);
-RcppExport SEXP _snipsnop_test_extract_SNP1(SEXP keepSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<size_t> >::type keep(keepSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_extract_SNP1(keep));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_extract_SNP2
-IntegerMatrix test_extract_SNP2(std::vector<size_t> keep);
-RcppExport SEXP _snipsnop_test_extract_SNP2(SEXP keepSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<size_t> >::type keep(keepSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_extract_SNP2(keep));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_matrix_file
-IntegerMatrix test_matrix_file(std::string path, size_t nbInds, size_t nbSNPs);
-RcppExport SEXP _snipsnop_test_matrix_file(SEXP pathSEXP, SEXP nbIndsSEXP, SEXP nbSNPsSEXP) {
+// get_matrix_from_file
+IntegerMatrix get_matrix_from_file(std::string path, size_t nbInds, size_t nbSNPs);
+RcppExport SEXP _snipsnop_get_matrix_from_file(SEXP pathSEXP, SEXP nbIndsSEXP, SEXP nbSNPsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
     Rcpp::traits::input_parameter< size_t >::type nbInds(nbIndsSEXP);
     Rcpp::traits::input_parameter< size_t >::type nbSNPs(nbSNPsSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_matrix_file(path, nbInds, nbSNPs));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_extract_Matrix_disk
-IntegerMatrix test_extract_Matrix_disk(std::vector<size_t> keep);
-RcppExport SEXP _snipsnop_test_extract_Matrix_disk(SEXP keepSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::vector<size_t> >::type keep(keepSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_extract_Matrix_disk(keep));
+    rcpp_result_gen = Rcpp::wrap(get_matrix_from_file(path, nbInds, nbSNPs));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -450,6 +431,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_LD_chunk", (DL_FUNC) &_snipsnop_LD_chunk, 5},
     {"_snipsnop_computeSNPStats", (DL_FUNC) &_snipsnop_computeSNPStats, 1},
     {"_snipsnop_SNPMatrixToIntegerMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToIntegerMatrix, 1},
+    {"_snipsnop_extractSNPmatrixMemory_", (DL_FUNC) &_snipsnop_extractSNPmatrixMemory_, 2},
+    {"_snipsnop_extractSNPmatrixDisk_", (DL_FUNC) &_snipsnop_extractSNPmatrixDisk_, 3},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 1},
     {"_snipsnop_readBedFileMemory_", (DL_FUNC) &_snipsnop_readBedFileMemory_, 3},
     {"_snipsnop_test_ds", (DL_FUNC) &_snipsnop_test_ds, 2},
@@ -474,11 +457,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_test_contingency", (DL_FUNC) &_snipsnop_test_contingency, 2},
     {"_snipsnop_test_performance_stats_matrix", (DL_FUNC) &_snipsnop_test_performance_stats_matrix, 0},
     {"_snipsnop_test_all_stats_matrix", (DL_FUNC) &_snipsnop_test_all_stats_matrix, 0},
-    {"_snipsnop_test_extract_Matrix", (DL_FUNC) &_snipsnop_test_extract_Matrix, 1},
-    {"_snipsnop_test_extract_SNP1", (DL_FUNC) &_snipsnop_test_extract_SNP1, 1},
-    {"_snipsnop_test_extract_SNP2", (DL_FUNC) &_snipsnop_test_extract_SNP2, 1},
-    {"_snipsnop_test_matrix_file", (DL_FUNC) &_snipsnop_test_matrix_file, 3},
-    {"_snipsnop_test_extract_Matrix_disk", (DL_FUNC) &_snipsnop_test_extract_Matrix_disk, 1},
+    {"_snipsnop_get_matrix_from_file", (DL_FUNC) &_snipsnop_get_matrix_from_file, 3},
     {"_snipsnop_test_copyConstructor", (DL_FUNC) &_snipsnop_test_copyConstructor, 0},
     {"_snipsnop_test_first_scnd_ind", (DL_FUNC) &_snipsnop_test_first_scnd_ind, 0},
     {"_snipsnop_set_num_thread", (DL_FUNC) &_snipsnop_set_num_thread, 1},
