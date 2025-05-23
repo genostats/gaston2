@@ -30,7 +30,8 @@
  * 
  * @return SNPmatrix, stocking shared_ptrs to SNPvectorMemory 
  */
-SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, Mode modeArray = PLINK) {
+
+void readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, SNPmatrix & M) {
   std::ifstream file(filename, std::ifstream::binary);
   if(!file.is_open()) {
     throw std::runtime_error("Cannot open file " + filename);
@@ -46,10 +47,9 @@ SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, Mo
     throw std::runtime_error("Not a bed file in SNP major mode");
   } 
 
-  SNPmatrix M;
   for(size_t i = 0; i < n_snp; i++) {
     //makes a shared_ptr on a vector of snips 
-    std::shared_ptr<SNPvectorMemory> snpVec(new SNPvectorMemory(n_ind, modeArray));
+    std::shared_ptr<SNPvectorMemory> snpVec(new SNPvectorMemory(n_ind));
     size_t n = snpVec->nbChars();
     uint8_t * data = snpVec->data();
     file.read(reinterpret_cast<char *>(data), n);
@@ -57,38 +57,19 @@ SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, Mo
   }
   
   file.close();
+}
+
+SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp) {
+  SNPmatrix M;
+  readBedFileMemory(filename, n_ind, n_snp, M);
   return M;
 }
 
 // R exported function
 // [[Rcpp::export]]
-Rcpp::XPtr<SNPmatrix> readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp) {
-std::ifstream file(filename, std::ifstream::binary);
-  if(!file.is_open()) {
-    throw std::runtime_error("Cannot open file");
-  }
-
-  // check magic number
-  char magic[3];
-  file.read(magic, 3);
-  if(magic[0] != 108 || magic[1] != 27) {
-    throw std::runtime_error("Not a bed file");
-  }
-  if(magic[2] != 1) {
-    throw std::runtime_error("Not a bed file in SNP major mode");
-  } 
-
+Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string filename, size_t n_ind, size_t n_snp) {
   Rcpp::XPtr<SNPmatrix> pM(new SNPmatrix);
-  for(size_t i = 0; i < n_snp; i++) {
-    //makes a shared_ptr on a vector of snips 
-    std::shared_ptr<SNPvectorMemory> snpVec(new SNPvectorMemory(n_ind));
-    size_t n = snpVec->nbChars();
-    uint8_t * data = snpVec->data();
-    file.read(reinterpret_cast<char *>(data), n);
-    pM->push_back(snpVec);
-  }
-
-  file.close();
+  readBedFileMemory(filename, n_ind, n_snp, *pM);
   return pM;
 }
 

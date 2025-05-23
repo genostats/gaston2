@@ -77,7 +77,7 @@ IntegerVector loop_sum(SNPmatrix matrix)
   return wrap(res);
 }
 
-// [[Rcpp::export]]
+/*
 IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp)
 {
   std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
@@ -101,6 +101,7 @@ IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp)
     res.push_back(i);
   return wrap(res);
 }
+*/
 
 /************************
  *    Test SNP reading  *
@@ -402,7 +403,8 @@ NumericVector test_modes_setsigma_one(int mode)
   std::vector<double> res;
 
   Mode mode_ = (Mode) mode;
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607, mode_);
+  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+  M.setMode(mode_);
   for (auto v : M.getSNPs())
   {
     v->compute_stats();
@@ -420,7 +422,7 @@ NumericVector test_modes_setsigma_one(int mode)
  ********************************/
 
 // [[Rcpp::export]]
-NumericMatrix test_LD(int SNPnb1, int SNPnb2)
+NumericMatrix test_LD_square(int SNPnb1, int SNPnb2)
 {
   if (SNPnb1 > 503 || SNPnb2 > 503)
   {
@@ -455,14 +457,15 @@ NumericMatrix test_LD(int SNPnb1, int SNPnb2)
         // snp2.compute_mu_sigma();
       }
 
-      res(i, j) = snp1.LD(snp2);
+       double r = snp1.LD(snp2); // parce que double par défaut dans template
+       res(i, j) = r * r; // plus carré dans la fonction
     }
   }
   return res;
 }
 
 // [[Rcpp::export]]
-IntegerMatrix test_contingency(int SNPnb1, int SNPnb2)
+SEXP test_contingency(int SNPnb1, int SNPnb2)
 {
   if (SNPnb1 > 503 || SNPnb2 > 503)
   {
@@ -471,14 +474,15 @@ IntegerMatrix test_contingency(int SNPnb1, int SNPnb2)
     return 0;
   }
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps ?
-  IntegerVector res(16);
+
+  IntegerVector res(9);
   SNPvector &snp1 = *M.getSNP(SNPnb1);
   SNPvector &snp2 = *M.getSNP(SNPnb2);
-  res = snp1.contingency(snp2);
-  res.attr("dim") = Dimension(4, 4);
-  IntegerMatrix m = as<IntegerMatrix>(res);
-  
-  return m;
+  snp1.contingency(snp2, res);
+  res.attr("dim") = Dimension(3, 3);
+  // IntegerMatrix m = as<IntegerMatrix>(res);
+  // return m;
+  return res;
 }
 
 // [[Rcpp::export]]
@@ -508,7 +512,7 @@ bool test_performance_stats_matrix()
   bool success = 1;
 
   // auto test1col = st.at(0);
-  // std::cout << test1col.type << "\n";
+  // std::cout << test1col.type() << "\n";
   // std::cout << test1col.get<int>() << "\n"; // THIS is a PTR to a vec of type int
   // std::cout << test1col.get<int>()->size();
   // std::cout << test1col.get<int>()->at(0);
@@ -828,7 +832,7 @@ void testsuite(bool verbose = true)
   std::ifstream file2("./inst/extdata/LD_ref.txt");
   double expected_LD;
 
-  NumericMatrix result_LD = test_LD(0, 503);
+  NumericMatrix result_LD = test_LD_square(0, 503);
   // if (result_LD == 0) goto conclusion;
 
   if (!file2)
