@@ -25,8 +25,6 @@
  * @param filename The name of the file to be opened
  * @param n_ind The number of individuals/samples
  * @param n_snp The number of SNP to read from the file and to load into the Matrix.
- * @param mode Mode index for reading the SNP, with NUMERIC = 0 (g = {0, 1, 2 and 3 = NA}), CENTERED = 1(g -= mu),
- * STANDARDIZED = 2 (g = (g-mu)/sd), PLINK = 3 .bed file : (g = {0, 1, 3 and 2 = NA})
  * 
  * @return SNPmatrix, stocking shared_ptrs to SNPvectorMemory 
  */
@@ -72,5 +70,3 @@ Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string filename, size_t n_ind, siz
   readBedFileMemory(filename, n_ind, n_snp, *pM);
   return pM;
 }
-
-

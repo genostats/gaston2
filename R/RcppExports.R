@@ -45,6 +45,10 @@ getIndStats <- function(pM) {
     .Call(`_snipsnop_getIndStats`, pM)
 }
 
+readBedFileDisk_ <- function(path, n_ind, n_snp) {
+    .Call(`_snipsnop_readBedFileDisk_`, path, n_ind, n_snp)
+}
+
 readBedFileMemory_ <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_readBedFileMemory_`, filename, n_ind, n_snp)
 }

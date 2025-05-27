@@ -68,11 +68,23 @@ public:
 
   SNPmatrix() {} // default constructor to have a specialized one just after
 
+  /**
+   * @brief Constructor "by copy", 
+   * but only copying the SNPs from SNPmatrix "other"
+   * specified in keep.
+   * @param other
+   * SNPmatrix acting as a reference to extract from
+   * @param keep, 
+   * a templated vector of index, corresponding to the SNPs 
+   * we want to keep from the "other" matrix
+   * @return the new SNPmatrix
+   */
   template <typename intVec>
   SNPmatrix(const SNPmatrix &other, intVec keep) {
     const std::vector<std::shared_ptr<SNPvector>> otherSNPs = other.getSNPs();
-    for (auto keep_idx : keep)
-      this->push_back(otherSNPs.at(keep_idx));
+    for (auto keep_idx : keep) {
+      this->push_back(otherSNPs.at(keep_idx)); // at is supposed to do bound checking
+    }
   }
 
 #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
@@ -144,12 +156,6 @@ public:
 
     indStatsComputed_ = true;
     // TODO : could add a checksum ?
-  }
-
-  // just a small helper f° to clrify extract_ind, not sure if usefull
-  int read_ind(uint8_t byte, size_t ind_idx) {
-    byte >>= (2 * (ind_idx % 4));
-    return byte & 3; // extraction des bits correspondant
   }
 
   /**

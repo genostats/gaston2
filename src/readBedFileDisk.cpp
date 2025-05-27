@@ -19,18 +19,8 @@
 #include <cstring>
 #include <Rcpp.h>
 
-/** @fn SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp)
- * @brief Reading a bed file with memory mapping, storing SNPs in a SNPmatrix returned
- * 
- * A more detailled description here
- * 
- * @param path The path to the file to be opened. Can be relative or absolute
- * @param n_ind The number of individuals/samples, given by the .bim ?
- * @param n_snp The number of SNP to read from the file and to load into the Matrix.
- *   
- * @return a SNPmatrix, stocking shared_ptrs to SNPvectorDisk 
-*/
-SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, Mode modeArray = PLINK) {
+
+void readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, SNPmatrix & M) {
   std::ifstream file_test(path, std::ifstream::binary);
   if (file_test.bad()) throw std::runtime_error("This file does not exists\n");
   std::error_code error;
@@ -57,11 +47,10 @@ SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, Mode mod
   if(magic[2] != 1) {
     throw std::runtime_error("Not a bed file in SNP major mode");
   }
-  
-  SNPmatrix M;
+
   auto file_offset = 3; // BCOS MAGIC BYTES 
   for(size_t i = 0; i < n_snp; i++) {
-    std::shared_ptr<SNPvectorDisk<mio::access_mode::read>> snpVec(new SNPvectorDisk<mio::access_mode::read>(n_ind,file_ptr, i, modeArray));
+    std::shared_ptr<SNPvectorDisk<mio::access_mode::read>> snpVec(new SNPvectorDisk<mio::access_mode::read>(n_ind,file_ptr, i));
     //data should be taken by file_ptr
 
     size_t n = snpVec->nbChars(); // func inherited from SNPVec, gives back size used by SNP
@@ -69,5 +58,31 @@ SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, Mode mod
     // Increment the file offset based on the size of the data
     file_offset += n;
   }
+}
+
+/** @fn SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp)
+ * @brief Reading a bed file with memory mapping, storing SNPs in a SNPmatrix returned
+ * 
+ * A more detailled description here
+ * 
+ * @param path The path to the file to be opened. Can be relative or absolute
+ * @param n_ind The number of individuals/samples, given by the .bim ?
+ * @param n_snp The number of SNP to read from the file and to load into the Matrix.
+ *   
+ * @return a SNPmatrix, stocking shared_ptrs to SNPvectorDisk 
+*/
+
+SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp) {
+  SNPmatrix M;
+  readBedFileDisk(path, n_ind, n_snp, M);
   return M;
+}
+
+
+// R exported function
+// [[Rcpp::export]]
+Rcpp::XPtr<SNPmatrix> readBedFileDisk_(std::string path, size_t n_ind, size_t n_snp) {
+  Rcpp::XPtr<SNPmatrix> pM(new SNPmatrix);
+  readBedFileDisk(path, n_ind, n_snp, *pM);
+  return pM;
 }

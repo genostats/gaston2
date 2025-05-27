@@ -150,6 +150,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// readBedFileDisk_
+Rcpp::XPtr<SNPmatrix> readBedFileDisk_(std::string path, size_t n_ind, size_t n_snp);
+RcppExport SEXP _snipsnop_readBedFileDisk_(SEXP pathSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< size_t >::type n_ind(n_indSEXP);
+    Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
+    rcpp_result_gen = Rcpp::wrap(readBedFileDisk_(path, n_ind, n_snp));
+    return rcpp_result_gen;
+END_RCPP
+}
 // readBedFileMemory_
 Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string filename, size_t n_ind, size_t n_snp);
 RcppExport SEXP _snipsnop_readBedFileMemory_(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
@@ -478,6 +491,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_extractSNPmatrixMemory_", (DL_FUNC) &_snipsnop_extractSNPmatrixMemory_, 2},
     {"_snipsnop_extractSNPmatrixDisk_", (DL_FUNC) &_snipsnop_extractSNPmatrixDisk_, 3},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 1},
+    {"_snipsnop_readBedFileDisk_", (DL_FUNC) &_snipsnop_readBedFileDisk_, 3},
     {"_snipsnop_readBedFileMemory_", (DL_FUNC) &_snipsnop_readBedFileMemory_, 3},
     {"_snipsnop_test_ds", (DL_FUNC) &_snipsnop_test_ds, 2},
     {"_snipsnop_test_ds2", (DL_FUNC) &_snipsnop_test_ds2, 0},
