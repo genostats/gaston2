@@ -54,6 +54,14 @@ stopifnot( all(D[3:5, 1:6] == D3) )
 D4 <- LD_chunk_EM(a, 167, 172, 168, 171)
 stopifnot( all(D[1:6, 2:5] == D4) )
 
+# --- checking big memory
+
+LD_square_bigmemory(a, 0, 606, "essai.bm")
+x <- attach.big.matrix("essai.bm.desc")
+y <- LD_square(a, 0, 606)
+range(y - as.matrix(x))
+
+
 
 
 if(FALSE) {

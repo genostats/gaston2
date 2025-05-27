@@ -25,6 +25,10 @@ LD_chunk_EM <- function(pM, i1, i2, j1, j2) {
     .Call(`_snipsnop_LD_chunk_EM`, pM, i1, i2, j1, j2)
 }
 
+LD_square_bigmemory <- function(pM, i1, i2, path) {
+    invisible(.Call(`_snipsnop_LD_square_bigmemory`, pM, i1, i2, path))
+}
+
 SNPMatrixToIntegerMatrix <- function(pM) {
     .Call(`_snipsnop_SNPMatrixToIntegerMatrix`, pM)
 }

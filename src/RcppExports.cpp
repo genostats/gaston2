@@ -93,6 +93,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// LD_square_bigmemory
+void LD_square_bigmemory(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, std::string path);
+RcppExport SEXP _snipsnop_LD_square_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    LD_square_bigmemory(pM, i1, i2, path);
+    return R_NilValue;
+END_RCPP
+}
 // SNPMatrixToIntegerMatrix
 Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix> pM);
 RcppExport SEXP _snipsnop_SNPMatrixToIntegerMatrix(SEXP pMSEXP) {
@@ -486,6 +499,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_LD_pair_EM", (DL_FUNC) &_snipsnop_LD_pair_EM, 3},
     {"_snipsnop_LD_square_EM", (DL_FUNC) &_snipsnop_LD_square_EM, 3},
     {"_snipsnop_LD_chunk_EM", (DL_FUNC) &_snipsnop_LD_chunk_EM, 5},
+    {"_snipsnop_LD_square_bigmemory", (DL_FUNC) &_snipsnop_LD_square_bigmemory, 4},
     {"_snipsnop_SNPMatrixToIntegerMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToIntegerMatrix, 1},
     {"_snipsnop_computeSNPStats", (DL_FUNC) &_snipsnop_computeSNPStats, 1},
     {"_snipsnop_extractSNPmatrixMemory_", (DL_FUNC) &_snipsnop_extractSNPmatrixMemory_, 2},
