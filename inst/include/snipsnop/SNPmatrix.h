@@ -69,52 +69,52 @@ public:
 #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
     initializer(omp_priv = decltype(omp_orig)(omp_orig.size(), 0))
 
-  void compute_indStats()  {
-    if(indStatsComputed_) return; // stats déjà calculées, on ne recalcule pas
+  void compute_indStats(bool force = false)  {
+    if(!force && indStatsComputed_) return; // stats déjà calculées, on ne recalcule pas
                                   
-    int total = SNPs_.size();
-    if (total == 0)
+    int nbSNPs = SNPs_.size();
+    if (nbSNPs == 0)
       throw std::out_of_range("No SNPs loaded into the SNPMatrix !");
 
     size_t nbInds = SNPs_[0]->nbInds();
     std::vector<int> unordered_stats(nbInds * 4, 0); // DO NOT USE nbCHars ! rounded up !
 
 #pragma omp parallel for reduction(vec_int_plus : unordered_stats)
-    for (int i = 0; i < total; i++)
+    for (int i = 0; i < nbSNPs; i++)
     { // parcourt tous les SNPs
       auto snp = SNPs_[i];
-      size_t nbBytes = snp->nbChars();
-
+      // size_t nbBytes = snp->nbChars();
+      size_t nbc_m1 = snp->nbChars() - 1;
       // parcourt le SNP[i], byte by byte
-      for (size_t byte = 0; byte < nbBytes; byte++)
+      for (size_t byte = 0; byte < nbc_m1; byte++)
       {
         uint8_t d = snp->data()[byte];
         size_t byteoffset = byte * 4;
 
-        // check si byte entiere à lire
-        int max_ind = 4;
-        if (byte == nbBytes - 1)
-        {
-          int reste = nbInds % 4;
-          if (reste)
-            max_ind = reste; // if != 0, else stays at 4 to read full byte
-        }
-
-        for (int ind = 0; ind < max_ind; ind++)
-        {
-          unsigned int val_plink = snp->currentMode_[0][(d >> (2 * ind)) & 3];
+        for (int ind = 0; ind < 4; ind++) {
+          unsigned int val_plink = snp->currentMode_[0][d&3];
           unordered_stats[(byteoffset + ind) * 4 + val_plink]++;
+          d >>= 2;
         }
+      }
+      // last byte read separately
+      unsigned int BitsInLastByte = (nbInds & 3)?(nbInds & 3):4;
+      uint8_t d = snp->data()[nbc_m1];
+      size_t byteoffset = nbc_m1 * 4;
+      for (int ind = 0; ind <  BitsInLastByte; ind++) {
+        unsigned int val_plink = snp->currentMode_[0][d&3];
+        unordered_stats[(byteoffset + ind) * 4 + val_plink]++;
+        d >>= 2;
       }
     }
 
+    // isolate columns from unordered_stats
     std::vector<int> vecN0s;
     std::vector<int> vecN1s;
     std::vector<int> vecN2s;
     std::vector<int> vecNAs;
 
-    for (size_t ind = 0; ind < nbInds; ind++)
-    {
+    for (size_t ind = 0; ind < nbInds; ind++) {
       auto idxnzeros = ind * 4;
       vecN0s.push_back(unordered_stats[idxnzeros]);
       vecN1s.push_back(unordered_stats[idxnzeros + 1]);
@@ -133,54 +133,6 @@ public:
     indStats_.push_back(NAs, "NAs");
 
     indStatsComputed_ = true;
-    // TODO : could add a checksum ?
-  }
-
-  // TODO à déplacer dans la classe DataStruct (fonction extractLines par exemple)
-  DataStruct extract_indStats(const std::vector<size_t> &keep)
-  {
-    DataStruct filtered_stats;
-
-    for (Column &col : indStats_.cols)
-    {
-      auto type = col.type();
-      if (type == datatype::INT)
-      {
-        const auto &values = col.get<int>();
-        std::vector<int> filtered;
-        for (size_t idx : keep)
-        {
-          filtered.push_back(values->at(idx));
-        }
-        filtered_stats.push_back(filtered);
-      }
-      else if (type == datatype::FLOAT)
-      {
-        const auto &values = col.get<float>();
-        std::vector<float> filtered;
-        for (size_t idx : keep)
-        {
-          filtered.push_back(values->at(idx));
-        }
-        filtered_stats.push_back(filtered);
-      }
-      else if (type == datatype::DOUBLE)
-      {
-        const auto &values = col.get<double>();
-        std::vector<double> filtered;
-        for (size_t idx : keep)
-        {
-          filtered.push_back(values->at(idx));
-        }
-        filtered_stats.push_back(filtered);
-      }
-      else //find out how to add a custom type ? 
-      {
-        throw std::runtime_error("No an existing type yet");
-      }
-    }
-
-    return filtered_stats;
   }
 
   // just a small helper f° to clrify extract_ind, not sure if usefull

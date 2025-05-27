@@ -9,10 +9,12 @@
 #ifndef _DataStruct_
 #define _DataStruct_
 
-struct DataStruct {
+class DataStruct {
+  private:
     std::vector<Column> cols;
     std::vector<std::string> colNames;
 
+  public:
     size_t size() const {
       return cols.size();
     }
@@ -25,6 +27,10 @@ struct DataStruct {
     void push_back(Column newcol, std::string name) {
       cols.push_back(newcol);
       colNames.push_back(name);
+    }
+
+    std::string colName(size_t i) const {
+      return colNames[i];
     }
 
     // TODO 
@@ -48,7 +54,7 @@ struct DataStruct {
     // constructeur vide...
     DataStruct() {}
 
-    // constructeur qui fait une extraction
+    // constructeur qui fait une extraction de lignes
     template<typename intVec>
     DataStruct(DataStruct & DS, intVec & keep) {
       for(size_t i = 0; i < DS.size(); i++) {

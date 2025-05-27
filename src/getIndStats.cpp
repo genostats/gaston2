@@ -11,3 +11,7 @@ Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix> pM) {
   return DataStructToDataFrame( pM->getIndStats() );
 }
 
+// [[Rcpp::export]]
+void test_force_compute_indStats(Rcpp::XPtr<SNPmatrix> pM) {
+  pM->compute_indStats(true);
+}

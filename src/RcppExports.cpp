@@ -150,6 +150,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_force_compute_indStats
+void test_force_compute_indStats(Rcpp::XPtr<SNPmatrix> pM);
+RcppExport SEXP _snipsnop_test_force_compute_indStats(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    test_force_compute_indStats(pM);
+    return R_NilValue;
+END_RCPP
+}
 // readBedFileMemory_
 Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string filename, size_t n_ind, size_t n_snp);
 RcppExport SEXP _snipsnop_readBedFileMemory_(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
@@ -478,6 +488,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_extractSNPmatrixMemory_", (DL_FUNC) &_snipsnop_extractSNPmatrixMemory_, 2},
     {"_snipsnop_extractSNPmatrixDisk_", (DL_FUNC) &_snipsnop_extractSNPmatrixDisk_, 3},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 1},
+    {"_snipsnop_test_force_compute_indStats", (DL_FUNC) &_snipsnop_test_force_compute_indStats, 1},
     {"_snipsnop_readBedFileMemory_", (DL_FUNC) &_snipsnop_readBedFileMemory_, 3},
     {"_snipsnop_test_ds", (DL_FUNC) &_snipsnop_test_ds, 2},
     {"_snipsnop_test_ds2", (DL_FUNC) &_snipsnop_test_ds2, 0},

@@ -45,6 +45,10 @@ getIndStats <- function(pM) {
     .Call(`_snipsnop_getIndStats`, pM)
 }
 
+test_force_compute_indStats <- function(pM) {
+    invisible(.Call(`_snipsnop_test_force_compute_indStats`, pM))
+}
+
 readBedFileMemory_ <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_readBedFileMemory_`, filename, n_ind, n_snp)
 }
