@@ -702,7 +702,8 @@ std::vector<std::string> tests_names = {
     "Computing values in centered mode",
     "Computing values in centered reduced mode",
     "Computing stats for all individuals", 
-    "Computing extracted individuals"
+    "Computing extracted individuals", 
+    "Extracting snps to a new matrix"
     // TODO : add a contingency test
   };
 
@@ -725,7 +726,7 @@ void testsuite(bool verbose = true)
 
   if (verbose) std::cout << "Using " << omp_get_max_threads() << " thread(s).\n";
 
-  std::vector<int> total = {0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<int> total = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   // test_readBedFileMemory
   std::vector<int> expected = {804, 771, 982, 873, 399, 968, 976, 976, 976, 976, 976, 397, 873, 976, 873, 981, 976, 981, 843, 976, 804,
@@ -977,8 +978,10 @@ void testsuite(bool verbose = true)
   }
 
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+  M.compute_indStats();
   std::vector<size_t> to_keep = { 2, 6, 229, 230, 231, 232, 233, 234, 235, 236, 237 };
-  IntegerMatrix res = SNPmat_to_IntMat(extractSNPmatrixMemory<std::vector<size_t>>(M, to_keep));
+  SNPmatrix res_mat = extractSNPmatrixMemory<std::vector<size_t>>(M, to_keep);
+  IntegerMatrix res = SNPmat_to_IntMat(res_mat);
   IntegerMatrix res_disk = SNPmat_to_IntMat(extractSNPmatrixDisk<std::vector<size_t>>(M, to_keep, "/tmp/extracted_mat_testsuite.bed"));
   
   IntegerMatrix from_file = get_matrix_from_file("/tmp/extracted_mat_testsuite.bed", 11, 607);
@@ -1008,6 +1011,42 @@ void testsuite(bool verbose = true)
       total[7] = 0;
     }
 
+    if ( i == 0 && j == 1) {
+      DataStruct og_dt = M.getIndStats();
+      Column og_N0 = og_dt.getColumn("N0");
+      Column og_N1 = og_dt.getColumn("N1");
+      Column og_N2 = og_dt.getColumn("N2");
+      Column og_NA = og_dt.getColumn("NAs");
+
+      DataStruct dt1 = res_mat.getIndStats();
+      Column dt1_N0 = dt1.getColumn("N0");
+      Column dt1_N1 = dt1.getColumn("N1");
+      Column dt1_N2 = dt1.getColumn("N2");
+      Column dt1_NA = dt1.getColumn("NAs");
+
+      size_t t = 0;
+      
+      for (auto x : to_keep) {
+        if ((og_N0.get<int>())[0][x] != (dt1_N0.get<int>())[0][t]) {
+          std::cout << RED << "Error: stats for N0 on new extracted matrix (" << x << "th snp in the original one) are wrong !" << RESET << std::endl;
+          total[8] = 0;
+        }
+        if ((og_N1.get<int>())[0][x] != (dt1_N1.get<int>())[0][t]) {
+          std::cout << RED << "Error: stats for N1 on new extracted matrix (" << x << "th snp in the original one) are wrong !" << RESET << std::endl;
+          total[8] = 0;
+        }
+        if ((og_N2.get<int>())[0][x] != (dt1_N2.get<int>())[0][t]) {
+          std::cout << RED << "Error: stats for N2 on new extracted matrix (" << x << "th snp in the original one) are wrong !" << RESET << std::endl;
+          total[8] = 0;
+        }
+        if ((og_NA.get<int>())[0][x] != (dt1_NA.get<int>())[0][t]) {
+          std::cout << RED << "Error: stats for NA on new extracted matrix (" << x << "th snp in the original one) are wrong !" << RESET << std::endl;
+          total[8] = 0;
+        }
+        t++;
+      }
+    }
+
     if (j > 10) // SNPs on rows, ind in cols
     {
       i++;
@@ -1018,6 +1057,25 @@ void testsuite(bool verbose = true)
   if (total[7])
   {
     if (verbose) std::cout << GREEN << "Test for selected inds to extract in new matrix passed!" << RESET << std::endl;
+  }
+
+  std::vector<size_t> keep_idx = {0, 1, 2, 3, 100, 606};
+  SNPmatrix extracted_snps(M, keep_idx);
+  total[8] = 1;
+
+  if (extracted_snps.getSNPs().size() != keep_idx.size()) {
+    total[8] = 0;
+    std::cout << RED << "Error: new extracted matrix for snps doesn't right nbr of new snps !" << RESET << std::endl;
+  } else {
+    for (size_t i = 0; i < keep_idx.size(); ++i) {
+      if (extracted_snps.getSNPs()[i] != M.getSNPs()[keep_idx[i]]) {
+        total[8] = 0;
+        std::cout << RED << "Error: New SNPmatrix from extracted snps doesn't match at index " << i << "\n";
+      }  
+    }
+  }
+  if (total[8]) {
+    if (verbose) std::cout << GREEN << "Test for selected snps to extract in new matrix passed!" << RESET << std::endl;
   }
 
 conclusion:
