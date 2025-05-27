@@ -83,7 +83,6 @@ public:
     for (int i = 0; i < nbSNPs; i++)
     { // parcourt tous les SNPs
       auto snp = SNPs_[i];
-      // size_t nbBytes = snp->nbChars();
       size_t nbc_m1 = snp->nbChars() - 1;
       // parcourt le SNP[i], byte by byte
       for (size_t byte = 0; byte < nbc_m1; byte++)
