@@ -13,12 +13,24 @@ LD_chunk <- function(pM, i1, i2, j1, j2) {
     .Call(`_snipsnop_LD_chunk`, pM, i1, i2, j1, j2)
 }
 
-computeSNPStats <- function(pM) {
-    invisible(.Call(`_snipsnop_computeSNPStats`, pM))
+LD_pair_EM <- function(pM, i1, i2) {
+    .Call(`_snipsnop_LD_pair_EM`, pM, i1, i2)
+}
+
+LD_square_EM <- function(pM, i1, i2) {
+    .Call(`_snipsnop_LD_square_EM`, pM, i1, i2)
+}
+
+LD_chunk_EM <- function(pM, i1, i2, j1, j2) {
+    .Call(`_snipsnop_LD_chunk_EM`, pM, i1, i2, j1, j2)
 }
 
 SNPMatrixToIntegerMatrix <- function(pM) {
     .Call(`_snipsnop_SNPMatrixToIntegerMatrix`, pM)
+}
+
+computeSNPStats <- function(pM) {
+    invisible(.Call(`_snipsnop_computeSNPStats`, pM))
 }
 
 extractSNPmatrixMemory_ <- function(other, keep) {

@@ -52,14 +52,45 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// computeSNPStats
-void computeSNPStats(Rcpp::XPtr<SNPmatrix> pM);
-RcppExport SEXP _snipsnop_computeSNPStats(SEXP pMSEXP) {
+// LD_pair_EM
+double LD_pair_EM(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2);
+RcppExport SEXP _snipsnop_LD_pair_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
-    computeSNPStats(pM);
-    return R_NilValue;
+    Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_pair_EM(pM, i1, i2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// LD_square_EM
+Rcpp::NumericMatrix LD_square_EM(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2);
+RcppExport SEXP _snipsnop_LD_square_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_square_EM(pM, i1, i2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// LD_chunk_EM
+Rcpp::NumericMatrix LD_chunk_EM(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, size_t j1, size_t j2);
+RcppExport SEXP _snipsnop_LD_chunk_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
+    Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type j2(j2SEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_chunk_EM(pM, i1, i2, j1, j2));
+    return rcpp_result_gen;
 END_RCPP
 }
 // SNPMatrixToIntegerMatrix
@@ -71,6 +102,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
     rcpp_result_gen = Rcpp::wrap(SNPMatrixToIntegerMatrix(pM));
     return rcpp_result_gen;
+END_RCPP
+}
+// computeSNPStats
+void computeSNPStats(Rcpp::XPtr<SNPmatrix> pM);
+RcppExport SEXP _snipsnop_computeSNPStats(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    computeSNPStats(pM);
+    return R_NilValue;
 END_RCPP
 }
 // extractSNPmatrixMemory_
@@ -429,8 +470,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_LD_pair", (DL_FUNC) &_snipsnop_LD_pair, 3},
     {"_snipsnop_LD_square", (DL_FUNC) &_snipsnop_LD_square, 3},
     {"_snipsnop_LD_chunk", (DL_FUNC) &_snipsnop_LD_chunk, 5},
-    {"_snipsnop_computeSNPStats", (DL_FUNC) &_snipsnop_computeSNPStats, 1},
+    {"_snipsnop_LD_pair_EM", (DL_FUNC) &_snipsnop_LD_pair_EM, 3},
+    {"_snipsnop_LD_square_EM", (DL_FUNC) &_snipsnop_LD_square_EM, 3},
+    {"_snipsnop_LD_chunk_EM", (DL_FUNC) &_snipsnop_LD_chunk_EM, 5},
     {"_snipsnop_SNPMatrixToIntegerMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToIntegerMatrix, 1},
+    {"_snipsnop_computeSNPStats", (DL_FUNC) &_snipsnop_computeSNPStats, 1},
     {"_snipsnop_extractSNPmatrixMemory_", (DL_FUNC) &_snipsnop_extractSNPmatrixMemory_, 2},
     {"_snipsnop_extractSNPmatrixDisk_", (DL_FUNC) &_snipsnop_extractSNPmatrixDisk_, 3},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 1},

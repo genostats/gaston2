@@ -41,11 +41,15 @@ public:
   /**
    * @brief get number of SNPs (see also nbSNPs)
    */
-  unsigned int size() const { return SNPs_.size(); }
+  unsigned int size() const { 
+    return SNPs_.size(); 
+  }
   /**
    * @brief get number of SNPs (see also size)
    */
-  unsigned int nbSNPs() const { return SNPs_.size(); }
+  unsigned int nbSNPs() const { 
+    return SNPs_.size(); 
+  }
   /**
    * @brief get number of Inds
    */
@@ -236,6 +240,9 @@ public:
   // comute SNP stats for snp i with i1 <= i <= i2
   // SHOULD THIS CHANGE TO i1 <= i < i2 ?
   void computeSNPStats(size_t i1, size_t i2) {
+    if(i1 > i2) std::swap(i1, i2);
+    if(i2 >= SNPs_.size()) 
+      throw std::out_of_range("Out of range [computeSNPStats]");
     for(size_t i = i1; i <= i2; i++) {
       SNPs_[i]->compute_stats();
     }

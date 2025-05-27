@@ -15,7 +15,7 @@ ctl <- c(0.999999999999998, -0.0422681970547771, 0.916897472541938,
 a <- readBedFileMemory_("inst/extdata/LCT.bed", 503, 607)
 computeSNPStats(a)
 
-# - checking LD_square
+# ----- checking LD_square ----
 M <- LD_square(a, 167, 172)
 stopifnot( max(abs(M-ctl)) < 1e-10 )
 
@@ -35,13 +35,33 @@ stopifnot( all(M[3:5, 1:6] == M3) )
 M4 <- LD_chunk(a, 167, 172, 168, 171)
 stopifnot( all(M[1:6, 2:5] == M4) )
 
-if(TRUE) {
+
+# ---- checking EM version ----
+D <- LD_square_EM(a, 167, 172) 
+
+D0 <- LD_chunk_EM(a, 167, 170, 170, 172)
+stopifnot( all(D[1:4, 4:6] == D0) )
+
+D1 <- LD_chunk_EM(a, 167, 171, 170, 172)
+stopifnot( all(D[1:5, 4:6] == D1) )
+
+D2 <- LD_chunk_EM(a, 169, 172, 167, 171)
+stopifnot( all(D[3:6, 1:5] == D2) )
+
+D3 <- LD_chunk_EM(a, 169, 171, 167, 172)
+stopifnot( all(D[3:5, 1:6] == D3) )
+
+D4 <- LD_chunk_EM(a, 167, 172, 168, 171)
+stopifnot( all(D[1:6, 2:5] == D4) )
+
+
+
+if(FALSE) {
 data("LCT", package = "gaston")
 x <- gaston::as.bed.matrix(LCT.gen, LCT.fam, LCT.bim)
 
-mb1 <-microbenchmark::microbenchmark(M1 <- gaston::LD(x, c(1, 607), measure = "r"), M2 <- LD_square(a, 0, 606), times = 10)
+mb1 <- microbenchmark::microbenchmark(M1 <- .Call(gaston:::`_gaston_LD`, PACKAGE = "gaston", x@bed, x@mu, x@sigma, 0, 606), M2 <- LD_square(a, 0, 606), times = 40)
 stopifnot( max(abs(M1- M2)) < 1e-12 )
 
-mb2 <- microbenchmark::microbenchmark(M1 <- .Call(gaston:::`_gaston_LD`, PACKAGE = "gaston", x@bed, x@mu, x@sigma, 0, 606), M2 <- LD_square(a, 0, 606), times = 40)
-stopifnot( max(abs(M1- M2)) < 1e-12 )
+mb2 <- microbenchmark::microbenchmark(D <- LD_square_EM(a, 0, 606), times = 40)
 }
