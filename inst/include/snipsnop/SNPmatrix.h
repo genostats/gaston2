@@ -66,11 +66,21 @@ public:
     SNPs_.pop_back();
   }
 
+  SNPmatrix() {} // default constructor to have a specialized one just after
+
+  template <typename intVec>
+  SNPmatrix(const SNPmatrix &other, intVec keep) {
+    const std::vector<std::shared_ptr<SNPvector>> otherSNPs = other.getSNPs();
+    for (auto keep_idx : keep)
+      this->push_back(otherSNPs.at(keep_idx));
+  }
+
 #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
     initializer(omp_priv = decltype(omp_orig)(omp_orig.size(), 0))
 
   void compute_indStats()  {
     if(indStatsComputed_) return; // stats déjà calculées, on ne recalcule pas
+
                                   
     int total = SNPs_.size();
     if (total == 0)
@@ -136,53 +146,6 @@ public:
     // TODO : could add a checksum ?
   }
 
-  // TODO à déplacer dans la classe DataStruct (fonction extractLines par exemple)
-  DataStruct extract_indStats(const std::vector<size_t> &keep)
-  {
-    DataStruct filtered_stats;
-
-    for (Column &col : indStats_.cols)
-    {
-      auto type = col.type();
-      if (type == datatype::INT)
-      {
-        const auto &values = col.get<int>();
-        std::vector<int> filtered;
-        for (size_t idx : keep)
-        {
-          filtered.push_back(values->at(idx));
-        }
-        filtered_stats.push_back(filtered);
-      }
-      else if (type == datatype::FLOAT)
-      {
-        const auto &values = col.get<float>();
-        std::vector<float> filtered;
-        for (size_t idx : keep)
-        {
-          filtered.push_back(values->at(idx));
-        }
-        filtered_stats.push_back(filtered);
-      }
-      else if (type == datatype::DOUBLE)
-      {
-        const auto &values = col.get<double>();
-        std::vector<double> filtered;
-        for (size_t idx : keep)
-        {
-          filtered.push_back(values->at(idx));
-        }
-        filtered_stats.push_back(filtered);
-      }
-      else //find out how to add a custom type ? 
-      {
-        throw std::runtime_error("No an existing type yet");
-      }
-    }
-
-    return filtered_stats;
-  }
-
   // just a small helper f° to clrify extract_ind, not sure if usefull
   int read_ind(uint8_t byte, size_t ind_idx) {
     byte >>= (2 * (ind_idx % 4));
@@ -224,10 +187,12 @@ public:
     indStats_.push_back(N1s);
     indStats_.push_back(N2s);
     indStats_.push_back(NAs);
+    indStatsComputed_ = true;
   }
 
   void setIndStats(DataStruct new_stats) {
     indStats_ = new_stats;
+    indStatsComputed_ = true;
   }
 
   // compute all SNP stats

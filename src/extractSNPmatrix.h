@@ -16,6 +16,9 @@ void extractSNPmatrixMemory(const SNPmatrix &other, const intVec &keep, SNPmatri
   for (const auto &snp : otherSNPs){
     newMat.push_back(std::make_shared<SNPvectorMemory>(snp, keep));
   }
+  //extract stats now and set stats_set_ to true
+  DataStruct original_dt = other.getIndStats();
+  newMat.setIndStats(DataStruct(original_dt, keep));
 }
 
 template <typename intVec>
@@ -76,13 +79,9 @@ void extractSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, std::strin
   for (const auto &snp : otherSNPs){
     newMat.push_back(std::make_shared<SNPvectorDisk<mio::access_mode::write>>(snp, file_ptr, SNPindex++, keep));
   }
-
-//   file_ptr->sync(error);
-//   if (error)
-//   {
-//     std::string errMsg = "Error code " + std::to_string(error.value()) + ", Failed to map the file : " + error.message();
-//     throw std::runtime_error(errMsg);
-//   }
+  //extract stats now and set stats_set_ to true
+  DataStruct original_dt = other.getIndStats();
+  newMat.setIndStats(DataStruct(original_dt, keep));
 }
 
 template <typename intVec>
