@@ -29,8 +29,16 @@ class DataStruct {
       colNames.push_back(name);
     }
 
+    void push_back(DataStruct D) {
+      for(size_t i = 0; i < D.size(); i++) {
+        std::cout << "i = " << i << "\n";
+        cols.push_back(D.at(i));
+        colNames.push_back(D.colName(i));
+      }
+    }
+
     std::string colName(size_t i) const {
-      return colNames[i];
+      return colNames.at(i);
     }
 
     // TODO 

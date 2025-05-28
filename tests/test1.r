@@ -18,6 +18,13 @@ x <- gaston::as.bed.matrix(LCT.gen, LCT.fam, LCT.bim)
 cn <- c("N0", "N1", "N2", "NAs")
 stopifnot( all(getIndStats(a)[,cn] == x@ped[,cn]) )
 
-set_num_thread(1)
-mb <- microbenchmark::microbenchmark( test_force_compute_indStats(a) );
-mb
+# set_num_thread(1)
+# mb <- microbenchmark::microbenchmark( test_force_compute_indStats(a) );
+# mb
+
+# checking read fam file
+a <- readBedFileMemory_("inst/extdata/LCT.bed", 503, 607)
+readFamFile(a, "inst/extdata/LCT.fam")
+head(getIndStats(a, FALSE))
+head(getIndStats(a, TRUE))
+

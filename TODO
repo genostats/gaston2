@@ -1,0 +1,2 @@
+- les fonctions de lecture ddans DataStruct ne sont pas robustes
+  à la présence de chaines de caractères dans une colonne numerique (eg 'NA')

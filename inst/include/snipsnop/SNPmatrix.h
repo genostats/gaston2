@@ -1,9 +1,9 @@
 #include "SNPvector.h"
 #include "SNPvectorDisk.h"
-#include <vector> // for omp reduction
-#include <memory> // for shared_ptr
+#include <vector>     // for omp reduction
+#include <memory>     // for shared_ptr
 #include <stdexcept>  // for out of range exceptions
-
+#include <fstream>    // for ifstream
 #include "Datastruct.h"
 
 #include "SNPvectorMemory.h"
@@ -71,7 +71,8 @@ public:
 
   void compute_indStats(bool force = false)  {
     if(!force && indStatsComputed_) return; // stats déjà calculées, on ne recalcule pas
-                                  
+    
+    std::cout << "compute ind stats\n";    
     int nbSNPs = SNPs_.size();
     if (nbSNPs == 0)
       throw std::out_of_range("No SNPs loaded into the SNPMatrix !");
@@ -165,7 +166,13 @@ public:
     return SNPs_[i];
   }
 
+  // get the DataStruct containing individual stats
   const DataStruct getIndStats() const { return indStats_; }
+
+  // get the DataStruct containing snp stats
+  const DataStruct getSNPStats() const { return indStats_; }
+
+
 
   // TODO : see if by default possible ?
   // they need to be ordered !!!!
@@ -205,8 +212,27 @@ public:
       snp->setMode(mode);
     }
   }
+
+  void readFamFile(std::string famFile) {
+    std::ifstream in(famFile);
+    std::vector<datatype> colTypes = { datatype::STRING, datatype::STRING, datatype::STRING, datatype::STRING, datatype::INT, datatype::INT };
+    std::vector<std::string> colNames = { "famid", "id", "father", "mother", "sex", "pheno" };
+    DataStruct DS(in, colTypes, colNames);
+    indStats_.push_back(DS);
+  }
+
+  void readBimFile(std::string bimFile) {
+    std::ifstream in(bimFile);
+    std::vector<datatype> colTypes = { datatype::STRING, datatype::STRING, datatype::STRING, datatype::STRING, datatype::INT, datatype::INT };
+    std::vector<std::string> colNames = { "chr", "id", "pos", "dist", "A1", "A2" };
+    DataStruct DS(in, colTypes, colNames);
+    snpStats_.push_back(DS);
+  }
+
 private:
-  DataStruct indStats_;
+  // stats and informations
+  DataStruct indStats_;   // will contain fam file + statistiques
+  DataStruct snpStats_;   // will contain bim file + ?
   std::vector<std::shared_ptr<SNPvector>> SNPs_;
   bool indStatsComputed_ = false;
 };

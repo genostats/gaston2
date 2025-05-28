@@ -6,8 +6,8 @@
 Rcpp::DataFrame DataStructToDataFrame(const DataStruct & DS);
 
 // [[Rcpp::export]]
-Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix> pM) {
-  pM->compute_indStats();
+Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix> pM, bool compute = true) {
+  if(compute) pM->compute_indStats();
   return DataStructToDataFrame( pM->getIndStats() );
 }
 
