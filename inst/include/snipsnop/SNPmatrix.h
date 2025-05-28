@@ -170,7 +170,7 @@ public:
   const DataStruct getIndStats() const { return indStats_; }
 
   // get the DataStruct containing snp stats
-  const DataStruct getSNPStats() const { return indStats_; }
+  const DataStruct getSNPStats() const { return snpStats_; }
 
 
 
@@ -223,7 +223,7 @@ public:
 
   void readBimFile(std::string bimFile) {
     std::ifstream in(bimFile);
-    std::vector<datatype> colTypes = { datatype::STRING, datatype::STRING, datatype::STRING, datatype::STRING, datatype::INT, datatype::INT };
+    std::vector<datatype> colTypes = { datatype::STRING, datatype::STRING, datatype::INT, datatype::DOUBLE, datatype::STRING, datatype::STRING };
     std::vector<std::string> colNames = { "chr", "id", "pos", "dist", "A1", "A2" };
     DataStruct DS(in, colTypes, colNames);
     snpStats_.push_back(DS);
