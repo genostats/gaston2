@@ -298,6 +298,7 @@ public:
     gg[14] = (2. - mu_) * (1. - (other.mu_));
     gg[15] = (2. - mu_) * (2. - (other.mu_));
 
+    // PB ! what if v == 0 ?
     scalar_t v = sigma_ * other.sigma_;
 
     // don't recall functions at each loop turn !!

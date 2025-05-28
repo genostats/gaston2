@@ -17,14 +17,19 @@ MMatrix<T>::MMatrix(std::string path, size_t nrow, size_t ncol, bool verbose)
     , path_(path), verbose_(verbose)
 {
     size_ = ncol * nrow;
+    if (!size_) throw std::invalid_argument("Ncol or Nrow are equal 0, cannot map an empty file !");
     size_t matrix_size = size_ * sizeof(T);
 
-    std::ifstream file(path, std::ifstream::binary);
-    if (!file.good())
+
+  /* FIRST : check if file exists, if it does not, create one of the good size*/
+    const char * path_c = path.c_str();
+    FILE *check = fopen(path_c, "rb"); // open en readonly 
+
+    if (!check)
     {
         if (verbose_ == true) std::cout << "The file " << path << " does not exist, creating one ...  ";
-        std::ofstream file(path, std::ios::binary); // to load with \0
-        if (!file || !file.is_open())
+        std::ofstream newfile(path, std::ios::binary); // to load with \0
+        if (!newfile || !newfile.is_open())
         {
             throw std::runtime_error("Failed to open the file;");
         }
@@ -32,19 +37,50 @@ MMatrix<T>::MMatrix(std::string path, size_t nrow, size_t ncol, bool verbose)
         after using seekp to the before last byte will
         ensure we have a non-empty file of the desired size
         without loading it into memory */
-        file.seekp(matrix_size - 1);
-        file.put('\0');
+        newfile.seekp(matrix_size - 1);
+        newfile.put('\0');
         // mio will reopen it
-        file.close();
+        newfile.close();
         if (verbose_ == true) std::cout << "Done !" << std::endl;
     }
-    else if (verbose_ == true) {
-        std::cout << "Using and overwritting already existing file: " << path << std::endl;
-    }
-    // then opening the file
-    std::error_code error;
+    else {
+        if (verbose_ == true) {
+            std::cout << "Using and potentially overwritting already existing " << path << std::endl;
+        }
+        fclose(check);
 
+        // from https://stackoverflow.com/questions/238603/how-can-i-get-a-files-size-in-c
+        struct stat buf;
+        if (stat(path_c, &buf) != 0) {
+            throw std::runtime_error("Failed to analyse file: " + path);
+        }
+        off_t file_size = buf.st_size;
+        if (file_size != matrix_size) {
+            if (verbose_) {
+                std::cout << "Resizing file from " << file_size << " to " << matrix_size << " bytes." << std::endl;
+            }
+
+            if (matrix_size > file_size) {
+                std::fstream resize_file(path, std::ios::binary | std::ios::in | std::ios::out );
+                if (!resize_file.is_open()) {
+                    throw std::runtime_error("Failed to reopen file for resizing.");
+                }
+                //same as creating one with good size
+                resize_file.seekp(matrix_size - 1);
+                resize_file.put('\0');
+                resize_file.close();
+            } else {
+                // TRIM IT DOWN !!
+                if (truncate(path_c, matrix_size) != 0) {
+                    throw std::runtime_error("Failed to truncate file: " + path);
+                }
+            }
+        }
+    }
+
+    std::error_code error;
     matrix_file_ = mio::make_mmap_sink(path, 0, mio::map_entire_file, error);
+    
     if (error)
     {
         std::string errMsg = "Error code " + std::to_string(error.value())
@@ -52,14 +88,10 @@ MMatrix<T>::MMatrix(std::string path, size_t nrow, size_t ncol, bool verbose)
         throw std::runtime_error(errMsg);
     }
 
-    // TODO : see if necessary
-    if (matrix_size > matrix_file_.size())
-    {
-        std::string errMsg = "Error : Trying to access a matrix of "
-            + std::to_string(matrix_size) + " byte(s), so bigger than " + path
-            + " file.";
-        throw std::invalid_argument(errMsg);
+    if (matrix_file_.empty() || matrix_file_.data() == nullptr) {
+        throw std::runtime_error("Memory mapping failed: no data mapped.");
     }
+
     data_ptr_ = reinterpret_cast<T *>(matrix_file_.data());
 }
 
