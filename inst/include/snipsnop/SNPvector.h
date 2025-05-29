@@ -65,9 +65,17 @@ enum Mode
 class SNPvector {
 
 protected: // can be accessed also by class inheriting
+
+  // nbInds and mode shared by all inheriting classes
+  // (cf constructors below)
+
+  const size_t nbInds_;
+  enum Mode mode_ = Mode::PLINK;
+
   /* Containing N0, N1, N2, NAs on the whole SNP,
   following Plink format
   populated by compute_stats()*/
+
   unsigned int stats_[4] = {0, 0, 0, 0};
   bool stats_set_ = false;
 
@@ -75,7 +83,7 @@ protected: // can be accessed also by class inheriting
   double sigma_ = 0;
 
   // just a small helper f° to extract an individual genotype from a byte
-  inline int read_ind(uint8_t byte, size_t ind_idx) {
+  inline uint8_t read_ind(uint8_t byte, size_t ind_idx) {
     byte >>= (2 * (ind_idx % 4));
     return byte & 3; // extraction des bits correspondant
   }
@@ -85,7 +93,9 @@ protected: // can be accessed also by class inheriting
   // default values = "raw genotypes" with a 3 for NA (could be set to NaN ? to be considered)
   // (see also in setMode below)
   double g_trans[4] = {0, 3, 1, 2};
-  enum Mode mode_ = Mode::PLINK;
+
+  // constructor allowing to set nbInds and mode (to be called by derived classes)
+  SNPvector(size_t nbInds, Mode mode = Mode::PLINK) : nbInds_(nbInds), mode_(mode) {}
 
   void computeMode() { 
     switch(mode_) {
@@ -122,6 +132,7 @@ protected: // can be accessed also by class inheriting
         throw std::runtime_error("Private function computeMode called with bad mode value");
     }
   }
+
 public:
   /**
    * @brief pure virtual function,
@@ -131,8 +142,11 @@ public:
    */
   // virtual uint8_t *data() = 0;
   virtual const uint8_t *data() const = 0;
+
   // nombre d'individus
-  virtual size_t nbInds() const = 0;
+  size_t nbInds() const {
+    return nbInds_;
+  }
 
   // BY DEFAULT, PLINK format, with 01 = missing genotype
   // double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}, {0, 0, 0, 0}};
@@ -238,18 +252,18 @@ public:
     if(!set_mu && !set_sigma) return;    // do nothing
     if(!stats_set_) compute_stats(false, false); // compute stats first (could also throw error ?)
 
-    double N = nbInds(); // equal to ncols in gaston
+    double N = (double) nbInds(); // equal to ncols in gaston
 
-    unsigned int N1s = stats_[1];
-    unsigned int N2s = stats_[2];
-    unsigned int NAs = stats_[3];
-    double n = N - NAs;
+    double N1s = (double) stats_[1];
+    double N2s = (double) stats_[2];
+    double NAs = (double) stats_[3];
+    double n = N - (double) NAs;
 
     double m = (2 * N2s + N1s) / n;
     if(set_mu) mu_ = m;
     if(set_sigma) {
       double mu2 = m * m;
-      sigma_ = sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
+      sigma_ = std::sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
     }
   }
 
@@ -402,8 +416,8 @@ public:
 
   class Iterator {
   private:
-    int currentChar;     // ii dans le code RV, correspond au byte sur lequel je suis
-    int current2bits;    // ss dans le code RV, correspond au bit (0...3) dans le byte
+    size_t currentChar;     // ii dans le code RV, correspond au byte sur lequel je suis
+    size_t current2bits;    // ss dans le code RV, correspond au bit (0...3) dans le byte
     SNPvector &iterated; // link to mother class
     const double * values;     // values according to current mode of iterated
 

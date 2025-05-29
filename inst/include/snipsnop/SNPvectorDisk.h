@@ -22,12 +22,18 @@
 template<mio::access_mode accessMode>
 class SNPvectorDisk : public SNPvector {
 
+  private:
+  uint8_t * data_;
+  /** @brief a shared_ptr to the object handling the file, 
+  when the last SNP from the same file is deleted, the file is unmapped and closed */
+  std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref_;
+
   public:
- 
   // on donne à ce constructeur un shared ptr vers fichier ouvert par mio + le nb d'individus, et le SNP index à pointer
   SNPvectorDisk(size_t nbInds, std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref, size_t SNP_index) : 
+    SNPvector(nbInds),
     data_((uint8_t *) (file_ref->data() + 3 /* offset from the 3 first magic bytes) */ + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index) ), 
-    nbInds_(nbInds), file_ref_(file_ref) {}
+    file_ref_(file_ref) {}
  
 
   // TODO !! : check what happens with empty SNP ?
@@ -36,10 +42,11 @@ class SNPvectorDisk : public SNPvector {
   // le but est d'écrire dans un fichier .bed *qu'on a créé nous-même* et qui est encore vide (à part les 3 magic bytes)
   // (ou pas forcément vide, ça va la modifier en place)
   // toujours créé en mode PLINK
-  SNPvectorDisk(const std::shared_ptr<SNPvector> source, \
-    std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> file_ref, size_t SNP_index) : 
+  SNPvectorDisk(const std::shared_ptr<SNPvector> source, 
+                std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> file_ref, 
+                size_t SNP_index) : 
+      SNPvector(source->nbInds()), 
       data_((uint8_t *) (file_ref->data() + 3 + (source->nbInds()/4 + ((source->nbInds()%4 == 0u)?0:1)) * SNP_index)), 
-      nbInds_(source->nbInds()), 
       file_ref_(file_ref) {
     // on copie les données de source dans le fichier, à la bonne place qui est pointée par data_a
     size_t nbChars = source->nbChars();
@@ -50,11 +57,11 @@ class SNPvectorDisk : public SNPvector {
   }
 
   // constructeur par sélection des individus spécifiés : 
-  // to_keep contient les indexs des individus à conserver dans le SNP
+  // to_keep contient les indices des individus à conserver dans le SNP
   template <typename intVec>
   SNPvectorDisk(const std::shared_ptr<SNPvector> source, \
     std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> newfile, size_t SNP_index, intVec &keep) : 
-    nbInds_(keep.size()), file_ref_(newfile) {
+    SNPvector(keep.size()), file_ref_(newfile) {
     
     data_ = (uint8_t *) newfile->data() + (3 + (nbInds_/4 + ((nbInds_%4 == 0u)?0:1)) * SNP_index); // bcos mio sends back a char *
     const uint8_t * sourceData = source->data();
@@ -64,9 +71,9 @@ class SNPvectorDisk : public SNPvector {
 
     for(size_t i = 0; i < nbInds_; i++) {
 
-      int ind_idx = keep[i];
+      size_t ind_idx = keep[i];
       size_t currentChar = ind_idx / 4;    // index du byte
-      int ind_gen = read_ind(sourceData[currentChar], ind_idx);
+      uint8_t ind_gen = read_ind(sourceData[currentChar], ind_idx);
 
       ind_gen <<= (new_2bits); // shifter pour le mettre au bon endroit dans le nv byte
       newdata |= ind_gen;
@@ -86,45 +93,9 @@ class SNPvectorDisk : public SNPvector {
     //std::cout << "Destroying a SNP, here's the count of file_ref_ : " << file_ref_.use_count() << "\n";
   }
 
-  size_t nbInds() const { return nbInds_; }
-
-  // pointer to the first char
-  // uint8_t * data() {
-  //   return &data_[0];
-  // }
-
   const uint8_t * data() const {
     return &data_[0];
   }
 
-  /*
-  void setMode(Mode mode) {
-    mode_ = mode;
-  }
-  
-  void setMode(Mode mode, double personalized[4]) { 
-    mode_ = mode;
-    for (int i = 0; i< 4; i++)
-    currentMode_[4][i] = personalized[i];
-  }
-
-  // returns the array used to translate datas
-  // TODO : see if Mode enum more usefulS
-  const double * mode() const { return currentMode_[mode_]; }
-  
-  const double mode(unsigned int n) const { return currentMode_[mode_][n]; }
-  */
-
-  private:
-  /** @brief a vector containing the bits composing the SNP */
-  //std::vector<uint8_t> data_;
-  /** @brief a ptr in the mio file, pointing to the bits composing the SNP
-   * It's constness is imposed by mio, that openned a read only file */
-  uint8_t *data_;
-   /** @brief to help parse SNP*/
-  const size_t nbInds_;
-  /** @brief a shared_ptr to the object handling the file, 
-  when the last SNP from the same file is deleted, the file is unmapped and closed */
-  std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref_;
 };
 #endif // SNPMMATRIX

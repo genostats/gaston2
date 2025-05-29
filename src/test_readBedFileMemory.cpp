@@ -276,7 +276,6 @@ unsigned int test_performance_iterator_2d(unsigned int n)
 IntegerVector test_snp_stats(unsigned int n)
 {
   int nbSNPs = 1;
-  unsigned int S = 0;
   if (n > 503)
   {
     nbSNPs = (n / 503) + 1;
@@ -382,7 +381,6 @@ NumericMatrix test_mu_sigma(unsigned int n)
     auto vec = M.getSNP(i);
     // NEED TO COMPUTE BEFORE
     vec->compute_stats();
-    auto stats = vec->getStats();
     // std::cout << "This is stats for SNP[" << i << "] : " << stats[0] << ", " << stats[1] << ", " << stats[2];
 
     vec->compute_mu_sigma();

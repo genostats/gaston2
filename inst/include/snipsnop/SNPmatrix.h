@@ -41,19 +41,19 @@ public:
   /**
    * @brief get number of SNPs (see also nbSNPs)
    */
-  unsigned int size() const { 
+  size_t size() const { 
     return SNPs_.size(); 
   }
   /**
    * @brief get number of SNPs (see also size)
    */
-  unsigned int nbSNPs() const { 
+  size_t nbSNPs() const { 
     return SNPs_.size(); 
   }
   /**
    * @brief get number of Inds
    */
-  unsigned int nbInds() const {
+  size_t nbInds() const {
     if(nbSNPs() == 0) {
       return 0;
     }
@@ -94,7 +94,7 @@ public:
     if(indStatsComputed_) return; // stats déjà calculées, on ne recalcule pas
 
                                   
-    int total = SNPs_.size();
+    size_t total = SNPs_.size();
     if (total == 0)
       throw std::out_of_range("No SNPs loaded into the SNPMatrix !");
 
@@ -102,7 +102,7 @@ public:
     std::vector<int> unordered_stats(nbInds * 4, 0); // DO NOT USE nbCHars ! rounded up !
 
 #pragma omp parallel for reduction(vec_int_plus : unordered_stats)
-    for (int i = 0; i < total; i++) { // parcourt tous les SNPs
+    for (size_t i = 0; i < total; i++) { // parcourt tous les SNPs
       auto snp = SNPs_[i];
       size_t nbBytes = snp->nbChars();
 
