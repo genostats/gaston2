@@ -49,11 +49,11 @@ static uint8_t N1[256] = {
 
 enum Mode
 {
-  PLINK = 0,                 // .bed file : (g = {0, 1, 3 and 2 = NA})
-  CENTERED = 1,              // (g -= mu)
-  STANDARDIZED_MU_SIGMA = 2, // (g = (g-mu)/sd)
-  NUMERIC = 3,               // (g = {0, 1, 2 and 3 = NA}) (almost never used)
-  PERSONALIZED = 4
+  PLINK,                 // .bed file : g = {0, 1, 3 and 2 = NA}
+  CENTERED,              // g -= mu
+  STANDARDIZED_MU_SIGMA, // g = (g-mu)/sd
+  STANDARDIZED_P,        // g = (g - 2⁼p) / sqrt(2*p*(1-p)) with p = mu/2
+  CUSTOM 
 };
 
 /**
@@ -62,8 +62,7 @@ enum Mode
  * Stores a bit vector, could be in memory or in a memory_mapped file
  *
  */
-class SNPvector
-{
+class SNPvector {
 
 protected: // can be accessed also by class inheriting
   /* Containing N0, N1, N2, NAs on the whole SNP,
@@ -81,6 +80,48 @@ protected: // can be accessed also by class inheriting
     return byte & 3; // extraction des bits correspondant
   }
 
+  // an array for transformed genotype (either centered, standardized, etc)
+  // values can be changed by function setMode
+  // default values = "raw genotypes" with a 3 for NA (could be set to NaN ? to be considered)
+  // (see also in setMode below)
+  double g_trans[4] = {0, 3, 1, 2};
+  enum Mode mode_ = Mode::PLINK;
+
+  void computeMode() { 
+    switch(mode_) {
+      case Mode::PLINK: {
+        g_trans[0] = 0; 
+        g_trans[1] = 3;
+        g_trans[2] = 1;
+        g_trans[3] = 2;
+        break;
+      }
+      case Mode::CENTERED: {
+        g_trans[0] = 0 - mu_; 
+        g_trans[1] = 0;
+        g_trans[2] = 1 - mu_;
+        g_trans[3] = 2 - mu_;
+        break;
+      }
+      case Mode::STANDARDIZED_MU_SIGMA: {
+        g_trans[0] = (0 - mu_)/sigma_; 
+        g_trans[1] = 0;
+        g_trans[2] = (1 - mu_)/sigma_;
+        g_trans[3] = (2 - mu_)/sigma_;
+        break;
+      }
+      case Mode::STANDARDIZED_P: {
+        double s = sqrt( mu_*(1 - mu_/2) ); // sqrt 2p(1-p)
+        g_trans[0] = (0 - mu_)/s; 
+        g_trans[1] = 0;
+        g_trans[2] = (1 - mu_)/s;
+        g_trans[3] = (2 - mu_)/s;
+        break;
+      }
+      default:
+        throw std::runtime_error("Private function computeMode called with bad mode value");
+    }
+  }
 public:
   /**
    * @brief pure virtual function,
@@ -94,16 +135,41 @@ public:
   virtual size_t nbInds() const = 0;
 
   // BY DEFAULT, PLINK format, with 01 = missing genotype
-  double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}, {0, 0, 0, 0}};
+  // double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}, {0, 0, 0, 0}};
 
-  // To use xhen changing to a mode already computed
-  virtual void setMode(Mode mode) = 0;
-  // To use when you want to give an array
-  virtual void setMode(Mode mode, double personnalized[4]) = 0;
+  // To use set mode and compute g_trans value accordingly
+  void setMode(Mode mode) { 
+    if(mode == mode_) return; // didn't change, do nothing
+    if(mode == Mode::CUSTOM) 
+      throw std::runtime_error("Can't set custom mode this way");
+    mode_ = mode;
+    computeMode();
+  }
 
-  virtual const double *mode() const = 0;
-  virtual const double mode(unsigned int n) const = 0;
+  // Personnalized mode
+  // To be used when you want to give the three values 
+  // (missing genotype is always set to zero)
+  template<typename vector>
+  void setMode(const vector & values) {
+    if(values.size() != 3) throw std::runtime_error("in setMode, size should be three");
+    g_trans[0] = values[0];
+    g_trans[1] = 0; // missing, always zero
+    g_trans[2] = values[1];
+    g_trans[3] = values[2];
+    mode_ = Mode::CUSTOM;
+  }
 
+  // get mode
+  Mode mode() const {
+    return mode_;
+  }
+
+  // get values
+  const double * values() const {
+    return g_trans;
+  }
+
+  // checked if stats are set
   bool stats_set() const {
     return stats_set_;
   }
@@ -114,42 +180,41 @@ public:
    *
    * @return size_t
    */
-  size_t nbChars() const
-  {
+  size_t nbChars() const {
     const size_t n = nbInds();
     return n / 4 + ((n % 4 == 0u) ? 0 : 1);
   }
 
-  const unsigned int *getStats() const
-  {
+  const unsigned int *getStats() const {
     return stats_;
   }
 
-  double getMu() const
-  {
+  double getMu() const {
     return mu_;
   }
 
-  void setMu(double mu)
-  {
-    mu_ = mu;
-    compute_mode();
-  }
-
-  double getSigma() const
-  {
+  double getSigma() const {
     return sigma_;
   }
 
-  void setSigma(double sigma)
-  {
+  void setMu(double mu) {
+    mu_ = mu;
+    computeMode(); // recompute mode
+  }
+
+  void setSigma(double sigma) {
     sigma_ = sigma;
-    compute_mode();
+    computeMode(); // recompute mode
+  }
+  
+  void setMuSigma(double mu, double sigma) {
+    mu_ = mu;
+    sigma_ = sigma;
+    computeMode(); // recompute mode
   }
 
   // dummy function summing the n first individuals from the SNP, if no n specified, summing all SNPs available
-  double sum(int n = -1)
-  {
+  double sum(int n = -1) {
     double S = 0;
     const uint8_t *d = data();
     size_t nc = nbChars(); // max nb of bytes
@@ -157,22 +222,22 @@ public:
     if (n == -1)
       n = nbInds(); // set to max nb of bits available
 
-    for (size_t i = 0; (cptr < n && i < nc); i++)
-    {
+    for (size_t i = 0; (cptr < n && i < nc); i++) {
       uint8_t byte = d[i];
-      for (unsigned int bits = 0; (cptr < n && bits < 4); bits++)
-      {
+      for (unsigned int bits = 0; (cptr < n && bits < 4); bits++) {
         unsigned int val = (byte >> (2 * bits)) & 3; // Extract the SNP (2 bits)
-        S += mode(val);
+        S += g_trans[val];
         cptr++;
       }
     }
     return S;
   }
 
-  // CAREFULL ! This function WILL overwrite mu and sigma !
-  void compute_mu_sigma()
-  {
+  // This function overwrites mu and/or sigma, according to the arguments
+  void compute_mu_sigma(bool set_mu = true, bool set_sigma = true) {
+    if(!set_mu && !set_sigma) return;    // do nothing
+    if(!stats_set_) compute_stats(false, false); // compute stats first (could also throw error ?)
+
     double N = nbInds(); // equal to ncols in gaston
 
     unsigned int N1s = stats_[1];
@@ -180,66 +245,26 @@ public:
     unsigned int NAs = stats_[3];
     double n = N - NAs;
 
-    mu_ = (2 * N2s + N1s) / n;
-    double mu2 = mu_ * mu_;
-    sigma_ = sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
-  }
-
-  void compute_mu()
-  {
-    double N = nbInds(); // equal to ncols in gaston
-
-    unsigned int N1s = stats_[1];
-    unsigned int N2s = stats_[2];
-    unsigned int NAs = stats_[3];
-    double n = N - NAs;
-
-    mu_ = (2 * N2s + N1s) / n;
-  }
-
-  void compute_sigma()
-  {
-    double N = nbInds(); // equal to ncols in gaston
-
-    unsigned int N1s = stats_[1];
-    unsigned int N2s = stats_[2];
-    unsigned int NAs = stats_[3];
-
-    double mu2 = mu_ * mu_;
-    sigma_ = sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
-  }
-
-  void compute_mode()
-  {
-
-    // Centered mode Plinked
-    currentMode_[1][0] = -mu_;
-    currentMode_[1][1] = 0;
-    currentMode_[1][2] = 1 - mu_;
-    currentMode_[1][3] = 2 - mu_;
-
-    // Centré réduit
-    currentMode_[2][0] = currentMode_[1][0] / sigma_;
-    currentMode_[2][1] = 0;
-    currentMode_[2][2] = currentMode_[1][2] / sigma_;
-    currentMode_[2][3] = currentMode_[1][3] / sigma_;
+    double m = (2 * N2s + N1s) / n;
+    if(set_mu) mu_ = m;
+    if(set_sigma) {
+      double mu2 = m * m;
+      sigma_ = sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
+    }
   }
 
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
-  void compute_stats()
-  {
+  void compute_stats(bool set_mu = true, bool set_sigma = true) {
     // if already called, do nothing
     if(stats_set_) return;
-    size_t nbByte = nbChars();
-    size_t BitsInLastByte = (nbInds() % 4); // number of bits to read on last byte
-    if (!BitsInLastByte)
-      BitsInLastByte = 4; // to read entire last byte
+
+    size_t nbc_m1 = nbChars() - 1;
 
     /* FIRST : filling up stats_ with N0s, N1s, N2s, and NAs with PLINK translation*/
     stats_[0] = stats_[1] = stats_[2] = stats_[3] = 0;
 
     // all bytes excepted last byte
-    for (size_t i = 0; i < nbByte - 1; i++) {
+    for (size_t i = 0; i < nbc_m1; i++) {
       uint8_t d = data()[i];
       stats_[0] += N0[d];
       stats_[2] += N0[255 - d]; // raw = 3
@@ -247,31 +272,27 @@ public:
       stats_[1] += N1[255 - d]; // raw = 2
     }
 
-    // last byte
-    uint8_t d = data()[nbByte - 1];
+    // last byte treated separately,
     // stopping mid-byte if necessary:
-    while (BitsInLastByte > 0) {
-      unsigned int val = (d & 3);
-      unsigned int val_plink = currentMode_[0][val];
+    unsigned int g[4] = {0, 3, 1, 2};
+    uint8_t d = data()[nbc_m1];
+    unsigned int BitsInLastByte = (nbInds() & 3)?(nbInds() & 3):4;
+    while(BitsInLastByte > 0) {
+      unsigned int val_plink = g[d&3];
       stats_[val_plink]++;
       BitsInLastByte--;
       d >>= 2; // 1 shift par loop
     }
 
-    // THEN : computing mu and sigma checking if no value given
-    if (!mu_ && !sigma_)
-      compute_mu_sigma(); // compute mu & sd ONLY IF BOTH == 0
-    else if (!mu_)
-      compute_mu(); // only compute mu, implied sigma_ was given
-    else if (!sigma_)
-      compute_sigma(); // sigma will be calculated from given mu_
-
     // stats are set !!
     stats_set_ = true;
 
+    // THEN : computing mu and sigma (according to arguments)
+    compute_mu_sigma(set_mu, set_sigma);
+
     /* FINALLY : updating the "mode" enum that acts as a filter
      to get calculated via mu_and sigma_*/
-    return compute_mode();
+    computeMode();
   }
 
   // for scalar product :
@@ -299,9 +320,9 @@ public:
     gg[15] = (2. - mu_) * (2. - (other.mu_));
 
     // PB ! what if v == 0 ?
+    // TODO return NaN directly
     scalar_t v = sigma_ * other.sigma_;
 
-    // don't recall functions at each loop turn !!
     auto data1 = data();
     auto data2 = other.data();
     size_t nbc_m1 = nbChars() - 1;
@@ -379,38 +400,36 @@ public:
     contingencyTable[8] = table[15];
   }
 
-  class Iterator
-  {
+  class Iterator {
   private:
     int currentChar;     // ii dans le code RV, correspond au byte sur lequel je suis
     int current2bits;    // ss dans le code RV, correspond au bit (0...3) dans le byte
     SNPvector &iterated; // link to mother class
+    const double * values;     // values according to current mode of iterated
 
   public:
     // le constructeur vide démarre à 0, et récupère l'instance qui l'appelle
-    Iterator(SNPvector &it) : currentChar(0), current2bits(0), iterated(it) {}
+    Iterator(SNPvector &it) : currentChar(0), current2bits(0), iterated(it), values(it.values()) {}
 
-    Iterator(size_t ind, SNPvector &it) : currentChar(ind / 4), current2bits(ind % 4), iterated(it)
-    {
+    Iterator(size_t ind, SNPvector &it) : currentChar(ind / 4), current2bits(ind % 4), iterated(it), values(it.values()) {
       if (currentChar > iterated.nbChars())
         throw std::out_of_range("End Iterator is too far !");
     }
 
+    // TODO est-ce qu'on ne peut pas avoir le byte shifté dans la classe et faire seulement un >>= 2 à l'appel de ++
+    //      (et un update tous les 4 appels) ?
+
     // operateur * const : renvoie la valeur 2bits par 2bits
-    double operator*()
-    {
+    double operator*() {
       uint8_t byte = iterated.data()[currentChar];
       byte >>= (2 * current2bits);   // pour avoir les 2bits de poids faible
-      unsigned int val = (byte & 3); // mtn on les isole
-      return iterated.mode(val);
+      return values[byte&3];
     }
 
     // Operateur ++ : passe à la valeur suivante, PRE-INCRÉMENTATION
-    Iterator &operator++()
-    {
+    Iterator &operator++() {
       current2bits++;
-      if (current2bits > 3)
-      {
+      if (current2bits > 3) {
         current2bits = 0;
         currentChar++;
       }

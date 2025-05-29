@@ -16,18 +16,16 @@ class SNPvectorMemory : public SNPvector
 {
 public:
   // un constructeur, taille nbInds
-  SNPvectorMemory(size_t nbInds, Mode mode = PLINK) : data_(nbInds / 4 + ((nbInds % 4 == 0u) ? 0 : 1)), nbInds_(nbInds), mode_(mode) {}
+  SNPvectorMemory(size_t nbInds) : data_(nbInds / 4 + ((nbInds % 4 == 0u) ? 0 : 1)), nbInds_(nbInds) {}
 
   // constructeur par copie
-  SNPvectorMemory(const std::shared_ptr<SNPvector> source) \
-  : data_(source->data(), source->data() + source->nbInds()),
-  nbInds_(source->nbInds()), mode_(PLINK) {}
+  SNPvectorMemory(const std::shared_ptr<SNPvector> source) : data_(source->data(), source->data() + source->nbInds()),
+                                                             nbInds_(source->nbInds()) {}
 
   // constructeur par copie avec une sélection des individus,
   // par un vecteur d'index 
   template <typename intVec>
-  SNPvectorMemory(const std::shared_ptr<SNPvector> source, intVec &keep) \
-  :   nbInds_(keep.size()), mode_(PLINK) {
+  SNPvectorMemory(const std::shared_ptr<SNPvector> source, intVec &keep) : nbInds_(keep.size()) {
     const uint8_t *refdata = source->data();
     // check the keep (no idx to far or impossible)
     data_.assign((nbInds_ / 4 + ((nbInds_ % 4 == 0u) ? 0 : 1)), 0); // creating with nbChars of 0
@@ -66,23 +64,22 @@ public:
 
   const uint8_t *data() const { return &data_[0]; }
 
-  void setMode(Mode mode) { mode_ = mode; }
-  void setMode(Mode mode, double personalized[4]) { 
-    mode_ = mode;
-    for (int i = 0; i< 4; i++)
-    currentMode_[4][i] = personalized[i];
-  }
+  // void setMode(Mode mode) { mode_ = mode; }
+  // void setMode(Mode mode, double personalized[4]) { 
+  //  mode_ = mode;
+  //  for (int i = 0; i< 4; i++)
+  //   currentMode_[4][i] = personalized[i];
+  // }
 
   // returns the array used to translate datas 
-  const double *mode() const { return currentMode_[mode_]; } // considered as const cos double *mode() const
+  // const double *mode() const { return currentMode_[mode_]; } // considered as const cos double *mode() const
 
-  //returns the translation of n through mode
-  const double mode(unsigned int n) const { return currentMode_[mode_][n]; }
+  // returns the translation of n through mode
+  // const double mode(unsigned int n) const { return currentMode_[mode_][n]; }
 
   private:
   std::vector<uint8_t> data_;
   const size_t nbInds_;
-  enum Mode mode_;
 
 };
 

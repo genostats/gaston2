@@ -102,29 +102,27 @@ public:
     std::vector<int> unordered_stats(nbInds * 4, 0); // DO NOT USE nbCHars ! rounded up !
 
 #pragma omp parallel for reduction(vec_int_plus : unordered_stats)
-    for (int i = 0; i < total; i++)
-    { // parcourt tous les SNPs
+    for (int i = 0; i < total; i++) { // parcourt tous les SNPs
       auto snp = SNPs_[i];
       size_t nbBytes = snp->nbChars();
 
+// TODO check if this loop can be improved (move last byte out of loop, shift 'd' once at each turn)
       // parcourt le SNP[i], byte by byte
-      for (size_t byte = 0; byte < nbBytes; byte++)
-      {
+      unsigned int g[4] = {0, 3, 1, 2};
+      for (size_t byte = 0; byte < nbBytes; byte++) {
         uint8_t d = snp->data()[byte];
         size_t byteoffset = byte * 4;
 
         // check si byte entiere à lire
         int max_ind = 4;
-        if (byte == nbBytes - 1)
-        {
+        if (byte == nbBytes - 1) {
           int reste = nbInds % 4;
           if (reste)
             max_ind = reste; // if != 0, else stays at 4 to read full byte
         }
 
-        for (int ind = 0; ind < max_ind; ind++)
-        {
-          unsigned int val_plink = snp->currentMode_[0][(d >> (2 * ind)) & 3];
+        for (int ind = 0; ind < max_ind; ind++) {
+          unsigned int val_plink = g[(d >> (2 * ind)) & 3];
           unordered_stats[(byteoffset + ind) * 4 + val_plink]++;
         }
       }

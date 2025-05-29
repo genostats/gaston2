@@ -25,10 +25,9 @@ class SNPvectorDisk : public SNPvector {
   public:
  
   // on donne à ce constructeur un shared ptr vers fichier ouvert par mio + le nb d'individus, et le SNP index à pointer
-  SNPvectorDisk(size_t nbInds, std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref, \
-    size_t SNP_index, Mode mode = PLINK) : 
+  SNPvectorDisk(size_t nbInds, std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref, size_t SNP_index) : 
     data_((uint8_t *) (file_ref->data() + 3 /* offset from the 3 first magic bytes) */ + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index) ), 
-    nbInds_(nbInds), file_ref_(file_ref), mode_(mode) {}
+    nbInds_(nbInds), file_ref_(file_ref) {}
  
 
   // TODO !! : check what happens with empty SNP ?
@@ -39,7 +38,9 @@ class SNPvectorDisk : public SNPvector {
   // toujours créé en mode PLINK
   SNPvectorDisk(const std::shared_ptr<SNPvector> source, \
     std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> file_ref, size_t SNP_index) : 
-      data_((uint8_t *) (file_ref->data() + 3 + (source->nbInds()/4 + ((source->nbInds()%4 == 0u)?0:1)) * SNP_index)), nbInds_(source->nbInds()), file_ref_(file_ref), mode_(PLINK) {
+      data_((uint8_t *) (file_ref->data() + 3 + (source->nbInds()/4 + ((source->nbInds()%4 == 0u)?0:1)) * SNP_index)), 
+      nbInds_(source->nbInds()), 
+      file_ref_(file_ref) {
     // on copie les données de source dans le fichier, à la bonne place qui est pointée par data_a
     size_t nbChars = source->nbChars();
     const uint8_t * sourceData = source->data();
@@ -53,7 +54,7 @@ class SNPvectorDisk : public SNPvector {
   template <typename intVec>
   SNPvectorDisk(const std::shared_ptr<SNPvector> source, \
     std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> newfile, size_t SNP_index, intVec &keep) : 
-    nbInds_(keep.size()), file_ref_(newfile), mode_(PLINK) {
+    nbInds_(keep.size()), file_ref_(newfile) {
     
     data_ = (uint8_t *) newfile->data() + (3 + (nbInds_/4 + ((nbInds_%4 == 0u)?0:1)) * SNP_index); // bcos mio sends back a char *
     const uint8_t * sourceData = source->data();
@@ -96,6 +97,7 @@ class SNPvectorDisk : public SNPvector {
     return &data_[0];
   }
 
+  /*
   void setMode(Mode mode) {
     mode_ = mode;
   }
@@ -111,7 +113,8 @@ class SNPvectorDisk : public SNPvector {
   const double * mode() const { return currentMode_[mode_]; }
   
   const double mode(unsigned int n) const { return currentMode_[mode_][n]; }
-  
+  */
+
   private:
   /** @brief a vector containing the bits composing the SNP */
   //std::vector<uint8_t> data_;
@@ -120,8 +123,6 @@ class SNPvectorDisk : public SNPvector {
   uint8_t *data_;
    /** @brief to help parse SNP*/
   const size_t nbInds_;
-  /** @brief an enum keeping track on how to read datas */
-  enum Mode mode_;
   /** @brief a shared_ptr to the object handling the file, 
   when the last SNP from the same file is deleted, the file is unmapped and closed */
   std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref_;

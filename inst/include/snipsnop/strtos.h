@@ -7,7 +7,6 @@
 // comme strtof mais renvoie une std::string. On s'arrête au premier blanc.
 inline std::string strtos(const char * x, char ** end) {
   const char * p = x;
-  bool sign = false;
   std::string val;
   // skip white spaces
   while(isspace(*p)) p++;
