@@ -117,6 +117,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// SNPMatrixToNumericMatrix
+Rcpp::NumericMatrix SNPMatrixToNumericMatrix(Rcpp::XPtr<SNPmatrix> pM);
+RcppExport SEXP _snipsnop_SNPMatrixToNumericMatrix(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    rcpp_result_gen = Rcpp::wrap(SNPMatrixToNumericMatrix(pM));
+    return rcpp_result_gen;
+END_RCPP
+}
 // computeSNPStats
 void computeSNPStats(Rcpp::XPtr<SNPmatrix> pM);
 RcppExport SEXP _snipsnop_computeSNPStats(SEXP pMSEXP) {
@@ -172,6 +183,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
     test_force_compute_indStats(pM);
     return R_NilValue;
+END_RCPP
+}
+// grm
+Rcpp::NumericMatrix grm(Rcpp::XPtr<SNPmatrix> pM);
+RcppExport SEXP _snipsnop_grm(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    rcpp_result_gen = Rcpp::wrap(grm(pM));
+    return rcpp_result_gen;
 END_RCPP
 }
 // readBedFileDisk_
@@ -523,11 +545,13 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_LD_chunk_EM", (DL_FUNC) &_snipsnop_LD_chunk_EM, 5},
     {"_snipsnop_LD_square_bigmemory", (DL_FUNC) &_snipsnop_LD_square_bigmemory, 4},
     {"_snipsnop_SNPMatrixToIntegerMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToIntegerMatrix, 1},
+    {"_snipsnop_SNPMatrixToNumericMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToNumericMatrix, 1},
     {"_snipsnop_computeSNPStats", (DL_FUNC) &_snipsnop_computeSNPStats, 1},
     {"_snipsnop_extractSNPmatrixMemory_", (DL_FUNC) &_snipsnop_extractSNPmatrixMemory_, 2},
     {"_snipsnop_extractSNPmatrixDisk_", (DL_FUNC) &_snipsnop_extractSNPmatrixDisk_, 3},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 2},
     {"_snipsnop_test_force_compute_indStats", (DL_FUNC) &_snipsnop_test_force_compute_indStats, 1},
+    {"_snipsnop_grm", (DL_FUNC) &_snipsnop_grm, 1},
     {"_snipsnop_readBedFileDisk_", (DL_FUNC) &_snipsnop_readBedFileDisk_, 3},
     {"_snipsnop_readBedFileMemory_", (DL_FUNC) &_snipsnop_readBedFileMemory_, 3},
     {"_snipsnop_readFamFile", (DL_FUNC) &_snipsnop_readFamFile, 2},
