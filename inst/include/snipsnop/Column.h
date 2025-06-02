@@ -11,6 +11,8 @@
 #ifndef _Column_
 #define _Column_
 
+// #define DEBUG_COL 1
+
 struct Column {
   private:
 
@@ -30,11 +32,21 @@ struct Column {
  public:
 
     // un constructeur qui prend comme argument un std vector et initialise handler et type_
+    // le vecteur est copié lors du passage de l'argiment
     template <typename T>
     Column(std::vector<T> vec) : handler( std::make_shared<std::vector<T>>(vec) ) {
       type_ = whichType<T>();
       checkHandler();
     }
+
+
+#ifdef DEBUG_COL
+    // verbose copy constructor (for testing)
+    Column(const Column & col) : type_(col.type_), handler(col.handler) {
+      std::cout << "Copy one column of type " << typeToString(type_) << " (passed by ref)\n";
+    }
+#endif
+
 
     // un constructeur qui prend juste un datatype et initialise avec un vecteur vide
     Column(datatype ty) : type_(ty) {

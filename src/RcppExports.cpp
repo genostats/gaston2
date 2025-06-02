@@ -185,6 +185,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// getSNPStats
+Rcpp::DataFrame getSNPStats(Rcpp::XPtr<SNPmatrix> pM);
+RcppExport SEXP _snipsnop_getSNPStats(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    rcpp_result_gen = Rcpp::wrap(getSNPStats(pM));
+    return rcpp_result_gen;
+END_RCPP
+}
 // grm
 Rcpp::NumericMatrix grm(Rcpp::XPtr<SNPmatrix> pM);
 RcppExport SEXP _snipsnop_grm(SEXP pMSEXP) {
@@ -220,6 +231,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
     rcpp_result_gen = Rcpp::wrap(readBedFileMemory_(filename, n_ind, n_snp));
     return rcpp_result_gen;
+END_RCPP
+}
+// readBimFile
+void readBimFile(Rcpp::XPtr<SNPmatrix> pM, std::string bimFile);
+RcppExport SEXP _snipsnop_readBimFile(SEXP pMSEXP, SEXP bimFileSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< std::string >::type bimFile(bimFileSEXP);
+    readBimFile(pM, bimFile);
+    return R_NilValue;
 END_RCPP
 }
 // readFamFile
@@ -551,9 +573,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_extractSNPmatrixDisk_", (DL_FUNC) &_snipsnop_extractSNPmatrixDisk_, 3},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 2},
     {"_snipsnop_test_force_compute_indStats", (DL_FUNC) &_snipsnop_test_force_compute_indStats, 1},
+    {"_snipsnop_getSNPStats", (DL_FUNC) &_snipsnop_getSNPStats, 1},
     {"_snipsnop_grm", (DL_FUNC) &_snipsnop_grm, 1},
     {"_snipsnop_readBedFileDisk_", (DL_FUNC) &_snipsnop_readBedFileDisk_, 3},
     {"_snipsnop_readBedFileMemory_", (DL_FUNC) &_snipsnop_readBedFileMemory_, 3},
+    {"_snipsnop_readBimFile", (DL_FUNC) &_snipsnop_readBimFile, 2},
     {"_snipsnop_readFamFile", (DL_FUNC) &_snipsnop_readFamFile, 2},
     {"_snipsnop_test_ds", (DL_FUNC) &_snipsnop_test_ds, 2},
     {"_snipsnop_test_ds2", (DL_FUNC) &_snipsnop_test_ds2, 0},

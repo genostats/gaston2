@@ -150,10 +150,10 @@ public:
     Column N2s(vecN2s);
     Column NAs(vecNAs);
 
-    indStats_.push_back(N0s, "N0");
-    indStats_.push_back(N1s, "N1");
-    indStats_.push_back(N2s, "N2");
-    indStats_.push_back(NAs, "NAs");
+    indStats_.setColumn(N0s, "N0");
+    indStats_.setColumn(N1s, "N1");
+    indStats_.setColumn(N2s, "N2");
+    indStats_.setColumn(NAs, "NAs");
 
     indStatsComputed_ = true;
   }
@@ -184,10 +184,10 @@ public:
   }
 
   // get the DataStruct containing individual stats
-  const DataStruct getIndStats() const { return indStats_; }
+  const DataStruct & getIndStats() const { return indStats_; }
 
   // get the DataStruct containing snp stats
-  const DataStruct getSNPStats() const { return snpStats_; }
+  const DataStruct & getSNPStats() const { return snpStats_; }
 
 
 
@@ -236,7 +236,7 @@ public:
     std::vector<datatype> colTypes = { datatype::STRING, datatype::STRING, datatype::STRING, datatype::STRING, datatype::INT, datatype::INT };
     std::vector<std::string> colNames = { "famid", "id", "father", "mother", "sex", "pheno" };
     DataStruct DS(in, colTypes, colNames);
-    indStats_.push_back(DS);
+    indStats_.setColumns(DS);
   }
 
   void readBimFile(std::string bimFile) {
@@ -244,7 +244,7 @@ public:
     std::vector<datatype> colTypes = { datatype::STRING, datatype::STRING, datatype::INT, datatype::DOUBLE, datatype::STRING, datatype::STRING };
     std::vector<std::string> colNames = { "chr", "id", "pos", "dist", "A1", "A2" };
     DataStruct DS(in, colTypes, colNames);
-    snpStats_.push_back(DS);
+    snpStats_.setColumns(DS);
   }
 
 private:

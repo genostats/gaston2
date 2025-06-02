@@ -9,53 +9,91 @@
 #ifndef _DataStruct_
 #define _DataStruct_
 
+#define DEBUG_DS false
+
 class DataStruct {
   private:
     std::vector<Column> cols;
     std::vector<std::string> colNames;
 
+    size_t findColumn(std::string name) const {
+      for(size_t i = 0; i < colNames.size(); i++) {
+        if(colNames[i] == name) return i;
+      }
+      return(colNames.size()); // out of range
+      // throw std::out_of_range("Column not fund");
+    }
+
   public:
-    size_t size() const {
+    inline size_t size() const {
       return cols.size();
     }
 
-    void push_back(Column newcol) { 
+    inline std::string colName(size_t i) const {
+      return colNames.at(i);
+    }
+
+    // push_back = ajouter une colonne non nommée
+    inline void push_back(Column newcol) { 
       cols.push_back(newcol);
       colNames.push_back("");
     }
 
-    void push_back(Column newcol, std::string name) {
+    // ajouter une colonne nommée
+    inline void push_back(Column newcol, std::string name) {
+if(DEBUG_DS) std::cout << "Entering push_back\n";
       cols.push_back(newcol);
       colNames.push_back(name);
+if(DEBUG_DS) std::cout << "Exiting push_back\n";
     }
 
-    void push_back(DataStruct D) {
+    // ajouter toutes les colonnes de D
+    inline void push_back(DataStruct D) {
       for(size_t i = 0; i < D.size(); i++) {
-        cols.push_back(D.at(i));
-        colNames.push_back(D.colName(i));
+        push_back(D.at(i), D.colName(i));
       }
     }
 
-    std::string colName(size_t i) const {
-      return colNames.at(i);
+    // vérifie si la colonne existe et la remplace, et sinon fait un push_back
+    // a priori la colonne est copiée lors du passage de l'argument
+    inline void setColumn(Column & col, std::string name) {
+if(DEBUG_DS) std::cout << "Entering setColumn\n";
+      size_t pos = findColumn(name);
+if(DEBUG_DS) std::cout << "pos = " << pos << "\n";
+      if(pos == size()) {
+if(DEBUG_DS) std::cout << "pushing\n";
+        push_back(col, name);
+      } else {
+if(DEBUG_DS) std::cout << "replacing\n";
+        cols[pos] = col;
+      }
+if(DEBUG_DS) std::cout << "Exiting setColumn\n";
     }
 
-    // TODO 
-    // function setColumn(Column, std::string) qui vérifie si la colonne existe et remplace, et sinon fait un push_back
+    // idem avec toutes les colonnes d'uutre data struct (forme simple de merge)
+    inline void setColumns(DataStruct & D) {
+if(DEBUG_DS) std::cout << "Entering setColumns\n";
+      for(size_t i = 0; i < D.size(); i++) {
+if(DEBUG_DS) std::cout << "i " << i << "\n";
+        setColumn(D.at(i), D.colName(i));
+      }
+if(DEBUG_DS) std::cout << "Exiting setColumns\n";
+    }
 
-    Column at(size_t pos) const { 
+    inline const Column & at(size_t pos) const { 
       return cols.at(pos); 
     }
 
-    Column getColumn(std::string name) const {
-      size_t pos = colNames.size(); // default value = out of range
-      for(size_t i = 0; i < colNames.size(); i++) {
-        if(colNames[i] == name) {
-          pos = i;
-          break;
-        }
-      }
-      return at(pos);
+    inline const Column & getColumn(std::string name) const {
+      return at(findColumn(name));
+    }
+
+    inline Column & at(size_t pos) { 
+      return cols.at(pos); 
+    }
+
+    inline Column & getColumn(std::string name) {
+      return at(findColumn(name));
     }
 
     // constructeur vide...
@@ -81,13 +119,13 @@ class DataStruct {
       // créations colonnes vides
       for(size_t i = 0; i < nb_cols; i++) 
         push_back(Column(colTypes[i]), colNames[i]);
-
+if(DEBUG_DS) std::cout << "colonnes vides créées\n";
       // lecture fichier ligne par ligne
       std::string line;
       while(std::getline(in, line)) {
         char * c = (char *) line.c_str();
         for(size_t i = 0; i < nb_cols; i++) {
-          c = at(i).push_back_token(c);
+          c = cols[i].push_back_token(c);
           if(*c == 0) break; // fin de ligne
         }
       }

@@ -28,3 +28,6 @@ readFamFile(a, "inst/extdata/LCT.fam")
 head(getIndStats(a, FALSE))
 head(getIndStats(a, TRUE))
 
+readBimFile(a, "inst/extdata/LCT.bim")
+head(getSNPStats(a))
+

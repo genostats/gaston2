@@ -57,6 +57,10 @@ test_force_compute_indStats <- function(pM) {
     invisible(.Call(`_snipsnop_test_force_compute_indStats`, pM))
 }
 
+getSNPStats <- function(pM) {
+    .Call(`_snipsnop_getSNPStats`, pM)
+}
+
 grm <- function(pM) {
     .Call(`_snipsnop_grm`, pM)
 }
@@ -67,6 +71,10 @@ readBedFileDisk_ <- function(path, n_ind, n_snp) {
 
 readBedFileMemory_ <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_readBedFileMemory_`, filename, n_ind, n_snp)
+}
+
+readBimFile <- function(pM, bimFile) {
+    invisible(.Call(`_snipsnop_readBimFile`, pM, bimFile))
 }
 
 readFamFile <- function(pM, famFile) {

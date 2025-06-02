@@ -1,2 +1,3 @@
 - les fonctions de lecture ddans DataStruct ne sont pas robustes
   à la présence de chaines de caractères dans une colonne numerique (eg 'NA')
+  même strtof ne doit pas faire ce qu'on voudrait dans ce cas

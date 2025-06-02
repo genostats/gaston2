@@ -3,7 +3,7 @@
 #include <Rcpp.h>
 
 
-SEXP ColumnToSEXP(Column col) {
+SEXP ColumnToSEXP(const Column & col) {
   datatype dt = col.type();
   if(dt == INT) 
     return Rcpp::wrap(*col.get<int>());
