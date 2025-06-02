@@ -153,14 +153,25 @@ BEGIN_RCPP
 END_RCPP
 }
 // getIndStats
-Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix> pM);
-RcppExport SEXP _snipsnop_getIndStats(SEXP pMSEXP) {
+Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix> pM, bool compute);
+RcppExport SEXP _snipsnop_getIndStats(SEXP pMSEXP, SEXP computeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
-    rcpp_result_gen = Rcpp::wrap(getIndStats(pM));
+    Rcpp::traits::input_parameter< bool >::type compute(computeSEXP);
+    rcpp_result_gen = Rcpp::wrap(getIndStats(pM, compute));
     return rcpp_result_gen;
+END_RCPP
+}
+// test_force_compute_indStats
+void test_force_compute_indStats(Rcpp::XPtr<SNPmatrix> pM);
+RcppExport SEXP _snipsnop_test_force_compute_indStats(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    test_force_compute_indStats(pM);
+    return R_NilValue;
 END_RCPP
 }
 // readBedFileDisk_
@@ -187,6 +198,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
     rcpp_result_gen = Rcpp::wrap(readBedFileMemory_(filename, n_ind, n_snp));
     return rcpp_result_gen;
+END_RCPP
+}
+// readFamFile
+void readFamFile(Rcpp::XPtr<SNPmatrix> pM, std::string famFile);
+RcppExport SEXP _snipsnop_readFamFile(SEXP pMSEXP, SEXP famFileSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< std::string >::type famFile(famFileSEXP);
+    readFamFile(pM, famFile);
+    return R_NilValue;
 END_RCPP
 }
 // test_ds
@@ -504,9 +526,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_computeSNPStats", (DL_FUNC) &_snipsnop_computeSNPStats, 1},
     {"_snipsnop_extractSNPmatrixMemory_", (DL_FUNC) &_snipsnop_extractSNPmatrixMemory_, 2},
     {"_snipsnop_extractSNPmatrixDisk_", (DL_FUNC) &_snipsnop_extractSNPmatrixDisk_, 3},
-    {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 1},
+    {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 2},
+    {"_snipsnop_test_force_compute_indStats", (DL_FUNC) &_snipsnop_test_force_compute_indStats, 1},
     {"_snipsnop_readBedFileDisk_", (DL_FUNC) &_snipsnop_readBedFileDisk_, 3},
     {"_snipsnop_readBedFileMemory_", (DL_FUNC) &_snipsnop_readBedFileMemory_, 3},
+    {"_snipsnop_readFamFile", (DL_FUNC) &_snipsnop_readFamFile, 2},
     {"_snipsnop_test_ds", (DL_FUNC) &_snipsnop_test_ds, 2},
     {"_snipsnop_test_ds2", (DL_FUNC) &_snipsnop_test_ds2, 0},
     {"_snipsnop_test_ds3", (DL_FUNC) &_snipsnop_test_ds3, 1},

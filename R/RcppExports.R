@@ -45,8 +45,12 @@ extractSNPmatrixDisk_ <- function(other, keep, path_str) {
     .Call(`_snipsnop_extractSNPmatrixDisk_`, other, keep, path_str)
 }
 
-getIndStats <- function(pM) {
-    .Call(`_snipsnop_getIndStats`, pM)
+getIndStats <- function(pM, compute = TRUE) {
+    .Call(`_snipsnop_getIndStats`, pM, compute)
+}
+
+test_force_compute_indStats <- function(pM) {
+    invisible(.Call(`_snipsnop_test_force_compute_indStats`, pM))
 }
 
 readBedFileDisk_ <- function(path, n_ind, n_snp) {
@@ -55,6 +59,10 @@ readBedFileDisk_ <- function(path, n_ind, n_snp) {
 
 readBedFileMemory_ <- function(filename, n_ind, n_snp) {
     .Call(`_snipsnop_readBedFileMemory_`, filename, n_ind, n_snp)
+}
+
+readFamFile <- function(pM, famFile) {
+    invisible(.Call(`_snipsnop_readFamFile`, pM, famFile))
 }
 
 test_ds <- function(DF, In) {

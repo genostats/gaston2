@@ -492,8 +492,8 @@ bool test_performance_stats_matrix()
 
   //std::cout << "Stats loaded. Vector size: " << st.cols.size() << "\n";
 
-  if (st.cols.size() != 4) {
-    std::cerr << "Error: expected 4 stat columns (N0, N1, N2, NA), got " << st.cols.size() << "\n";
+  if (st.size() != 4) {
+    std::cerr << "Error: expected 4 stat columns (N0, N1, N2, NA), got " << st.size() << "\n";
     return false;
   }
 
