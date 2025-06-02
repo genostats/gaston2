@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>    //for contingency !!
 #include <algorithm> // for omp reduction ?
+#include "debug.h"
 
 #ifndef _SNPvector_
 #define _SNPvector_
@@ -97,11 +98,11 @@ protected: // can be accessed also by class inheriting
   // constructor allowing to set nbInds and mode (to be called by derived classes)
   SNPvector(size_t nbInds, Mode mode = Mode::PLINK) : nbInds_(nbInds), mode_(mode) {}
 
-  void computeMode() { 
+  inline void computeMode() { 
     switch(mode_) {
       case Mode::PLINK: {
         g_trans[0] = 0; 
-        g_trans[1] = 3;
+        g_trans[1] = 3;   // or NAN ?
         g_trans[2] = 1;
         g_trans[3] = 2;
         break;
@@ -133,6 +134,31 @@ protected: // can be accessed also by class inheriting
     }
   }
 
+  // n'utilise pas le mode courant, et multiplie l'écart type par scale (typiquement sqrt(nbSNPs))
+  // deux modes possibles seulement
+  inline void computeScaledMode(Mode mo, double scale) { 
+    switch(mo) {
+      case Mode::STANDARDIZED_MU_SIGMA: {
+        double s = sigma_ * scale;
+        g_trans[0] = (0 - mu_)/s; 
+        g_trans[1] = 0;
+        g_trans[2] = (1 - mu_)/s;
+        g_trans[3] = (2 - mu_)/s;
+        break;
+      }
+      case Mode::STANDARDIZED_P: {
+        double s = sqrt( mu_*(1 - mu_/2) ) * scale; // sqrt 2p(1-p)
+        g_trans[0] = (0 - mu_)/s; 
+        g_trans[1] = 0;
+        g_trans[2] = (1 - mu_)/s;
+        g_trans[3] = (2 - mu_)/s;
+        break;
+      }
+      default:
+        throw std::runtime_error("Private function computeScaledMode called with bad mode value");
+    }
+  }
+
 public:
   /**
    * @brief pure virtual function,
@@ -158,6 +184,18 @@ public:
       throw std::runtime_error("Can't set custom mode this way");
     mode_ = mode;
     computeMode();
+  }
+
+  // Will set the mode to CUSTOM !!
+  // Standard error is *multiplied* by scale
+  // This is used in GRM computations (and nowhere else I think),
+  // - because it should be slightly faster to pre-scale the SNPs than to divide the
+  //   matrix by sqrt(nbSNPs) or sqrt(nbSNPs - 1) at the end of the computation.
+  // - because weighting SNPs is one of my long delayed projects...
+  // Should we add a member 'scale' with default value = 1 ?
+  void setScaledMode(Mode mode, double scale) {
+    computeScaledMode(mode, scale);
+    mode_ = Mode::CUSTOM;
   }
 
   // Personnalized mode
@@ -413,6 +451,208 @@ public:
     contingencyTable[7] = table[14];
     contingencyTable[8] = table[15];
   }
+
+  // on va incrémenter un vecteur de scalar_t [n'importe quoi qui a un opérateur [] et size())
+  // size = n * (n + 1) / 2 = la moitié d'une matrice symmétrique, diagonale incluse
+  // si on voit V comme une matrice c'est V += SNP . SNP'
+  template<typename scalar_t, typename vectorType> 
+  void tcrossprod0(vectorType & V) {
+    if(V.size()*2 != nbInds_ * (nbInds_ + 1)) throw std::runtime_error("tcrossprod, V has not the right size");
+
+    auto DATA = data();
+    size_t nbc_m1 = nbChars() - 1;
+   
+    // value of transformed *genotypes* 0, 1, 2, skipping NA (always 0)
+    scalar_t v0 = (scalar_t) g_trans[0];
+    scalar_t v1 = (scalar_t) g_trans[2];
+    scalar_t v2 = (scalar_t) g_trans[3];
+    scalar_t VALUES[16] = 
+      { v0*v0, 0, v0*v1, v0*v2,
+            0, 0,     0,     0,
+        v0*v1, 0, v1*v1, v1*v2,
+        v0*v2, 0, v1*v2, v2*v2 } ;
+    // loop j1 to nbChar - 1
+    for(size_t j1 = 0; j1 < nbc_m1; j1++) {
+      // l'indice où écrire dans V
+      size_t k = 2*j1 * (4*j1 + 1);
+      uint8_t g1 = DATA[j1]; 
+      for(unsigned int ss1 = 0; ss1 < 4; ss1++) {
+        scalar_t * VALUES1 = VALUES + (g1&3) * 4;  // le début de la ligne qui correspond à (g1&3)
+        g1 >>= 2;
+        // on boucle j2 de 0 à j1 - 1
+        for(size_t j2 = 0; j2 < j1; j2++) {
+          uint8_t g2 = DATA[j2];
+          for(unsigned int ss2 = 0; ss2 < 4; ss2++) {
+            V[k++] += VALUES1[ g2&3 ];
+            g2 >>= 2;
+          }
+        }
+        // j2 = j1 est traité à part
+        uint8_t g2 = DATA[j1];
+        for(unsigned int ss2 = 0; ss2 <= ss1; ss2++) {
+          V[k++] += VALUES1[ g2&3 ];
+          g2 >>= 2;
+        }
+      }
+    }
+    // j1 = nbChar - 1 est traité à part. C'est essentiellement la même boucle
+    // (on a hardcoded j1 = nbc_m1) 
+    // mais on s'arrête à BitsInLastByte pour ss1. Cette boucle ne peut être déroulée à 
+    // la compilation.
+    unsigned int BitsInLastByte = (nbInds_ & 3)?(nbInds_ & 3):4;
+    size_t k = 2*nbc_m1 * (4*nbc_m1 + 1);
+    uint8_t g1 = DATA[nbc_m1];
+
+    for(unsigned int ss1 = 0; ss1 < BitsInLastByte; ss1++) {
+      scalar_t * VALUES1 = VALUES + (g1&3) * 4;  // le début de la ligne qui correspond à (g1&3)
+      g1 >>= 2;
+      // on boucle j2 de 0 à j1 - 1
+      for(size_t j2 = 0; j2 < nbc_m1; j2++) {
+        uint8_t g2 = DATA[j2];
+        for(unsigned int ss2 = 0; ss2 < 4; ss2++) {
+          V[k++] += VALUES1[ g2&3 ];
+          g2 >>= 2;
+        }
+      }
+      // j2 = j1 = nbc_m1 est traité à part
+      uint8_t g2 = DATA[nbc_m1];
+      for(unsigned int ss2 = 0; ss2 <= ss1; ss2++) {
+        V[k++] += VALUES1[ g2&3 ];
+        g2 >>= 2;
+      }
+    }
+  }
+
+  template<typename scalar_t, typename vectorType> 
+  void tcrossprod(vectorType & V) {
+    if(V.size()*2 != nbInds_ * (nbInds_ + 1)) throw std::runtime_error("tcrossprod, V has not the right size");
+
+    auto DATA = data();
+    size_t nbc_m1 = nbChars() - 1;
+   
+    // value of transformed *genotypes* 0, 1, 2, skipping NA (always 0)
+    const scalar_t v0 = (scalar_t) g_trans[0];
+    const scalar_t v1 = (scalar_t) g_trans[2];
+    const scalar_t v2 = (scalar_t) g_trans[3];
+
+    // loop j1 to nbChar - 1
+    uint8_t previous_genotype_1 = 4; // impossible value
+#pragma omp parallel for firstprivate(previous_genotype_1)
+    for(size_t j1 = 0; j1 < nbc_m1; j1++) {
+      // l'indice où écrire dans V : début de la ligne 4j1, on a écrit 4j1 * (4j1 + 1) / 2 éléments
+      size_t k = 2*j1 * (4*j1 + 1);
+      uint8_t g1 = DATA[j1]; 
+
+      for(unsigned int ss1 = 0; ss1 < 4; ss1++) {
+        uint8_t current_genotype_1 = g1&3;
+
+        // skip if genotype is NA / all H1 = 0...
+        if(current_genotype_1 == (uint8_t) 1) {
+          k += 4*j1 + ss1 + 1;
+          g1 >>= 2;
+          continue;
+        }
+
+        scalar_t v_g1 = g_trans[ current_genotype_1 ];
+        scalar_t H1[32];
+        if(current_genotype_1 != previous_genotype_1) { // update H1 only if v_g1 did change
+          const scalar_t v_g1_v0 = v_g1*v0;
+          const scalar_t v_g1_v1 = v_g1*v1;
+          const scalar_t v_g1_v2 = v_g1*v2;
+          H1[0]  = v_g1_v0;  H1[1] = v_g1_v0;  H1[2]  = 0;        H1[3]  = v_g1_v0; 
+          H1[4]  = v_g1_v1;  H1[5] = v_g1_v0;  H1[6]  = v_g1_v2;  H1[7]  = v_g1_v0; 
+          H1[8]  = v_g1_v0;  H1[9] = 0;        H1[10] = 0;        H1[11] = 0; 
+          H1[12] = v_g1_v1; H1[13] = 0;        H1[14] = v_g1_v2;  H1[15] = 0; 
+          H1[16] = v_g1_v0; H1[17] = v_g1_v1;  H1[18] = 0;        H1[19] = v_g1_v1; 
+          H1[20] = v_g1_v1; H1[21] = v_g1_v1;  H1[22] = v_g1_v2;  H1[23] = v_g1_v1; 
+          H1[24] = v_g1_v0; H1[25] = v_g1_v2;  H1[26] = 0;        H1[27] = v_g1_v2; 
+          H1[28] = v_g1_v1; H1[29] = v_g1_v2;  H1[30] = v_g1_v2;  H1[31] = v_g1_v2; 
+        }
+        // le tableau H1 est construit de façon que 
+        // H1[2*x] et H1[2*x+1] sont les valeurs des g_trans[geno1] * g_trans[geno2] et g_trans[geno1] * g_trans[geno2']
+        // où x = 0 à 15 (4 bits) est la concaténation de geno2 (poids faible) et geno2' (poids fort)
+
+        g1 >>= 2;
+        previous_genotype_1 = current_genotype_1;
+        // current_genotype_1 = g1&3;
+
+        // on boucle j2 de 0 à j1 - 1
+        for(size_t j2 = 0; j2 < j1; j2++) {
+          uint8_t g2 = DATA[j2];
+          // ou coupe g2 en deux morceaux
+          uint8_t gg2 = (g2&15)*2; // apparemment le compilateur n'optimise pas ça si on le met dans les crochets ci-dessous...
+          V[k++] += H1[ gg2 ];
+          V[k++] += H1[ gg2 + 1 ];
+          g2 >>= 4;
+          V[k++] += H1[ g2*2 ];
+          V[k++] += H1[ g2*2 + 1 ];
+        }
+        // j2 = j1 est traité à part
+        uint8_t g2 = DATA[j1];
+        for(unsigned int ss2 = 0; ss2 <= ss1; ss2++) {
+          V[k++] += v_g1 * g_trans[ g2&3 ];
+          g2 >>= 2;
+        }
+      }
+    }
+    // j1 = nbChar - 1 est traité à part. C'est essentiellement la même boucle
+    // (on a hardcoded j1 = nbc_m1) 
+    // mais on s'arrête à BitsInLastByte pour ss1. Cette boucle ne peut être déroulée à 
+    // la compilation.
+    unsigned int BitsInLastByte = (nbInds_ & 3)?(nbInds_ & 3):4;
+    size_t k = 2*nbc_m1 * (4*nbc_m1 + 1); // idem ci-dessus avec j1 = nbc_m1
+    uint8_t g1 = DATA[nbc_m1];
+
+    for(unsigned int ss1 = 0; ss1 < BitsInLastByte; ss1++) {
+      uint8_t current_genotype_1 = g1&3;
+
+      // skip if genotype is NA / all H1 = 0...
+      if(current_genotype_1 == (uint8_t) 1) {
+        k += 4*nbc_m1 + ss1 + 1;
+        g1 >>= 2;
+        continue;
+      }
+
+      scalar_t v_g1 = g_trans[ current_genotype_1 ];
+      scalar_t H1[32];
+      if(current_genotype_1 != previous_genotype_1) { // update H1 only if v_g1 did change
+        const scalar_t v_g1_v0 = v_g1*v0;
+        const scalar_t v_g1_v1 = v_g1*v1;
+        const scalar_t v_g1_v2 = v_g1*v2;
+        H1[0]  = v_g1_v0;  H1[1] = v_g1_v0;  H1[2]  = 0;        H1[3]  = v_g1_v0; 
+        H1[4]  = v_g1_v1;  H1[5] = v_g1_v0;  H1[6]  = v_g1_v2;  H1[7]  = v_g1_v0; 
+        H1[8]  = v_g1_v0;  H1[9] = 0;        H1[10] = 0;        H1[11] = 0; 
+        H1[12] = v_g1_v1; H1[13] = 0;        H1[14] = v_g1_v2;  H1[15] = 0; 
+        H1[16] = v_g1_v0; H1[17] = v_g1_v1;  H1[18] = 0;        H1[19] = v_g1_v1; 
+        H1[20] = v_g1_v1; H1[21] = v_g1_v1;  H1[22] = v_g1_v2;  H1[23] = v_g1_v1; 
+        H1[24] = v_g1_v0; H1[25] = v_g1_v2;  H1[26] = 0;        H1[27] = v_g1_v2; 
+        H1[28] = v_g1_v1; H1[29] = v_g1_v2;  H1[30] = v_g1_v2;  H1[31] = v_g1_v2; 
+      }
+      g1 >>= 2;
+      previous_genotype_1 = current_genotype_1;
+
+      // on boucle j2 de 0 à j1 - 1 = nbc_m1 - 1
+      for(size_t j2 = 0; j2 < nbc_m1; j2++) {
+        // ici on a k == ((4 * nbc_m1 + ss1) * (4 * nbc_m1 + ss1 + 1)) / 2 + 4*j2 ;
+        uint8_t g2 = DATA[j2];
+        // ou coupe g2 en deux morceaux
+        uint8_t gg2 = (g2&15)*2; // apparemment le compilateur n'optimise pas ça si on le met dans les crochets ci-dessous...
+        V[k++] += H1[ gg2 ];
+        V[k++] += H1[ gg2 + 1 ];
+        g2 >>= 4;
+        V[k++] += H1[ g2*2 ];
+        V[k++] += H1[ g2*2 + 1 ];
+      }
+      // j2 = j1 = nbc_m1 est traité à part
+      // ici k == ((4 * nbc_m1 + ss1) * (4 * nbc_m1 + ss1 + 1)) / 2 + 4*nbc_m1;
+      uint8_t g2 = DATA[nbc_m1];
+      for(unsigned int ss2 = 0; ss2 <= ss1; ss2++) {
+        V[k++] += v_g1 * g_trans[ g2&3 ];
+        g2 >>= 2;
+      }
+    }
+  }
+
 
   class Iterator {
   private:

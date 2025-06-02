@@ -33,6 +33,10 @@ SNPMatrixToIntegerMatrix <- function(pM) {
     .Call(`_snipsnop_SNPMatrixToIntegerMatrix`, pM)
 }
 
+SNPMatrixToNumericMatrix <- function(pM) {
+    .Call(`_snipsnop_SNPMatrixToNumericMatrix`, pM)
+}
+
 computeSNPStats <- function(pM) {
     invisible(.Call(`_snipsnop_computeSNPStats`, pM))
 }
@@ -47,6 +51,10 @@ extractSNPmatrixDisk_ <- function(other, keep, path_str) {
 
 getIndStats <- function(pM) {
     .Call(`_snipsnop_getIndStats`, pM)
+}
+
+grm <- function(pM) {
+    .Call(`_snipsnop_grm`, pM)
 }
 
 readBedFileDisk_ <- function(path, n_ind, n_snp) {
