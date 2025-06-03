@@ -456,77 +456,9 @@ public:
   // size = n * (n + 1) / 2 = la moitié d'une matrice symmétrique, diagonale incluse
   // si on voit V comme une matrice c'est V += SNP . SNP'
   template<typename scalar_t, typename vectorType> 
-  void tcrossprod0(vectorType & V) {
-    if(V.size()*2 != nbInds_ * (nbInds_ + 1)) throw std::runtime_error("tcrossprod, V has not the right size");
-
-    auto DATA = data();
-    size_t nbc_m1 = nbChars() - 1;
-   
-    // value of transformed *genotypes* 0, 1, 2, skipping NA (always 0)
-    scalar_t v0 = (scalar_t) g_trans[0];
-    scalar_t v1 = (scalar_t) g_trans[2];
-    scalar_t v2 = (scalar_t) g_trans[3];
-    scalar_t VALUES[16] = 
-      { v0*v0, 0, v0*v1, v0*v2,
-            0, 0,     0,     0,
-        v0*v1, 0, v1*v1, v1*v2,
-        v0*v2, 0, v1*v2, v2*v2 } ;
-    // loop j1 to nbChar - 1
-    for(size_t j1 = 0; j1 < nbc_m1; j1++) {
-      // l'indice où écrire dans V
-      size_t k = 2*j1 * (4*j1 + 1);
-      uint8_t g1 = DATA[j1]; 
-      for(unsigned int ss1 = 0; ss1 < 4; ss1++) {
-        scalar_t * VALUES1 = VALUES + (g1&3) * 4;  // le début de la ligne qui correspond à (g1&3)
-        g1 >>= 2;
-        // on boucle j2 de 0 à j1 - 1
-        for(size_t j2 = 0; j2 < j1; j2++) {
-          uint8_t g2 = DATA[j2];
-          for(unsigned int ss2 = 0; ss2 < 4; ss2++) {
-            V[k++] += VALUES1[ g2&3 ];
-            g2 >>= 2;
-          }
-        }
-        // j2 = j1 est traité à part
-        uint8_t g2 = DATA[j1];
-        for(unsigned int ss2 = 0; ss2 <= ss1; ss2++) {
-          V[k++] += VALUES1[ g2&3 ];
-          g2 >>= 2;
-        }
-      }
-    }
-    // j1 = nbChar - 1 est traité à part. C'est essentiellement la même boucle
-    // (on a hardcoded j1 = nbc_m1) 
-    // mais on s'arrête à BitsInLastByte pour ss1. Cette boucle ne peut être déroulée à 
-    // la compilation.
-    unsigned int BitsInLastByte = (nbInds_ & 3)?(nbInds_ & 3):4;
-    size_t k = 2*nbc_m1 * (4*nbc_m1 + 1);
-    uint8_t g1 = DATA[nbc_m1];
-
-    for(unsigned int ss1 = 0; ss1 < BitsInLastByte; ss1++) {
-      scalar_t * VALUES1 = VALUES + (g1&3) * 4;  // le début de la ligne qui correspond à (g1&3)
-      g1 >>= 2;
-      // on boucle j2 de 0 à j1 - 1
-      for(size_t j2 = 0; j2 < nbc_m1; j2++) {
-        uint8_t g2 = DATA[j2];
-        for(unsigned int ss2 = 0; ss2 < 4; ss2++) {
-          V[k++] += VALUES1[ g2&3 ];
-          g2 >>= 2;
-        }
-      }
-      // j2 = j1 = nbc_m1 est traité à part
-      uint8_t g2 = DATA[nbc_m1];
-      for(unsigned int ss2 = 0; ss2 <= ss1; ss2++) {
-        V[k++] += VALUES1[ g2&3 ];
-        g2 >>= 2;
-      }
-    }
-  }
-
-  template<typename scalar_t, typename vectorType> 
   void tcrossprod(vectorType & V) {
     if(V.size()*2 != nbInds_ * (nbInds_ + 1)) throw std::runtime_error("tcrossprod, V has not the right size");
-
+    
     auto DATA = data();
     size_t nbc_m1 = nbChars() - 1;
    
