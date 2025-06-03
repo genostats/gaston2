@@ -45,6 +45,22 @@ struct Column {
     Column(const Column & col) : type_(col.type_), handler(col.handler) {
       std::cout << "Copy one column of type " << typeToString(type_) << " (passed by ref)\n";
     }
+    
+    Column & operator=(const Column& col) {
+      type_ = col.type_;
+      handler = col.handler;
+      std::cout << "Copy operator on one column of type " << typeToString(type_) << " (passed by ref)\n";
+      return *this;
+    }
+
+    // verbose move operator, moving TO col
+    Column & operator=(Column&& col)
+    {
+      std::cout << "Using move for column of type " << typeToString(type_) << "\n";
+        std::swap(type_, col.type_);
+        std::swap(handler, col.handler);
+        return *this;
+    }
 #endif
 
 
