@@ -1,4 +1,4 @@
-Package: snipsnop
+Package: gaston2
 Type: Package
 Title: 3 classes for SNPs manipulations, that can also be on disk.
 Version: 1.0

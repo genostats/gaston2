@@ -1,3 +1,4 @@
+library(gaston2)
 a <- readBedFileMemory_("inst/extdata/LCT.bed", 503, 607)
 A <- SNPMatrixToNumericMatrix(a)
 

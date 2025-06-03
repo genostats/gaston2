@@ -2,194 +2,194 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 LD_pair <- function(pM, i1, i2) {
-    .Call(`_snipsnop_LD_pair`, pM, i1, i2)
+    .Call(`_gaston2_LD_pair`, pM, i1, i2)
 }
 
 LD_square <- function(pM, i1, i2) {
-    .Call(`_snipsnop_LD_square`, pM, i1, i2)
+    .Call(`_gaston2_LD_square`, pM, i1, i2)
 }
 
 LD_chunk <- function(pM, i1, i2, j1, j2) {
-    .Call(`_snipsnop_LD_chunk`, pM, i1, i2, j1, j2)
+    .Call(`_gaston2_LD_chunk`, pM, i1, i2, j1, j2)
 }
 
 LD_pair_EM <- function(pM, i1, i2) {
-    .Call(`_snipsnop_LD_pair_EM`, pM, i1, i2)
+    .Call(`_gaston2_LD_pair_EM`, pM, i1, i2)
 }
 
 LD_square_EM <- function(pM, i1, i2) {
-    .Call(`_snipsnop_LD_square_EM`, pM, i1, i2)
+    .Call(`_gaston2_LD_square_EM`, pM, i1, i2)
 }
 
 LD_chunk_EM <- function(pM, i1, i2, j1, j2) {
-    .Call(`_snipsnop_LD_chunk_EM`, pM, i1, i2, j1, j2)
+    .Call(`_gaston2_LD_chunk_EM`, pM, i1, i2, j1, j2)
 }
 
 LD_square_bigmemory <- function(pM, i1, i2, path) {
-    invisible(.Call(`_snipsnop_LD_square_bigmemory`, pM, i1, i2, path))
+    invisible(.Call(`_gaston2_LD_square_bigmemory`, pM, i1, i2, path))
 }
 
 SNPMatrixToIntegerMatrix <- function(pM) {
-    .Call(`_snipsnop_SNPMatrixToIntegerMatrix`, pM)
+    .Call(`_gaston2_SNPMatrixToIntegerMatrix`, pM)
 }
 
 SNPMatrixToNumericMatrix <- function(pM) {
-    .Call(`_snipsnop_SNPMatrixToNumericMatrix`, pM)
+    .Call(`_gaston2_SNPMatrixToNumericMatrix`, pM)
 }
 
 computeSNPStats <- function(pM) {
-    invisible(.Call(`_snipsnop_computeSNPStats`, pM))
+    invisible(.Call(`_gaston2_computeSNPStats`, pM))
 }
 
 extractSNPsfromSNPmatrix_ <- function(other, keep) {
-    .Call(`_snipsnop_extractSNPsfromSNPmatrix_`, other, keep)
+    .Call(`_gaston2_extractSNPsfromSNPmatrix_`, other, keep)
 }
 
 extractIndsfromSNPmatrixMemory_ <- function(other, keep) {
-    .Call(`_snipsnop_extractIndsfromSNPmatrixMemory_`, other, keep)
+    .Call(`_gaston2_extractIndsfromSNPmatrixMemory_`, other, keep)
 }
 
 extractIndsfromSNPmatrixDisk_ <- function(other, keep, path_str) {
-    .Call(`_snipsnop_extractIndsfromSNPmatrixDisk_`, other, keep, path_str)
+    .Call(`_gaston2_extractIndsfromSNPmatrixDisk_`, other, keep, path_str)
 }
 
 getIndStats <- function(pM, compute = TRUE) {
-    .Call(`_snipsnop_getIndStats`, pM, compute)
+    .Call(`_gaston2_getIndStats`, pM, compute)
 }
 
 test_force_compute_indStats <- function(pM) {
-    invisible(.Call(`_snipsnop_test_force_compute_indStats`, pM))
+    invisible(.Call(`_gaston2_test_force_compute_indStats`, pM))
 }
 
 getSNPStats <- function(pM) {
-    .Call(`_snipsnop_getSNPStats`, pM)
+    .Call(`_gaston2_getSNPStats`, pM)
 }
 
 grm <- function(pM) {
-    .Call(`_snipsnop_grm`, pM)
+    .Call(`_gaston2_grm`, pM)
 }
 
 readBedFileDisk_ <- function(path, n_ind, n_snp) {
-    .Call(`_snipsnop_readBedFileDisk_`, path, n_ind, n_snp)
+    .Call(`_gaston2_readBedFileDisk_`, path, n_ind, n_snp)
 }
 
 readBedFileMemory_ <- function(filename, n_ind, n_snp) {
-    .Call(`_snipsnop_readBedFileMemory_`, filename, n_ind, n_snp)
+    .Call(`_gaston2_readBedFileMemory_`, filename, n_ind, n_snp)
 }
 
 readBimFile <- function(pM, bimFile) {
-    invisible(.Call(`_snipsnop_readBimFile`, pM, bimFile))
+    invisible(.Call(`_gaston2_readBimFile`, pM, bimFile))
 }
 
 readFamFile <- function(pM, famFile) {
-    invisible(.Call(`_snipsnop_readFamFile`, pM, famFile))
+    invisible(.Call(`_gaston2_readFamFile`, pM, famFile))
 }
 
 test_ds <- function(DF, In) {
-    .Call(`_snipsnop_test_ds`, DF, In)
+    .Call(`_gaston2_test_ds`, DF, In)
 }
 
 test_ds2 <- function() {
-    .Call(`_snipsnop_test_ds2`)
+    .Call(`_gaston2_test_ds2`)
 }
 
 test_ds3 <- function(famFile) {
-    .Call(`_snipsnop_test_ds3`, famFile)
+    .Call(`_gaston2_test_ds3`, famFile)
 }
 
 test_readBedFileMemory <- function(filename, n_ind, n_snp, verbose = TRUE) {
-    .Call(`_snipsnop_test_readBedFileMemory`, filename, n_ind, n_snp, verbose)
+    .Call(`_gaston2_test_readBedFileMemory`, filename, n_ind, n_snp, verbose)
 }
 
 test_readBedFileDisk <- function(filename, n_ind, n_snp) {
-    .Call(`_snipsnop_test_readBedFileDisk`, filename, n_ind, n_snp)
+    .Call(`_gaston2_test_readBedFileDisk`, filename, n_ind, n_snp)
 }
 
 test_delete <- function(filename, n_ind, n_snp) {
-    .Call(`_snipsnop_test_delete`, filename, n_ind, n_snp)
+    .Call(`_gaston2_test_delete`, filename, n_ind, n_snp)
 }
 
 test_performance_iterator_default <- function(n) {
-    .Call(`_snipsnop_test_performance_iterator_default`, n)
+    .Call(`_gaston2_test_performance_iterator_default`, n)
 }
 
 test_performance_iterator_1 <- function(n) {
-    .Call(`_snipsnop_test_performance_iterator_1`, n)
+    .Call(`_gaston2_test_performance_iterator_1`, n)
 }
 
 test_performance_iterator_2 <- function(n) {
-    .Call(`_snipsnop_test_performance_iterator_2`, n)
+    .Call(`_gaston2_test_performance_iterator_2`, n)
 }
 
 test_performance_iterator_disk <- function(n) {
-    .Call(`_snipsnop_test_performance_iterator_disk`, n)
+    .Call(`_gaston2_test_performance_iterator_disk`, n)
 }
 
 test_performance_iterator_1d <- function(n) {
-    .Call(`_snipsnop_test_performance_iterator_1d`, n)
+    .Call(`_gaston2_test_performance_iterator_1d`, n)
 }
 
 test_performance_iterator_2d <- function(n) {
-    .Call(`_snipsnop_test_performance_iterator_2d`, n)
+    .Call(`_gaston2_test_performance_iterator_2d`, n)
 }
 
 test_snp_stats <- function(n) {
-    .Call(`_snipsnop_test_snp_stats`, n)
+    .Call(`_gaston2_test_snp_stats`, n)
 }
 
 test_snp_stats_all <- function(n_ind, n_snp) {
-    .Call(`_snipsnop_test_snp_stats_all`, n_ind, n_snp)
+    .Call(`_gaston2_test_snp_stats_all`, n_ind, n_snp)
 }
 
 test_snp_stats_d <- function(n) {
-    .Call(`_snipsnop_test_snp_stats_d`, n)
+    .Call(`_gaston2_test_snp_stats_d`, n)
 }
 
 test_sums <- function(n) {
-    .Call(`_snipsnop_test_sums`, n)
+    .Call(`_gaston2_test_sums`, n)
 }
 
 test_mu_sigma <- function(n) {
-    .Call(`_snipsnop_test_mu_sigma`, n)
+    .Call(`_gaston2_test_mu_sigma`, n)
 }
 
 test_modes_setsigma_one <- function(mode) {
-    .Call(`_snipsnop_test_modes_setsigma_one`, mode)
+    .Call(`_gaston2_test_modes_setsigma_one`, mode)
 }
 
 test_LD_square <- function(SNPnb1, SNPnb2) {
-    .Call(`_snipsnop_test_LD_square`, SNPnb1, SNPnb2)
+    .Call(`_gaston2_test_LD_square`, SNPnb1, SNPnb2)
 }
 
 test_contingency <- function(SNPnb1, SNPnb2) {
-    .Call(`_snipsnop_test_contingency`, SNPnb1, SNPnb2)
+    .Call(`_gaston2_test_contingency`, SNPnb1, SNPnb2)
 }
 
 test_performance_stats_matrix <- function() {
-    .Call(`_snipsnop_test_performance_stats_matrix`)
+    .Call(`_gaston2_test_performance_stats_matrix`)
 }
 
 test_all_stats_matrix <- function() {
-    .Call(`_snipsnop_test_all_stats_matrix`)
+    .Call(`_gaston2_test_all_stats_matrix`)
 }
 
 get_matrix_from_file <- function(path, nbInds, nbSNPs) {
-    .Call(`_snipsnop_get_matrix_from_file`, path, nbInds, nbSNPs)
+    .Call(`_gaston2_get_matrix_from_file`, path, nbInds, nbSNPs)
 }
 
 test_copyConstructor <- function() {
-    invisible(.Call(`_snipsnop_test_copyConstructor`))
+    invisible(.Call(`_gaston2_test_copyConstructor`))
 }
 
 test_first_scnd_ind <- function() {
-    .Call(`_snipsnop_test_first_scnd_ind`)
+    .Call(`_gaston2_test_first_scnd_ind`)
 }
 
 set_num_thread <- function(num) {
-    invisible(.Call(`_snipsnop_set_num_thread`, num))
+    invisible(.Call(`_gaston2_set_num_thread`, num))
 }
 
 testsuite <- function(verbose = TRUE) {
-    invisible(.Call(`_snipsnop_testsuite`, verbose))
+    invisible(.Call(`_gaston2_testsuite`, verbose))
 }
 

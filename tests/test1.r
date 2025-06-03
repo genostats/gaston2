@@ -1,4 +1,4 @@
-require(snipsnop)
+require(gaston2)
 
 # reading in memory
 a <- readBedFileMemory_("inst/extdata/LCT.bed", 503, 607)
