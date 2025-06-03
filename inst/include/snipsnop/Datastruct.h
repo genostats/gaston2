@@ -34,13 +34,13 @@ class DataStruct {
     }
 
     // push_back = ajouter une colonne non nommée
-    inline void push_back(Column newcol) { 
+    inline void push_back(const Column & newcol) { 
       cols.push_back(newcol);
       colNames.push_back("");
     }
 
     // ajouter une colonne nommée
-    inline void push_back(Column newcol, std::string name) {
+    inline void push_back(const Column & newcol, std::string name) {
 if(DEBUG_DS) std::cout << "Entering push_back\n";
       cols.push_back(newcol);
       colNames.push_back(name);
@@ -56,7 +56,7 @@ if(DEBUG_DS) std::cout << "Exiting push_back\n";
 
     // vérifie si la colonne existe et la remplace, et sinon fait un push_back
     // a priori la colonne est copiée lors du passage de l'argument
-    inline void setColumn(Column & col, std::string name) {
+    inline void setColumn(const Column & col, std::string name) {
 if(DEBUG_DS) std::cout << "Entering setColumn\n";
       size_t pos = findColumn(name);
 if(DEBUG_DS) std::cout << "pos = " << pos << "\n";
@@ -71,10 +71,10 @@ if(DEBUG_DS) std::cout << "Exiting setColumn\n";
     }
 
     // idem avec toutes les colonnes d'uutre data struct (forme simple de merge)
-    inline void setColumns(DataStruct & D) {
+    inline void setColumns(const DataStruct & D) {
 if(DEBUG_DS) std::cout << "Entering setColumns\n";
       for(size_t i = 0; i < D.size(); i++) {
-if(DEBUG_DS) std::cout << "i " << i << "\n";
+if(DEBUG_DS) std::cout << "i = " << i << "\n";
         setColumn(D.at(i), D.colName(i));
       }
 if(DEBUG_DS) std::cout << "Exiting setColumns\n";
