@@ -553,6 +553,7 @@ public:
           continue;
         }
 
+// TODO tester de précalculer les trois tableaux H1 possibles...
         scalar_t v_g1 = g_trans[ current_genotype_1 ];
         scalar_t H1[32];
         if(current_genotype_1 != previous_genotype_1) { // update H1 only if v_g1 did change

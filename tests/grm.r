@@ -15,17 +15,17 @@ g3 <- gaston::GRM(x)*606/607
 stopifnot( max(abs(g1 - g3)) < 5e-5 ) 
 
 
-if(FALSE) {
+if(TRUE) {
 RcppParallel::setThreadOptions(1)
 set_num_thread(1)
-microbenchmark::microbenchmark(grm(a), tcrossprod(A), gaston::GRM(x))
+mb1 <- microbenchmark::microbenchmark(grm(a), tcrossprod(A), gaston::GRM(x))
 
 RcppParallel::setThreadOptions(4)
 set_num_thread(4)
-microbenchmark::microbenchmark(grm(a), gaston::GRM(x))
+mb4 <- microbenchmark::microbenchmark(grm(a), gaston::GRM(x))
 
 RcppParallel::setThreadOptions(8)
 set_num_thread(8)
-microbenchmark::microbenchmark(grm(a), gaston::GRM(x))
+mb8 <- microbenchmark::microbenchmark(grm(a), gaston::GRM(x))
 }
 
