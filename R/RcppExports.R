@@ -41,6 +41,10 @@ computeSNPStats <- function(pM) {
     invisible(.Call(`_gaston2_computeSNPStats`, pM))
 }
 
+dimSNPmatrix <- function(pM) {
+    .Call(`_gaston2_dimSNPmatrix`, pM)
+}
+
 extractSNPsfromSNPmatrix_ <- function(other, keep) {
     .Call(`_gaston2_extractSNPsfromSNPmatrix_`, other, keep)
 }
@@ -67,6 +71,10 @@ getSNPStats <- function(pM) {
 
 grm <- function(pM) {
     .Call(`_gaston2_grm`, pM)
+}
+
+isnullptr <- function(pointer) {
+    .Call(`_gaston2_isnullptr`, pointer)
 }
 
 readBedFileDisk_ <- function(path, n_ind, n_snp) {

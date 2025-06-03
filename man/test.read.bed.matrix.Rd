@@ -15,7 +15,7 @@ test.read.bed.matrix(
 test read bed matrix
 }
 \examples{
-file <- system.file("extdata", "LCT.bed", package = "snipsnop")
+file <- system.file("extdata", "LCT.bed", package = "gaston2")
 a <- test.read.bed.matrix(file)
 all(a == LCT.test)
 }

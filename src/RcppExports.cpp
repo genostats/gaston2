@@ -138,6 +138,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// dimSNPmatrix
+Rcpp::IntegerVector dimSNPmatrix(Rcpp::XPtr<SNPmatrix> pM);
+RcppExport SEXP _gaston2_dimSNPmatrix(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    rcpp_result_gen = Rcpp::wrap(dimSNPmatrix(pM));
+    return rcpp_result_gen;
+END_RCPP
+}
 // extractSNPsfromSNPmatrix_
 Rcpp::XPtr<SNPmatrix> extractSNPsfromSNPmatrix_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep);
 RcppExport SEXP _gaston2_extractSNPsfromSNPmatrix_(SEXP otherSEXP, SEXP keepSEXP) {
@@ -216,6 +227,17 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
     rcpp_result_gen = Rcpp::wrap(grm(pM));
+    return rcpp_result_gen;
+END_RCPP
+}
+// isnullptr
+bool isnullptr(SEXP pointer);
+RcppExport SEXP _gaston2_isnullptr(SEXP pointerSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type pointer(pointerSEXP);
+    rcpp_result_gen = Rcpp::wrap(isnullptr(pointer));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -581,6 +603,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
     {"_gaston2_computeSNPStats", (DL_FUNC) &_gaston2_computeSNPStats, 1},
+    {"_gaston2_dimSNPmatrix", (DL_FUNC) &_gaston2_dimSNPmatrix, 1},
     {"_gaston2_extractSNPsfromSNPmatrix_", (DL_FUNC) &_gaston2_extractSNPsfromSNPmatrix_, 2},
     {"_gaston2_extractIndsfromSNPmatrixMemory_", (DL_FUNC) &_gaston2_extractIndsfromSNPmatrixMemory_, 2},
     {"_gaston2_extractIndsfromSNPmatrixDisk_", (DL_FUNC) &_gaston2_extractIndsfromSNPmatrixDisk_, 3},
@@ -588,6 +611,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_test_force_compute_indStats", (DL_FUNC) &_gaston2_test_force_compute_indStats, 1},
     {"_gaston2_getSNPStats", (DL_FUNC) &_gaston2_getSNPStats, 1},
     {"_gaston2_grm", (DL_FUNC) &_gaston2_grm, 1},
+    {"_gaston2_isnullptr", (DL_FUNC) &_gaston2_isnullptr, 1},
     {"_gaston2_readBedFileDisk_", (DL_FUNC) &_gaston2_readBedFileDisk_, 3},
     {"_gaston2_readBedFileMemory_", (DL_FUNC) &_gaston2_readBedFileMemory_, 3},
     {"_gaston2_readBimFile", (DL_FUNC) &_gaston2_readBimFile, 2},
