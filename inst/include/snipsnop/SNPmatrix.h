@@ -71,7 +71,7 @@ public:
   /**
    * @brief Constructor "by copy", 
    * but only copying the SNPs from SNPmatrix "other"
-   * specified in keep.
+   * specified in "keep".
    * @param other
    * SNPmatrix acting as a reference to extract from
    * @param keep, 
@@ -85,6 +85,8 @@ public:
     for (auto keep_idx : keep) {
       this->push_back(otherSNPs.at(keep_idx)); // at is supposed to do bound checking
     }
+    //Not automatically computing indStats back,
+    // so c° is setting indStatsComputed_ to false by default
   }
 
 #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \

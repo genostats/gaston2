@@ -41,12 +41,16 @@ computeSNPStats <- function(pM) {
     invisible(.Call(`_snipsnop_computeSNPStats`, pM))
 }
 
-extractSNPmatrixMemory_ <- function(other, keep) {
-    .Call(`_snipsnop_extractSNPmatrixMemory_`, other, keep)
+extractSNPsfromSNPmatrix_ <- function(other, keep) {
+    .Call(`_snipsnop_extractSNPsfromSNPmatrix_`, other, keep)
 }
 
-extractSNPmatrixDisk_ <- function(other, keep, path_str) {
-    .Call(`_snipsnop_extractSNPmatrixDisk_`, other, keep, path_str)
+extractIndsfromSNPmatrixMemory_ <- function(other, keep) {
+    .Call(`_snipsnop_extractIndsfromSNPmatrixMemory_`, other, keep)
+}
+
+extractIndsfromSNPmatrixDisk_ <- function(other, keep, path_str) {
+    .Call(`_snipsnop_extractIndsfromSNPmatrixDisk_`, other, keep, path_str)
 }
 
 getIndStats <- function(pM, compute = TRUE) {

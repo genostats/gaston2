@@ -16,20 +16,26 @@
 #include <Rcpp.h>
 #include "extractSNPmatrix.h"
 
-// TODO : think, do I want to return whole matrix ? ptr to matrix ?
-
-//R exported function, keep is an Integer Vector by default, hope that's okay ?
+//R exported function to have a matrix of only SNPs from "other" specified in "keep", 
+//keep is an Integer Vector by default, hope that's okay ?
 // [[Rcpp::export]]
-Rcpp::XPtr<SNPmatrix> extractSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector &keep) {
-  Rcpp::XPtr<SNPmatrix> pnewMat(new SNPmatrix);
-  extractSNPmatrixMemory(*other, keep, *pnewMat);
+Rcpp::XPtr<SNPmatrix> extractSNPsfromSNPmatrix_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector &keep) {
+  Rcpp::XPtr<SNPmatrix> pnewMat(new SNPmatrix(*other, keep));
   return pnewMat;
 }
 
 //R exported function, keep is an Integer Vector by default, hope that's okay ?
 // [[Rcpp::export]]
-Rcpp::XPtr<SNPmatrix> extractSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector &keep, std::string path_str) {
+Rcpp::XPtr<SNPmatrix> extractIndsfromSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector &keep) {
   Rcpp::XPtr<SNPmatrix> pnewMat(new SNPmatrix);
-  extractSNPmatrixDisk(*other, keep, path_str, *pnewMat);
+  extractIndsfromSNPmatrixMemory(*other, keep, *pnewMat);
+  return pnewMat;
+}
+
+//R exported function, keep is an Integer Vector by default, hope that's okay ?
+// [[Rcpp::export]]
+Rcpp::XPtr<SNPmatrix> extractIndsfromSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector &keep, std::string path_str) {
+  Rcpp::XPtr<SNPmatrix> pnewMat(new SNPmatrix);
+  extractIndsfromSNPmatrixDisk(*other, keep, path_str, *pnewMat);
   return pnewMat;
 }

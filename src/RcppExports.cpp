@@ -138,28 +138,40 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// extractSNPmatrixMemory_
-Rcpp::XPtr<SNPmatrix> extractSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep);
-RcppExport SEXP _snipsnop_extractSNPmatrixMemory_(SEXP otherSEXP, SEXP keepSEXP) {
+// extractSNPsfromSNPmatrix_
+Rcpp::XPtr<SNPmatrix> extractSNPsfromSNPmatrix_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep);
+RcppExport SEXP _snipsnop_extractSNPsfromSNPmatrix_(SEXP otherSEXP, SEXP keepSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type keep(keepSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractSNPmatrixMemory_(other, keep));
+    rcpp_result_gen = Rcpp::wrap(extractSNPsfromSNPmatrix_(other, keep));
     return rcpp_result_gen;
 END_RCPP
 }
-// extractSNPmatrixDisk_
-Rcpp::XPtr<SNPmatrix> extractSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep, std::string path_str);
-RcppExport SEXP _snipsnop_extractSNPmatrixDisk_(SEXP otherSEXP, SEXP keepSEXP, SEXP path_strSEXP) {
+// extractIndsfromSNPmatrixMemory_
+Rcpp::XPtr<SNPmatrix> extractIndsfromSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep);
+RcppExport SEXP _snipsnop_extractIndsfromSNPmatrixMemory_(SEXP otherSEXP, SEXP keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type keep(keepSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractIndsfromSNPmatrixMemory_(other, keep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// extractIndsfromSNPmatrixDisk_
+Rcpp::XPtr<SNPmatrix> extractIndsfromSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep, std::string path_str);
+RcppExport SEXP _snipsnop_extractIndsfromSNPmatrixDisk_(SEXP otherSEXP, SEXP keepSEXP, SEXP path_strSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type keep(keepSEXP);
     Rcpp::traits::input_parameter< std::string >::type path_str(path_strSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractSNPmatrixDisk_(other, keep, path_str));
+    rcpp_result_gen = Rcpp::wrap(extractIndsfromSNPmatrixDisk_(other, keep, path_str));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -569,8 +581,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_snipsnop_SNPMatrixToIntegerMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToIntegerMatrix, 1},
     {"_snipsnop_SNPMatrixToNumericMatrix", (DL_FUNC) &_snipsnop_SNPMatrixToNumericMatrix, 1},
     {"_snipsnop_computeSNPStats", (DL_FUNC) &_snipsnop_computeSNPStats, 1},
-    {"_snipsnop_extractSNPmatrixMemory_", (DL_FUNC) &_snipsnop_extractSNPmatrixMemory_, 2},
-    {"_snipsnop_extractSNPmatrixDisk_", (DL_FUNC) &_snipsnop_extractSNPmatrixDisk_, 3},
+    {"_snipsnop_extractSNPsfromSNPmatrix_", (DL_FUNC) &_snipsnop_extractSNPsfromSNPmatrix_, 2},
+    {"_snipsnop_extractIndsfromSNPmatrixMemory_", (DL_FUNC) &_snipsnop_extractIndsfromSNPmatrixMemory_, 2},
+    {"_snipsnop_extractIndsfromSNPmatrixDisk_", (DL_FUNC) &_snipsnop_extractIndsfromSNPmatrixDisk_, 3},
     {"_snipsnop_getIndStats", (DL_FUNC) &_snipsnop_getIndStats, 2},
     {"_snipsnop_test_force_compute_indStats", (DL_FUNC) &_snipsnop_test_force_compute_indStats, 1},
     {"_snipsnop_getSNPStats", (DL_FUNC) &_snipsnop_getSNPStats, 1},

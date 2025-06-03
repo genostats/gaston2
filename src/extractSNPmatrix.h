@@ -5,11 +5,17 @@
 
 /* /!\ Templated functions NEED to be in header !!*/
 
+// uneventful interface that does practically nothing, not even sure it is
+// wise to keep. Caller could also just call the c°, and avoid copying !
+template <typename intVec>
+SNPmatrix extractSNPsfromSNPmatrix(const SNPmatrix &other, const intVec &keep) {
+  return SNPmatrix(other, keep);
+}
 
-// creating a new SNPmatrix containing only the individuals with their index specified in "keep"
+// filling up a new SNPmatrix with only the individuals at index specified in "keep"
 // This new SNPmatrix can exists in memory or be filled with SNPvectorDisk.
 template <typename intVec>
-void extractSNPmatrixMemory(const SNPmatrix &other, const intVec &keep, SNPmatrix & newMat) {
+void extractIndsfromSNPmatrixMemory(const SNPmatrix &other, const intVec &keep, SNPmatrix & newMat) {
 
   const std::vector<std::shared_ptr<SNPvector>> otherSNPs = other.getSNPs();
 
@@ -22,16 +28,16 @@ void extractSNPmatrixMemory(const SNPmatrix &other, const intVec &keep, SNPmatri
 }
 
 template <typename intVec>
-SNPmatrix extractSNPmatrixMemory(const SNPmatrix &other, const intVec &keep) {
+SNPmatrix extractIndsfromSNPmatrixMemory(const SNPmatrix &other, const intVec &keep) {
   SNPmatrix M;
-  extractSNPmatrixMemory(other, keep, M);
+  extractIndsfromSNPmatrixMemory(other, keep, M);
   return M;
 }
 
 
 // same for SNPvectorDisk
 template <typename intVec>
-void extractSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, std::string path_str,SNPmatrix & newMat) {
+void extractIndsfromSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, std::string path_str,SNPmatrix & newMat) {
 
   std::error_code error;
 
@@ -85,9 +91,9 @@ void extractSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, std::strin
 }
 
 template <typename intVec>
-SNPmatrix extractSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, std::string path_str) {
+SNPmatrix extractIndsfromSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, std::string path_str) {
   SNPmatrix M;
-  extractSNPmatrixDisk(other, keep, path_str, M);
+  extractIndsfromSNPmatrixDisk(other, keep, path_str, M);
   return M;
 }
 #endif /*EXTRACTSNPMATRIX_H*/

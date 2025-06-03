@@ -978,9 +978,9 @@ void testsuite(bool verbose = true)
   SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
   M.compute_indStats();
   std::vector<size_t> to_keep = { 2, 6, 229, 230, 231, 232, 233, 234, 235, 236, 237 };
-  SNPmatrix res_mat = extractSNPmatrixMemory<std::vector<size_t>>(M, to_keep);
+  SNPmatrix res_mat = extractIndsfromSNPmatrixMemory<std::vector<size_t>>(M, to_keep);
   IntegerMatrix res = SNPmat_to_IntMat(res_mat);
-  IntegerMatrix res_disk = SNPmat_to_IntMat(extractSNPmatrixDisk<std::vector<size_t>>(M, to_keep, "/tmp/extracted_mat_testsuite.bed"));
+  IntegerMatrix res_disk = SNPmat_to_IntMat(extractIndsfromSNPmatrixDisk<std::vector<size_t>>(M, to_keep, "/tmp/extracted_mat_testsuite.bed"));
   
   IntegerMatrix from_file = get_matrix_from_file("/tmp/extracted_mat_testsuite.bed", 11, 607);
 
@@ -1058,7 +1058,9 @@ void testsuite(bool verbose = true)
   }
 
   std::vector<size_t> keep_idx = {0, 1, 2, 3, 100, 606};
-  SNPmatrix extracted_snps(M, keep_idx);
+  // now using the "interface" with C++, now sure how usefull it is,
+  // allows to have it be more uniform I guess
+  SNPmatrix extracted_snps = extractSNPsfromSNPmatrix(M, keep_idx);
   total[8] = 1;
 
   if (extracted_snps.getSNPs().size() != keep_idx.size()) {
