@@ -6,10 +6,10 @@
 #include <istream>
 #include "Column.h"
 
+#include "debug_flags.h"
+
 #ifndef _DataStruct_
 #define _DataStruct_
-
-#define DEBUG_DS false
 
 class DataStruct {
   private:
@@ -25,8 +25,19 @@ class DataStruct {
     }
 
   public:
+    // nombre de colonnes : deux fonctions
     inline size_t size() const {
       return cols.size();
+    }
+
+    inline size_t ncol() const {
+      return cols.size();
+    }
+
+    // nombre de lignes
+    inline size_t nrow() const {
+      if(size() == 0) return(0);
+      return cols[0].size();
     }
 
     inline std::string colName(size_t i) const {
@@ -41,10 +52,14 @@ class DataStruct {
 
     // ajouter une colonne nommée
     inline void push_back(const Column & newcol, std::string name) {
-if(DEBUG_DS) std::cout << "Entering push_back\n";
+#if DEBUG_DS
+  std::cout << "Entering push_back\n";
+#endif
       cols.push_back(newcol);
       colNames.push_back(name);
-if(DEBUG_DS) std::cout << "Exiting push_back\n";
+#if DEBUG_DS
+  std::cout << "Exiting push_back\n";
+#endif
     }
 
     // ajouter toutes les colonnes de D
@@ -57,27 +72,43 @@ if(DEBUG_DS) std::cout << "Exiting push_back\n";
     // vérifie si la colonne existe et la remplace, et sinon fait un push_back
     // a priori la colonne est copiée lors du passage de l'argument
     inline void setColumn(const Column & col, std::string name) {
-if(DEBUG_DS) std::cout << "Entering setColumn\n";
+#if DEBUG_DS
+  std::cout << "Entering setColumn\n";
+#endif
       size_t pos = findColumn(name);
-if(DEBUG_DS) std::cout << "pos = " << pos << "\n";
+#if DEBUG_DS
+  std::cout << "pos = " << pos << "\n";
+#endif
       if(pos == size()) {
-if(DEBUG_DS) std::cout << "pushing\n";
+#if DEBUG_DS
+  std::cout << "pushing\n";
+#endif
         push_back(col, name);
       } else {
-if(DEBUG_DS) std::cout << "replacing\n";
+#if DEBUG_DS
+  std::cout << "replacing\n";
+#endif
         cols[pos] = col;
       }
-if(DEBUG_DS) std::cout << "Exiting setColumn\n";
+#if DEBUG_DS
+  std::cout << "Exiting setColumn\n";
+#endif
     }
 
     // idem avec toutes les colonnes d'uutre data struct (forme simple de merge)
     inline void setColumns(const DataStruct & D) {
-if(DEBUG_DS) std::cout << "Entering setColumns\n";
+#if DEBUG_DS
+  std::cout << "Entering setColumns\n";
+#endif
       for(size_t i = 0; i < D.size(); i++) {
-if(DEBUG_DS) std::cout << "i = " << i << "\n";
+#if DEBUG_DS
+  std::cout << "i = " << i << "\n";
+#endif
         setColumn(D.at(i), D.colName(i));
       }
-if(DEBUG_DS) std::cout << "Exiting setColumns\n";
+#if DEBUG_DS
+  std::cout << "Exiting setColumns\n";
+#endif
     }
 
     inline const Column & at(size_t pos) const { 
@@ -107,25 +138,32 @@ if(DEBUG_DS) std::cout << "Exiting setColumns\n";
       }
     }
 
-    // constructeur qui lit un fichier sans header
-    // il faut donner les types des colonnes et leur nom
-    // pas très perfectionné (uniquement space delimited values,
-    // pas de prise en compte de quotes, pas bcp de check de format...) 
-    // mais ça ira pour lire des fichiers bim / fam
-    DataStruct(std::istream & in, std::vector<datatype> & colTypes, std::vector<std::string> & colNames) {
+    // constructeur qui créée des colonnes vides d'un type donné
+    DataStruct(std::vector<datatype> & colTypes, std::vector<std::string> & colNames) {
       size_t nb_cols = colTypes.size();
       if(nb_cols != colNames.size()) 
         throw std::runtime_error("colTypes and colNames have different sizes");
       // créations colonnes vides
       for(size_t i = 0; i < nb_cols; i++) 
         push_back(Column(colTypes[i]), colNames[i]);
-if(DEBUG_DS) std::cout << "colonnes vides créées\n";
+#if DEBUG_DS
+  std::cout << "colonnes vides créées\n";
+#endif
+    }
+
+    // fonction qui lit (append) un fichier sans header dans des colonnes
+    // déjà créées
+    // pas très perfectionné (uniquement space delimited values,
+    // pas de prise en compte de quotes, pas bcp de check de format...) 
+    // mais ça ira pour lire des fichiers bim / fam
+    void readFile(std::istream & in) {
+      size_t nb_cols = size();
       // lecture fichier ligne par ligne
       std::string line;
       while(std::getline(in, line)) {
         char * c = (char *) line.c_str();
         for(size_t i = 0; i < nb_cols; i++) {
-          c = cols[i].push_back_token(c);
+          c = cols[i].push_back_token(c); // toute la magie est dans ce membre de Column
           if(*c == 0) break; // fin de ligne
         }
       }

@@ -242,28 +242,28 @@ BEGIN_RCPP
 END_RCPP
 }
 // readBedFileDisk_
-Rcpp::XPtr<SNPmatrix> readBedFileDisk_(std::string path, size_t n_ind, size_t n_snp);
-RcppExport SEXP _gaston2_readBedFileDisk_(SEXP pathSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
+Rcpp::XPtr<SNPmatrix> readBedFileDisk_(std::string bedfile, std::string bimfile, std::string famfile);
+RcppExport SEXP _gaston2_readBedFileDisk_(SEXP bedfileSEXP, SEXP bimfileSEXP, SEXP famfileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
-    Rcpp::traits::input_parameter< size_t >::type n_ind(n_indSEXP);
-    Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
-    rcpp_result_gen = Rcpp::wrap(readBedFileDisk_(path, n_ind, n_snp));
+    Rcpp::traits::input_parameter< std::string >::type bedfile(bedfileSEXP);
+    Rcpp::traits::input_parameter< std::string >::type bimfile(bimfileSEXP);
+    Rcpp::traits::input_parameter< std::string >::type famfile(famfileSEXP);
+    rcpp_result_gen = Rcpp::wrap(readBedFileDisk_(bedfile, bimfile, famfile));
     return rcpp_result_gen;
 END_RCPP
 }
 // readBedFileMemory_
-Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string filename, size_t n_ind, size_t n_snp);
-RcppExport SEXP _gaston2_readBedFileMemory_(SEXP filenameSEXP, SEXP n_indSEXP, SEXP n_snpSEXP) {
+Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string bedfile, std::string bimfile, std::string famfile);
+RcppExport SEXP _gaston2_readBedFileMemory_(SEXP bedfileSEXP, SEXP bimfileSEXP, SEXP famfileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
-    Rcpp::traits::input_parameter< size_t >::type n_ind(n_indSEXP);
-    Rcpp::traits::input_parameter< size_t >::type n_snp(n_snpSEXP);
-    rcpp_result_gen = Rcpp::wrap(readBedFileMemory_(filename, n_ind, n_snp));
+    Rcpp::traits::input_parameter< std::string >::type bedfile(bedfileSEXP);
+    Rcpp::traits::input_parameter< std::string >::type bimfile(bimfileSEXP);
+    Rcpp::traits::input_parameter< std::string >::type famfile(famfileSEXP);
+    rcpp_result_gen = Rcpp::wrap(readBedFileMemory_(bedfile, bimfile, famfile));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -308,17 +308,6 @@ BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     rcpp_result_gen = Rcpp::wrap(test_ds2());
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_ds3
-Rcpp::DataFrame test_ds3(std::string famFile);
-RcppExport SEXP _gaston2_test_ds3(SEXP famFileSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type famFile(famFileSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_ds3(famFile));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -618,7 +607,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_readFamFile", (DL_FUNC) &_gaston2_readFamFile, 2},
     {"_gaston2_test_ds", (DL_FUNC) &_gaston2_test_ds, 2},
     {"_gaston2_test_ds2", (DL_FUNC) &_gaston2_test_ds2, 0},
-    {"_gaston2_test_ds3", (DL_FUNC) &_gaston2_test_ds3, 1},
     {"_gaston2_test_readBedFileMemory", (DL_FUNC) &_gaston2_test_readBedFileMemory, 4},
     {"_gaston2_test_readBedFileDisk", (DL_FUNC) &_gaston2_test_readBedFileDisk, 3},
     {"_gaston2_test_delete", (DL_FUNC) &_gaston2_test_delete, 3},

@@ -77,12 +77,12 @@ isnullptr <- function(pointer) {
     .Call(`_gaston2_isnullptr`, pointer)
 }
 
-readBedFileDisk_ <- function(path, n_ind, n_snp) {
-    .Call(`_gaston2_readBedFileDisk_`, path, n_ind, n_snp)
+readBedFileDisk_ <- function(bedfile, bimfile, famfile) {
+    .Call(`_gaston2_readBedFileDisk_`, bedfile, bimfile, famfile)
 }
 
-readBedFileMemory_ <- function(filename, n_ind, n_snp) {
-    .Call(`_gaston2_readBedFileMemory_`, filename, n_ind, n_snp)
+readBedFileMemory_ <- function(bedfile, bimfile, famfile) {
+    .Call(`_gaston2_readBedFileMemory_`, bedfile, bimfile, famfile)
 }
 
 readBimFile <- function(pM, bimFile) {
@@ -99,10 +99,6 @@ test_ds <- function(DF, In) {
 
 test_ds2 <- function() {
     .Call(`_gaston2_test_ds2`)
-}
-
-test_ds3 <- function(famFile) {
-    .Call(`_gaston2_test_ds3`, famFile)
 }
 
 test_readBedFileMemory <- function(filename, n_ind, n_snp, verbose = TRUE) {

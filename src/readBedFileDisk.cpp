@@ -2,7 +2,6 @@
  * @file readBedFileMemory.cpp
  * @author Hervé Perdry
  * @brief Main file with functions to interact with SNPvector and SNPmatrix
- * exported by readBedFileMemory.h and called in test_readBedFileMemory.cpp
  * @date 2023-12-11
  * 
  */
@@ -20,11 +19,20 @@
 #include <Rcpp.h>
 
 
-void readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, SNPmatrix & M) {
-  std::ifstream file_test(path, std::ifstream::binary);
+void readBedFileDisk(std::string bedfile, std::string bimfile, std::string famfile, SNPmatrix & M) {
+  // first read bim and fam file, to determine size
+  M.readFamFile(famfile);
+  M.readBimFile(bimfile);
+
+  size_t n_snp = M.getSNPStats().nrow();
+  size_t n_ind = M.getIndStats().nrow();
+
+  // now ready to read bed file
+
+  std::ifstream file_test(bedfile, std::ifstream::binary);
   if (file_test.bad()) throw std::runtime_error("This file does not exists\n");
   std::error_code error;
-  mio::mmap_source file_ = mio::make_mmap_source(path, 0, mio::map_entire_file, error);
+  mio::mmap_source file_ = mio::make_mmap_source(bedfile, 0, mio::map_entire_file, error);
   if (error) {
     std::string errMsg = "Error code " + std::to_string(error.value()) + ", Failed to map the file : " + error.message();
     throw std::runtime_error(errMsg); 
@@ -72,17 +80,17 @@ void readBedFileDisk(std::string path, size_t n_ind, size_t n_snp, SNPmatrix & M
  * @return a SNPmatrix, stocking shared_ptrs to SNPvectorDisk 
 */
 
-SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp) {
+SNPmatrix readBedFileDisk(std::string bedfile, std::string bimfile, std::string famfile) {
   SNPmatrix M;
-  readBedFileDisk(path, n_ind, n_snp, M);
+  readBedFileDisk(bedfile, bimfile, famfile, M);
   return M;
 }
 
 
 // R exported function
 // [[Rcpp::export]]
-Rcpp::XPtr<SNPmatrix> readBedFileDisk_(std::string path, size_t n_ind, size_t n_snp) {
+Rcpp::XPtr<SNPmatrix> readBedFileDisk_(std::string bedfile, std::string bimfile, std::string famfile) {
   Rcpp::XPtr<SNPmatrix> pM(new SNPmatrix);
-  readBedFileDisk(path, n_ind, n_snp, *pM);
+  readBedFileDisk(bedfile, bimfile, famfile, *pM);
   return pM;
 }

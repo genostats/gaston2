@@ -2,7 +2,6 @@
  * @file readBedFileMemory.cpp
  * @author Hervé Perdry
  * @brief Main file with functions to interact with SNPvector and SNPmatrix
- * exported by readBedFileMemory.h and called in test_readBedFileMemory.cpp
  * @date 2023-12-11
  * 
  */
@@ -22,17 +21,24 @@
 /**
  * @brief Reading a bed file, storing SNPs in a SNPmatrix returned
  * 
- * @param filename The name of the file to be opened
- * @param n_ind The number of individuals/samples
- * @param n_snp The number of SNP to read from the file and to load into the Matrix.
- * 
- * @return SNPmatrix, stocking shared_ptrs to SNPvectorMemory 
+ * @param bedfile The name of the bed file
+ * @param bimfile The name of the bim file
+ * @param bamfile The name of the fam file
+ * @param M reference to an originally empty SNPmatrix
  */
 
-void readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, SNPmatrix & M) {
-  std::ifstream file(filename, std::ifstream::binary);
+void readBedFileMemory(std::string bedfile, std::string bimfile, std::string famfile, SNPmatrix & M) {
+  // first read bim and fam file, to determine size
+  M.readFamFile(famfile);
+  M.readBimFile(bimfile);
+
+  size_t n_snp = M.getSNPStats().nrow();
+  size_t n_ind = M.getIndStats().nrow();
+
+  // now ready to read bed file
+  std::ifstream file(bedfile, std::ifstream::binary);
   if(!file.is_open()) {
-    throw std::runtime_error("Cannot open file " + filename);
+    throw std::runtime_error("Cannot open file " + bedfile);
   }
 
   // check magic number
@@ -57,16 +63,16 @@ void readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, SNPmatr
   file.close();
 }
 
-SNPmatrix readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp) {
+SNPmatrix readBedFileMemory(std::string bedfile, std::string bimfile, std::string famfile) {
   SNPmatrix M;
-  readBedFileMemory(filename, n_ind, n_snp, M);
+  readBedFileMemory(bedfile, bimfile, famfile, M);
   return M;
 }
 
 // R exported function
 // [[Rcpp::export]]
-Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string filename, size_t n_ind, size_t n_snp) {
+Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string bedfile, std::string bimfile, std::string famfile) {
   Rcpp::XPtr<SNPmatrix> pM(new SNPmatrix);
-  readBedFileMemory(filename, n_ind, n_snp, *pM);
+  readBedFileMemory(bedfile, bimfile, famfile, *pM);
   return pM;
 }

@@ -1,8 +1,6 @@
 /**
  * @file extractSNPmatrix.cpp
  * @author Hervé Perdry
- * @brief Main file with functions to interact with SNPvector and SNPmatrix
- * exported by readBedFileMemory.h and called in test_readBedFileMemory.cpp
  * @date 2023-12-11
  * 
  */

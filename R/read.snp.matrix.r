@@ -16,15 +16,14 @@ read.snp.matrix <- function(basename, memory = TRUE) {
   }
 
   if(!file.exists(bed)) stop("file ", bed, " not found")
-
-  nbInds <- R.utils::countLines(fam)
-  nbSNPs <- R.utils::countLines(bim)
+  if(!file.exists(bim)) stop("file ", bim, " not found")
+  if(!file.exists(fam)) stop("file ", fam, " not found")
 
   if(memory) {
-    ptr <- readBedFileMemory_(bed, nbInds, nbSNPs)
+    ptr <- readBedFileMemory_(bed, bim, fam)
   } else {
-    ptr <- readBedFileDisk_(bed, nbInds, nbSNPs)
+    ptr <- readBedFileDisk_(bed, bim, fam)
   }
-
+  
   new("snp.matrix", ptr = ptr, file = bed, type = ifelse(memory, "memory", "disk"))
 }

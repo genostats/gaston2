@@ -62,14 +62,3 @@ Rcpp::DataFrame test_ds2() {
   return DataStructToDataFrame(DS);
 }
 
-// passer le chemin de LCT.fam 
-// [[Rcpp::export]]
-Rcpp::DataFrame test_ds3(std::string famFile) {
-  std::ifstream in(famFile);
-  std::vector<datatype> colTypes = { datatype::STRING, datatype::STRING, datatype::STRING, datatype::STRING, datatype::INT, datatype::INT };
-  std::vector<std::string> colNames = { "famid", "id", "father", "mother", "sex", "pheno" };
-
-  DataStruct DS(in, colTypes, colNames);
-  return DataStructToDataFrame(DS);
-}
-

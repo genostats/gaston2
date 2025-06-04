@@ -1,3 +1,10 @@
 - les fonctions de lecture ddans DataStruct ne sont pas robustes
   à la présence de chaines de caractères dans une colonne numerique (eg 'NA')
   même strtof ne doit pas faire ce qu'on voudrait dans ce cas
+
+- JU dans l'extraction de matrices, setIndStats met indStatsComputed = true
+  il faudrait propager la valeur de indStatsComputed_ de la matrice originelle
+  au cas où on ait seulement chargé le fam file, ou même rien chargé du tout
+
+  JU question : à quoi servent les .get() dans Column.h ? à un autre moment
+  on a utilisé les shared pointeurs sans mettre de get

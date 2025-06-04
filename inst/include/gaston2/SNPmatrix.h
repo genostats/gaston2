@@ -235,18 +235,22 @@ public:
 
   void readFamFile(std::string famFile) {
     std::ifstream in(famFile);
+    if(!in.good()) 
+      throw std::runtime_error("Can't open fam file");
     std::vector<datatype> colTypes = { datatype::STRING, datatype::STRING, datatype::STRING, datatype::STRING, datatype::INT, datatype::INT };
     std::vector<std::string> colNames = { "famid", "id", "father", "mother", "sex", "pheno" };
-    DataStruct DS(in, colTypes, colNames);
-    indStats_.setColumns(DS);
+    indStats_ = DataStruct(colTypes, colNames);
+    indStats_.readFile(in);
   }
 
   void readBimFile(std::string bimFile) {
     std::ifstream in(bimFile);
+    if(!in.good()) 
+      throw std::runtime_error("Can't open bim file");
     std::vector<datatype> colTypes = { datatype::STRING, datatype::STRING, datatype::INT, datatype::DOUBLE, datatype::STRING, datatype::STRING };
     std::vector<std::string> colNames = { "chr", "id", "pos", "dist", "A1", "A2" };
-    DataStruct DS(in, colTypes, colNames);
-    snpStats_.setColumns(DS);
+    snpStats_ = DataStruct(colTypes, colNames);
+    snpStats_.readFile(in);
   }
 
 private:

@@ -1,7 +1,6 @@
 #include <Rcpp.h>
 #include "SNPmatrix.h"
 #include "SNPvector.h"
-#include "readBedFileMemory.h"
 #include "extractSNPmatrix.h"
 #include "debug.h"
 #include <vector>
@@ -13,13 +12,85 @@
 
 using namespace Rcpp;
 
-// when testing using : "extdata/LCT.bed" n_ind : 503 n_snp : 607
+SNPmatrix readBedFileMemory_old(std::string filename, size_t n_ind, size_t n_snp) {
+  std::ifstream file(filename, std::ifstream::binary);
+  if(!file.is_open()) {
+    throw std::runtime_error("Cannot open file " + filename);
+  }
+
+  // check magic number
+  char magic[3];
+  file.read(magic, 3);
+  if(magic[0] != 108 || magic[1] != 27) {
+    throw std::runtime_error("Not a bed file");
+  }
+  if(magic[2] != 1) {
+    throw std::runtime_error("Not a bed file in SNP major mode");
+  } 
+
+  SNPmatrix M;
+  for(size_t i = 0; i < n_snp; i++) {
+    //makes a shared_ptr on a vector of snips 
+    std::shared_ptr<SNPvectorMemory> snpVec(new SNPvectorMemory(n_ind));
+    size_t n = snpVec->nbChars();
+    uint8_t * data = snpVec->data();
+    file.read(reinterpret_cast<char *>(data), n);
+    M.push_back(snpVec);
+  }
+  
+  file.close();
+  return M;
+}
+
+
+SNPmatrix readBedFileDisk_old(std::string path, size_t n_ind, size_t n_snp) {
+  std::ifstream file_test(path, std::ifstream::binary);
+  if (file_test.bad()) throw std::runtime_error("This file does not exists\n");
+  std::error_code error;
+  mio::mmap_source file_ = mio::make_mmap_source(path, 0, mio::map_entire_file, error);
+  if (error) {
+    std::string errMsg = "Error code " + std::to_string(error.value()) + ", Failed to map the file : " + error.message();
+    throw std::runtime_error(errMsg); 
+  }
+  std::shared_ptr<mio::mmap_source> file_ptr = std::make_shared<mio::mmap_source>(std::move(file_)); // don't know if good idea, creates a NEW sink
+  // DON'T USE FILE_ FROM NOW ON COS IT'S NULL, WAS MOVED
+  const char* data = reinterpret_cast<const char*>(file_ptr->data());// const necessary bcos read only 
+  
+  // check magic number
+  char magic[3];
+  for (int i = 0; i < 3; i++)
+  {
+    //std::cout << int(*data) << ' ';
+    magic[i] = *(data + i);
+  }
+  //std::cout << '\n';
+  if(magic[0] != 108 || magic[1] != 27) {
+    throw std::runtime_error("Not a bed file");
+  }
+  if(magic[2] != 1) {
+    throw std::runtime_error("Not a bed file in SNP major mode");
+  }
+  SNPmatrix M;
+
+  auto file_offset = 3; // BCOS MAGIC BYTES 
+  for(size_t i = 0; i < n_snp; i++) {
+    std::shared_ptr<SNPvectorDisk<mio::access_mode::read>> snpVec(new SNPvectorDisk<mio::access_mode::read>(n_ind,file_ptr, i));
+    //data should be taken by file_ptr
+
+    size_t n = snpVec->nbChars(); // func inherited from SNPVec, gives back size used by SNP
+    M.push_back(snpVec);
+    // Increment the file offset based on the size of the data
+    file_offset += n;
+  }
+  return M;
+}
+
 
 // [[Rcpp::export]]
 IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t n_snp, bool verbose = true)
 {
   if (verbose) std::cout << " reading : " << filename << "\n n_ind : " << n_ind << "\n n_snp : " << n_snp << "\n";
-  SNPmatrix M = readBedFileMemory(filename, n_ind, n_snp);
+  SNPmatrix M = readBedFileMemory_old(filename, n_ind, n_snp);
   std::vector<unsigned int> res;
   for (auto v : M.getSNPs())
   {
@@ -31,7 +102,7 @@ IntegerVector test_readBedFileMemory(std::string filename, size_t n_ind, size_t 
 // [[Rcpp::export]]
 IntegerVector test_readBedFileDisk(std::string filename, size_t n_ind, size_t n_snp)
 {
-  SNPmatrix M = readBedFileDisk(filename, n_ind, n_snp);
+  SNPmatrix M = readBedFileDisk_old(filename, n_ind, n_snp);
   std::vector<unsigned int> res;
   for (auto v : M.getSNPs())
   {
@@ -43,13 +114,13 @@ IntegerVector test_readBedFileDisk(std::string filename, size_t n_ind, size_t n_
 // [[Rcpp::export]]
 IntegerVector test_delete(std::string filename, size_t n_ind, size_t n_snp)
 {
-  SNPmatrix M = readBedFileDisk(filename, n_ind, n_snp);
+  SNPmatrix M = readBedFileDisk_old(filename, n_ind, n_snp);
   std::vector<int> res;
   for (auto v : M.getSNPs())
   {
     res.push_back(v->sum());
   }
-  SNPmatrix MM = readBedFileMemory(filename, n_ind, n_snp);
+  SNPmatrix MM = readBedFileMemory_old(filename, n_ind, n_snp);
   for (auto v : MM.getSNPs())
   {
     M.push_back(v);
@@ -124,7 +195,7 @@ unsigned int test_performance_iterator_default(unsigned int n)
     n = n % 503;
   } // parce que 503 individus dans le file hardcodé
   // std::cout << "Nb of SNPs: " << nbSNPs << " and nb of bits to read on last :" << n <<"\n";
-  SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
   for (int i = 0; i < nbSNPs; i++)
   {
     auto vec = M.getSNP(i); // peut pas déréférencer là parce qu'instancie la classe abstraite SNPvector
@@ -150,7 +221,7 @@ unsigned int test_performance_iterator_1(unsigned int n)
     nbSNPs = (n / 503) + 1;
     n = n % 503;
   }
-  SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
 
   for (int i = 0; i < nbSNPs; i++)
   {
@@ -176,7 +247,7 @@ unsigned int test_performance_iterator_2(unsigned int n)
     nbSNPs = (n / 503) + 1;
     n = n % 503;
   }
-  SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
 
   for (int i = 0; i < nbSNPs; i++)
   {
@@ -204,7 +275,7 @@ unsigned int test_performance_iterator_disk(unsigned int n)
     nbSNPs = (n / 503) + 1;
     n = n % 503;
   }
-  SNPmatrix M = readBedFileDisk(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
+  SNPmatrix M = readBedFileDisk_old(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
   for (int i = 0; i < nbSNPs; i++)
   {
     auto vec = M.getSNP(i);;
@@ -228,7 +299,7 @@ unsigned int test_performance_iterator_1d(unsigned int n)
     nbSNPs = (n / 503) + 1;
     n = n % 503;
   }
-  SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
 
   for (int i = 0; i < nbSNPs; i++)
   {
@@ -254,7 +325,7 @@ unsigned int test_performance_iterator_2d(unsigned int n)
     nbSNPs = (n / 503) + 1;
     n = n % 503;
   }
-  SNPmatrix M = readBedFileDisk(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
+  SNPmatrix M = readBedFileDisk_old(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
 
   for (int i = 0; i < nbSNPs; i++)
   {
@@ -281,7 +352,7 @@ IntegerVector test_snp_stats(unsigned int n)
     nbSNPs = (n / 503) + 1;
     n = n % 503;
   }
-  SNPmatrix M = readBedFileMemory(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, (nbSNPs > 1) ? 503 : n, nbSNPs);
 
   std::vector<unsigned int> res(4, 0); // Initialize sum vector {0, 0, 0, 0}
 
@@ -308,7 +379,7 @@ IntegerVector test_snp_stats(unsigned int n)
 IntegerMatrix test_snp_stats_all(int n_ind, int n_snp)
 {
 
-  SNPmatrix M = readBedFileMemory(file_hardcode, n_ind, n_snp);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, n_ind, n_snp);
 
   IntegerMatrix res(n_snp, 4);
 
@@ -331,7 +402,7 @@ IntegerVector test_snp_stats_d(unsigned int n)
 {
   if (n > 503)
     n = 503;
-  SNPmatrix M = readBedFileDisk(file_hardcode, n, 1);
+  SNPmatrix M = readBedFileDisk_old(file_hardcode, n, 1);
   auto vec = M.getSNP(0);;
   vec->compute_stats();
   auto stats = vec->getStats();
@@ -372,7 +443,7 @@ NumericMatrix test_mu_sigma(unsigned int n)
 {
   int nbSNPs = n;
 
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, nbSNPs);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, 503, nbSNPs);
 
   NumericMatrix res(2, nbSNPs);
 
@@ -401,7 +472,7 @@ NumericVector test_modes_setsigma_one(int mode)
   std::vector<double> res;
 
   Mode mode_ = (Mode) mode;
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, 503, 607);
   M.setMode(mode_);
   for (auto v : M.getSNPs())
   {
@@ -436,7 +507,7 @@ NumericMatrix test_LD_square(int SNPnb1, int SNPnb2)
   }
 
   int nbSNPs = SNPnb2 - SNPnb1 + 1;
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
   NumericMatrix res(nbSNPs, nbSNPs);
 
   for (int i = 0; i < nbSNPs; i++)
@@ -471,7 +542,7 @@ SEXP test_contingency(int SNPnb1, int SNPnb2)
               << std::endl;
     return 0;
   }
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps ?
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, 503, 607); // should be good by loading aonly necessary snps ?
 
   IntegerVector res(9);
   SNPvector &snp1 = *M.getSNP(SNPnb1);
@@ -486,7 +557,7 @@ SEXP test_contingency(int SNPnb1, int SNPnb2)
 // [[Rcpp::export]]
 bool test_performance_stats_matrix()
 {
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, 503, 607);
   M.compute_indStats();
   DataStruct st = M.getIndStats();
 
@@ -551,7 +622,7 @@ bool test_performance_stats_matrix()
 // [[Rcpp::export]]
 IntegerMatrix test_all_stats_matrix()
 {
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, 503, 607); // should be good by loading aonly necessary snps
   //return wrap(M.compute_stats());
 
   M.compute_indStats();
@@ -604,7 +675,7 @@ IntegerMatrix SNPmat_to_IntMat(SNPmatrix matrix)
 // [[Rcpp::export]]
 IntegerMatrix get_matrix_from_file(std::string path, size_t nbInds, size_t nbSNPs)
 {
-  SNPmatrix M = readBedFileDisk(path, nbInds, nbSNPs);
+  SNPmatrix M = readBedFileDisk_old(path, nbInds, nbSNPs);
   IntegerMatrix x = SNPmat_to_IntMat(M);
   return x;
 }
@@ -614,7 +685,7 @@ void test_copyConstructor()
 {
       int nbInds = 503;
       int nbSNPs = 607;
-      SNPmatrix M = readBedFileMemory(file_hardcode, nbInds, nbSNPs);
+      SNPmatrix M = readBedFileMemory_old(file_hardcode, nbInds, nbSNPs);
 
       FILE *f = fopen("/tmp/test.bed", "wb");
       if (!f)
@@ -656,7 +727,7 @@ void test_copyConstructor()
 //[[Rcpp::export]]
 IntegerMatrix test_first_scnd_ind()
 {
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, 503, 607);
   IntegerMatrix m(607, 3);
   int i = 0;
   for (auto v : M.getSNPs()) {
@@ -975,7 +1046,7 @@ void testsuite(bool verbose = true)
     exit(EXIT_FAILURE);
   }
 
-  SNPmatrix M = readBedFileMemory(file_hardcode, 503, 607);
+  SNPmatrix M = readBedFileMemory_old(file_hardcode, 503, 607);
   M.compute_indStats();
   std::vector<size_t> to_keep = { 2, 6, 229, 230, 231, 232, 233, 234, 235, 236, 237 };
   SNPmatrix res_mat = extractIndsfromSNPmatrixMemory<std::vector<size_t>>(M, to_keep);

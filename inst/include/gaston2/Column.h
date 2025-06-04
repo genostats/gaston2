@@ -8,10 +8,10 @@
 #include "strtoi.h"
 #include "strtos.h"
 
+#include "debug_flags.h"
+
 #ifndef _Column_
 #define _Column_
-
-// #define DEBUG_COL 1
 
 struct Column {
   private:
@@ -39,13 +39,34 @@ struct Column {
       checkHandler();
     }
 
+    // size of the column
+    size_t size() const {
+      switch(type_) {
+        case INT : { 
+           return ((std::vector<int> *) handler.get())->size();
+        }
+        case FLOAT : {
+           return ((std::vector<float> *) handler.get())->size();
+        } 
+        case DOUBLE : {
+           return ((std::vector<double> *) handler.get())->size();
+        }
+        case STRING : {
+           return ((std::vector<std::string> *) handler.get())->size();
+        }
+        default :
+          throw std::runtime_error("In size, type is NONE");
+      }
+    }
 
-#ifdef DEBUG_COL
-    // verbose copy constructor (for testing)
+
+#if DEBUG_COL
+    // verbose copy constructor
     Column(const Column & col) : type_(col.type_), handler(col.handler) {
       std::cout << "Copy one column of type " << typeToString(type_) << " (passed by ref)\n";
     }
-    
+
+    // verbose assignement operator    
     Column & operator=(const Column& col) {
       type_ = col.type_;
       handler = col.handler;
@@ -57,9 +78,9 @@ struct Column {
     Column & operator=(Column&& col)
     {
       std::cout << "Using move for column of type " << typeToString(type_) << "\n";
-        std::swap(type_, col.type_);
-        std::swap(handler, col.handler);
-        return *this;
+      std::swap(type_, col.type_);
+      std::swap(handler, col.handler);
+      return *this;
     }
 #endif
 
