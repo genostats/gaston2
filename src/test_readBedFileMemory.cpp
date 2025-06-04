@@ -1,7 +1,8 @@
 #include <Rcpp.h>
 #include "SNPmatrix.h"
 #include "SNPvector.h"
-#include "extractSNPmatrix.h"
+#include "extractIndsfromSNPmatrixDisk.h"
+#include "extractIndsfromSNPmatrixMemory.h"
 #include "debug.h"
 #include <vector>
 #include <iostream>
@@ -125,8 +126,6 @@ IntegerVector test_delete(std::string filename, size_t n_ind, size_t n_snp)
   {
     M.push_back(v);
   }
-  std::cout << "Is the 3rd SNP on disk ? (yes) : " << M.onDisk(3);
-  std::cout << "\nAnd this one ? (no) : " << M.onDisk(n_snp + 3) << "\n";
   while (M.size() != 0)
   {
     M.deleteSNP();
@@ -165,8 +164,8 @@ IntegerVector test_readModes(std::string filename, size_t n_ind, size_t n_snp)
   IntegerVector res3 = loop_sum(M);
   for (auto i : res3)
     res.push_back(i);
-  std::cout << " reading in PLINK Mode \n";
-  M = readBedFileMemory(filename, n_ind, n_snp, PLINK);
+  std::cout << " reading in RAW_VALUES Mode \n";
+  M = readBedFileMemory(filename, n_ind, n_snp, RAW_VALUES);
   IntegerVector res4 = loop_sum(M);
   for (auto i : res4)
     res.push_back(i);
@@ -665,7 +664,7 @@ IntegerMatrix SNPmat_to_IntMat(SNPmatrix matrix)
     auto snp = SNPs[i];
     size_t j = 0;
     for (auto it = snp->begin(); it != snp->end(); ++it) {
-      mat(i, j++) = *it; // So read with PLINK mode !
+      mat(i, j++) = *it; // So read with RAW_VALUES mode !
     }
   }
 
@@ -1129,9 +1128,8 @@ void testsuite(bool verbose = true)
   }
 
   std::vector<size_t> keep_idx = {0, 1, 2, 3, 100, 606};
-  // now using the "interface" with C++, now sure how usefull it is,
-  // allows to have it be more uniform I guess
-  SNPmatrix extracted_snps = extractSNPsfromSNPmatrix(M, keep_idx);
+
+  SNPmatrix extracted_snps(M, keep_idx);
   total[8] = 1;
 
   if (extracted_snps.getSNPs().size() != keep_idx.size()) {

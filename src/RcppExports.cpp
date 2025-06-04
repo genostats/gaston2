@@ -208,6 +208,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// getMode
+std::string getMode(Rcpp::XPtr<SNPmatrix> pM);
+RcppExport SEXP _gaston2_getMode(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    rcpp_result_gen = Rcpp::wrap(getMode(pM));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getSNPStats
 Rcpp::DataFrame getSNPStats(Rcpp::XPtr<SNPmatrix> pM);
 RcppExport SEXP _gaston2_getSNPStats(SEXP pMSEXP) {
@@ -286,6 +297,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< std::string >::type famFile(famFileSEXP);
     readFamFile(pM, famFile);
+    return R_NilValue;
+END_RCPP
+}
+// setMode
+void setMode(Rcpp::XPtr<SNPmatrix> pM, std::string mode);
+RcppExport SEXP _gaston2_setMode(SEXP pMSEXP, SEXP modeSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< std::string >::type mode(modeSEXP);
+    setMode(pM, mode);
     return R_NilValue;
 END_RCPP
 }
@@ -598,6 +620,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_extractSNPsfromSNPmatrix_", (DL_FUNC) &_gaston2_extractSNPsfromSNPmatrix_, 2},
     {"_gaston2_getIndStats", (DL_FUNC) &_gaston2_getIndStats, 2},
     {"_gaston2_test_force_compute_indStats", (DL_FUNC) &_gaston2_test_force_compute_indStats, 1},
+    {"_gaston2_getMode", (DL_FUNC) &_gaston2_getMode, 1},
     {"_gaston2_getSNPStats", (DL_FUNC) &_gaston2_getSNPStats, 1},
     {"_gaston2_grm", (DL_FUNC) &_gaston2_grm, 1},
     {"_gaston2_isnullptr", (DL_FUNC) &_gaston2_isnullptr, 1},
@@ -605,6 +628,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_readBedFileMemory_", (DL_FUNC) &_gaston2_readBedFileMemory_, 3},
     {"_gaston2_readBimFile", (DL_FUNC) &_gaston2_readBimFile, 2},
     {"_gaston2_readFamFile", (DL_FUNC) &_gaston2_readFamFile, 2},
+    {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},
     {"_gaston2_test_ds", (DL_FUNC) &_gaston2_test_ds, 2},
     {"_gaston2_test_ds2", (DL_FUNC) &_gaston2_test_ds2, 0},
     {"_gaston2_test_readBedFileMemory", (DL_FUNC) &_gaston2_test_readBedFileMemory, 4},

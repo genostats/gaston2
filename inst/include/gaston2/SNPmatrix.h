@@ -147,32 +147,12 @@ public:
       vecNAs.push_back(unordered_stats[idxnzeros + 3]);
     }
 
-    Column N0s(vecN0s);
-    Column N1s(vecN1s);
-    Column N2s(vecN2s);
-    Column NAs(vecNAs);
-
-    indStats_.setColumn(N0s, "N0");
-    indStats_.setColumn(N1s, "N1");
-    indStats_.setColumn(N2s, "N2");
-    indStats_.setColumn(NAs, "NAs");
+    indStats_.setColumn(Column(vecN0s), "N0");
+    indStats_.setColumn(Column(vecN1s), "N1");
+    indStats_.setColumn(Column(vecN2s), "N2");
+    indStats_.setColumn(Column(vecNAs), "NAs");
 
     indStatsComputed_ = true;
-  }
-
-  /**
-   * @brief A member function testing whether the SNP at index
-   * is a SNPvectorDisk or a SNPVectorMemory
-   *
-   * @param index
-   * @return true
-   * @return false
-   */
-  bool onDisk(size_t index)
-  { // TODO  check why was that written ????doesn't work, will see later
-    if (std::shared_ptr<SNPvectorDisk<mio::access_mode::read>> test = std::dynamic_pointer_cast<SNPvectorDisk<mio::access_mode::read>>(SNPs_[index]))
-      return true;
-    return false; // test was a null ptr, not castable to a SNPvectorDisk
   }
 
   const std::vector<std::shared_ptr<SNPvector>> &getSNPs() const
@@ -190,7 +170,6 @@ public:
 
   // get the DataStruct containing snp stats
   const DataStruct & getSNPStats() const { return snpStats_; }
-
 
 
   // TODO : see if by default possible ?
@@ -231,6 +210,13 @@ public:
     for(auto & snp : SNPs_) {
       snp->setMode(mode);
     }
+    mode_ = mode;
+  }
+
+  // TODO (to thinkà there might be a problem if SNPs are not all in the same mode...
+  // possible solution : enforce mode when push_back is done ?
+  inline Mode mode() {
+    return mode_;
   }
 
   void readFamFile(std::string famFile) {
@@ -259,6 +245,7 @@ private:
   DataStruct snpStats_;   // will contain bim file + ?
   std::vector<std::shared_ptr<SNPvector>> SNPs_;
   bool indStatsComputed_ = false;
+  Mode mode_ = RAW_VALUES;
 };
 
 #endif

@@ -9,7 +9,7 @@ Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix> pM) {
   Rcpp::IntegerMatrix R(nbInds, nbSNPs);
   for(unsigned int j = 0; j < nbSNPs; j++) {
     auto SNP = pM->getSNP(j);
-    SNP->setMode(PLINK);
+    SNP->setMode(RAW_VALUES);
     unsigned int i = 0;
     for(int x : *SNP) {
       R(i++, j) = (x < 3)?x:NA_INTEGER;

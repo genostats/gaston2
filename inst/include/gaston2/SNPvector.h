@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>    //for contingency !!
 #include <algorithm> // for omp reduction ?
+
+#include "mode.h"
 #include "debug.h"
 
 #ifndef _SNPvector_
@@ -48,14 +50,6 @@ static uint8_t N1[256] = {
     0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0,
     0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0};
 
-enum Mode
-{
-  PLINK,                 // .bed file : g = {0, 1, 3 and 2 = NA}
-  CENTERED,              // g -= mu
-  STANDARDIZED_MU_SIGMA, // g = (g-mu)/sd
-  STANDARDIZED_P,        // g = (g - 2⁼p) / sqrt(2*p*(1-p)) with p = mu/2
-  CUSTOM 
-};
 
 /**
  * @brief An abstract class instanciated through SNPvectorMemory or SNPvectorDisk
@@ -71,7 +65,7 @@ protected: // can be accessed also by class inheriting
   // (cf constructors below)
 
   const size_t nbInds_;
-  enum Mode mode_ = Mode::PLINK;
+  enum Mode mode_ = Mode::RAW_VALUES;
 
   /* Containing N0, N1, N2, NAs on the whole SNP,
   following Plink format
@@ -96,11 +90,11 @@ protected: // can be accessed also by class inheriting
   double g_trans[4] = {0, 3, 1, 2};
 
   // constructor allowing to set nbInds and mode (to be called by derived classes)
-  SNPvector(size_t nbInds, Mode mode = Mode::PLINK) : nbInds_(nbInds), mode_(mode) {}
+  SNPvector(size_t nbInds, Mode mode = Mode::RAW_VALUES) : nbInds_(nbInds), mode_(mode) {}
 
   inline void computeMode() { 
     switch(mode_) {
-      case Mode::PLINK: {
+      case Mode::RAW_VALUES: {
         g_trans[0] = 0; 
         g_trans[1] = 3;   // or NAN ?
         g_trans[2] = 1;
@@ -174,7 +168,7 @@ public:
     return nbInds_;
   }
 
-  // BY DEFAULT, PLINK format, with 01 = missing genotype
+  // BY DEFAULT, RAW_VALUES format, with 01 = missing genotype
   // double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}, {0, 0, 0, 0}};
 
   // To use set mode and compute g_trans value accordingly
@@ -312,7 +306,7 @@ public:
 
     size_t nbc_m1 = nbChars() - 1;
 
-    /* FIRST : filling up stats_ with N0s, N1s, N2s, and NAs with PLINK translation*/
+    /* FIRST : filling up stats_ with N0s, N1s, N2s, and NAs with RAW_VALUES translation*/
     stats_[0] = stats_[1] = stats_[2] = stats_[3] = 0;
 
     // all bytes excepted last byte

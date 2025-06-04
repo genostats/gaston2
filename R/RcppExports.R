@@ -65,6 +65,10 @@ test_force_compute_indStats <- function(pM) {
     invisible(.Call(`_gaston2_test_force_compute_indStats`, pM))
 }
 
+getMode <- function(pM) {
+    .Call(`_gaston2_getMode`, pM)
+}
+
 getSNPStats <- function(pM) {
     .Call(`_gaston2_getSNPStats`, pM)
 }
@@ -91,6 +95,10 @@ readBimFile <- function(pM, bimFile) {
 
 readFamFile <- function(pM, famFile) {
     invisible(.Call(`_gaston2_readFamFile`, pM, famFile))
+}
+
+setMode <- function(pM, mode) {
+    invisible(.Call(`_gaston2_setMode`, pM, mode))
 }
 
 test_ds <- function(DF, In) {

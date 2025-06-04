@@ -41,7 +41,7 @@ class SNPvectorDisk : public SNPvector {
   // il va échouer si on n'a pas accessMode == mio::access_mode::write
   // le but est d'écrire dans un fichier .bed *qu'on a créé nous-même* et qui est encore vide (à part les 3 magic bytes)
   // (ou pas forcément vide, ça va la modifier en place)
-  // toujours créé en mode PLINK
+  // toujours créé en mode RAW_VALUES
   SNPvectorDisk(const std::shared_ptr<SNPvector> source, 
                 std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> file_ref, 
                 size_t SNP_index) : 
