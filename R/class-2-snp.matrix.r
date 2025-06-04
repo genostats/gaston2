@@ -1,8 +1,10 @@
+#' @name snp.matrix
+#' @rdname snp.matrix
 #' @title SNP matrix
 #' 
+#' @description A class for manipulation of genotype data
 #' @exportClass snp.matrix
-#'
-setClass("snp.matrix", slots = c(ptr = "externalptr", file = "character", type = "character"))
+setClass("snp.matrix", slots = c(ptr = "externalptr", file = "characterOrNull", type = "character"))
 
 setMethod("show", "snp.matrix", 
   function(object) {

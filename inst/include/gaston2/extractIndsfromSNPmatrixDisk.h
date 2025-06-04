@@ -1,43 +1,15 @@
-#ifndef EXTRACTSNPMATRIX_H
-#define EXTRACTSNPMATRIX_H
-
 #include "SNPmatrix.h"
+#include "SNPvectorDisk.h"
+#include <iostream>
+#include <memory> // shared_ptr
+#include "mio.hpp"
+#include <cstring>
 
-/* /!\ Templated functions NEED to be in header !!*/
-
-// uneventful interface that does practically nothing, not even sure it is
-// wise to keep. Caller could also just call the c°, and avoid copying !
-template <typename intVec>
-SNPmatrix extractSNPsfromSNPmatrix(const SNPmatrix &other, const intVec &keep) {
-  return SNPmatrix(other, keep);
-}
-
-// filling up a new SNPmatrix with only the individuals at index specified in "keep"
-// This new SNPmatrix can exists in memory or be filled with SNPvectorDisk.
-template <typename intVec>
-void extractIndsfromSNPmatrixMemory(const SNPmatrix &other, const intVec &keep, SNPmatrix & newMat) {
-
-  const std::vector<std::shared_ptr<SNPvector>> otherSNPs = other.getSNPs();
-
-  for (const auto &snp : otherSNPs){
-    newMat.push_back(std::make_shared<SNPvectorMemory>(snp, keep));
-  }
-  //extract stats now and set stats_set_ to true
-  DataStruct original_dt = other.getIndStats();
-  newMat.setIndStats(DataStruct(original_dt, keep));
-}
+#ifndef _EXTRACTINDMATRIX_DISK_
+#define _EXTRACTINDMATRIX_DISK_
 
 template <typename intVec>
-SNPmatrix extractIndsfromSNPmatrixMemory(const SNPmatrix &other, const intVec &keep) {
-  SNPmatrix M;
-  extractIndsfromSNPmatrixMemory(other, keep, M);
-  return M;
-}
-
-
-// same for SNPvectorDisk
-template <typename intVec>
-void extractIndsfromSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, std::string path_str,SNPmatrix & newMat) {
+void extractIndsfromSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, std::string path_str, SNPmatrix & newMat) {
 
   std::error_code error;
 
@@ -96,4 +68,6 @@ SNPmatrix extractIndsfromSNPmatrixDisk(const SNPmatrix &other, const intVec &kee
   extractIndsfromSNPmatrixDisk(other, keep, path_str, M);
   return M;
 }
-#endif /*EXTRACTSNPMATRIX_H*/
+
+
+#endif 

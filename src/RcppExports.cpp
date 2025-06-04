@@ -149,40 +149,40 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// extractSNPsfromSNPmatrix_
-Rcpp::XPtr<SNPmatrix> extractSNPsfromSNPmatrix_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep);
-RcppExport SEXP _gaston2_extractSNPsfromSNPmatrix_(SEXP otherSEXP, SEXP keepSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type keep(keepSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractSNPsfromSNPmatrix_(other, keep));
-    return rcpp_result_gen;
-END_RCPP
-}
-// extractIndsfromSNPmatrixMemory_
-Rcpp::XPtr<SNPmatrix> extractIndsfromSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep);
-RcppExport SEXP _gaston2_extractIndsfromSNPmatrixMemory_(SEXP otherSEXP, SEXP keepSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type keep(keepSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractIndsfromSNPmatrixMemory_(other, keep));
-    return rcpp_result_gen;
-END_RCPP
-}
 // extractIndsfromSNPmatrixDisk_
-Rcpp::XPtr<SNPmatrix> extractIndsfromSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector& keep, std::string path_str);
+Rcpp::XPtr<SNPmatrix> extractIndsfromSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector keep, std::string path_str);
 RcppExport SEXP _gaston2_extractIndsfromSNPmatrixDisk_(SEXP otherSEXP, SEXP keepSEXP, SEXP path_strSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
-    Rcpp::traits::input_parameter< Rcpp::IntegerVector& >::type keep(keepSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type keep(keepSEXP);
     Rcpp::traits::input_parameter< std::string >::type path_str(path_strSEXP);
     rcpp_result_gen = Rcpp::wrap(extractIndsfromSNPmatrixDisk_(other, keep, path_str));
+    return rcpp_result_gen;
+END_RCPP
+}
+// extractIndsfromSNPmatrixMemory_
+Rcpp::XPtr<SNPmatrix> extractIndsfromSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector keep);
+RcppExport SEXP _gaston2_extractIndsfromSNPmatrixMemory_(SEXP otherSEXP, SEXP keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type keep(keepSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractIndsfromSNPmatrixMemory_(other, keep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// extractSNPsfromSNPmatrix_
+Rcpp::XPtr<SNPmatrix> extractSNPsfromSNPmatrix_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector keep);
+RcppExport SEXP _gaston2_extractSNPsfromSNPmatrix_(SEXP otherSEXP, SEXP keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type keep(keepSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractSNPsfromSNPmatrix_(other, keep));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -593,9 +593,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
     {"_gaston2_computeSNPStats", (DL_FUNC) &_gaston2_computeSNPStats, 1},
     {"_gaston2_dimSNPmatrix", (DL_FUNC) &_gaston2_dimSNPmatrix, 1},
-    {"_gaston2_extractSNPsfromSNPmatrix_", (DL_FUNC) &_gaston2_extractSNPsfromSNPmatrix_, 2},
-    {"_gaston2_extractIndsfromSNPmatrixMemory_", (DL_FUNC) &_gaston2_extractIndsfromSNPmatrixMemory_, 2},
     {"_gaston2_extractIndsfromSNPmatrixDisk_", (DL_FUNC) &_gaston2_extractIndsfromSNPmatrixDisk_, 3},
+    {"_gaston2_extractIndsfromSNPmatrixMemory_", (DL_FUNC) &_gaston2_extractIndsfromSNPmatrixMemory_, 2},
+    {"_gaston2_extractSNPsfromSNPmatrix_", (DL_FUNC) &_gaston2_extractSNPsfromSNPmatrix_, 2},
     {"_gaston2_getIndStats", (DL_FUNC) &_gaston2_getIndStats, 2},
     {"_gaston2_test_force_compute_indStats", (DL_FUNC) &_gaston2_test_force_compute_indStats, 1},
     {"_gaston2_getSNPStats", (DL_FUNC) &_gaston2_getSNPStats, 1},

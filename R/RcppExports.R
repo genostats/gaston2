@@ -45,16 +45,16 @@ dimSNPmatrix <- function(pM) {
     .Call(`_gaston2_dimSNPmatrix`, pM)
 }
 
-extractSNPsfromSNPmatrix_ <- function(other, keep) {
-    .Call(`_gaston2_extractSNPsfromSNPmatrix_`, other, keep)
+extractIndsfromSNPmatrixDisk_ <- function(other, keep, path_str) {
+    .Call(`_gaston2_extractIndsfromSNPmatrixDisk_`, other, keep, path_str)
 }
 
 extractIndsfromSNPmatrixMemory_ <- function(other, keep) {
     .Call(`_gaston2_extractIndsfromSNPmatrixMemory_`, other, keep)
 }
 
-extractIndsfromSNPmatrixDisk_ <- function(other, keep, path_str) {
-    .Call(`_gaston2_extractIndsfromSNPmatrixDisk_`, other, keep, path_str)
+extractSNPsfromSNPmatrix_ <- function(other, keep) {
+    .Call(`_gaston2_extractSNPsfromSNPmatrix_`, other, keep)
 }
 
 getIndStats <- function(pM, compute = TRUE) {
