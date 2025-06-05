@@ -25,8 +25,20 @@ LD_chunk_EM <- function(pM, i1, i2, j1, j2) {
     .Call(`_gaston2_LD_chunk_EM`, pM, i1, i2, j1, j2)
 }
 
-LD_square_bigmemory <- function(pM, i1, i2, path) {
-    invisible(.Call(`_gaston2_LD_square_bigmemory`, pM, i1, i2, path))
+LD_square_bigmemory <- function(pM, i1, i2, path, usefloat = TRUE) {
+    invisible(.Call(`_gaston2_LD_square_bigmemory`, pM, i1, i2, path, usefloat))
+}
+
+LD_chunk_bigmemory <- function(pM, i1, i2, j1, j2, path, usefloat = TRUE) {
+    invisible(.Call(`_gaston2_LD_chunk_bigmemory`, pM, i1, i2, j1, j2, path, usefloat))
+}
+
+LD_square_EM_bigmemory <- function(pM, i1, i2, path, usefloat = TRUE) {
+    invisible(.Call(`_gaston2_LD_square_EM_bigmemory`, pM, i1, i2, path, usefloat))
+}
+
+LD_chunk_EM_bigmemory <- function(pM, i1, i2, j1, j2, path, usefloat = TRUE) {
+    invisible(.Call(`_gaston2_LD_chunk_EM_bigmemory`, pM, i1, i2, j1, j2, path, usefloat))
 }
 
 SNPMatrixToIntegerMatrix <- function(pM) {

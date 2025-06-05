@@ -94,15 +94,62 @@ BEGIN_RCPP
 END_RCPP
 }
 // LD_square_bigmemory
-void LD_square_bigmemory(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, std::string path);
-RcppExport SEXP _gaston2_LD_square_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP) {
+void LD_square_bigmemory(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, std::string path, bool usefloat);
+RcppExport SEXP _gaston2_LD_square_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
-    LD_square_bigmemory(pM, i1, i2, path);
+    Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
+    LD_square_bigmemory(pM, i1, i2, path, usefloat);
+    return R_NilValue;
+END_RCPP
+}
+// LD_chunk_bigmemory
+void LD_chunk_bigmemory(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
+RcppExport SEXP _gaston2_LD_chunk_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
+    Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type j2(j2SEXP);
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
+    LD_chunk_bigmemory(pM, i1, i2, j1, j2, path, usefloat);
+    return R_NilValue;
+END_RCPP
+}
+// LD_square_EM_bigmemory
+void LD_square_EM_bigmemory(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, std::string path, bool usefloat);
+RcppExport SEXP _gaston2_LD_square_EM_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
+    LD_square_EM_bigmemory(pM, i1, i2, path, usefloat);
+    return R_NilValue;
+END_RCPP
+}
+// LD_chunk_EM_bigmemory
+void LD_chunk_EM_bigmemory(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
+RcppExport SEXP _gaston2_LD_chunk_EM_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
+    Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
+    Rcpp::traits::input_parameter< size_t >::type j2(j2SEXP);
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
+    LD_chunk_EM_bigmemory(pM, i1, i2, j1, j2, path, usefloat);
     return R_NilValue;
 END_RCPP
 }
@@ -610,7 +657,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_LD_pair_EM", (DL_FUNC) &_gaston2_LD_pair_EM, 3},
     {"_gaston2_LD_square_EM", (DL_FUNC) &_gaston2_LD_square_EM, 3},
     {"_gaston2_LD_chunk_EM", (DL_FUNC) &_gaston2_LD_chunk_EM, 5},
-    {"_gaston2_LD_square_bigmemory", (DL_FUNC) &_gaston2_LD_square_bigmemory, 4},
+    {"_gaston2_LD_square_bigmemory", (DL_FUNC) &_gaston2_LD_square_bigmemory, 5},
+    {"_gaston2_LD_chunk_bigmemory", (DL_FUNC) &_gaston2_LD_chunk_bigmemory, 7},
+    {"_gaston2_LD_square_EM_bigmemory", (DL_FUNC) &_gaston2_LD_square_EM_bigmemory, 5},
+    {"_gaston2_LD_chunk_EM_bigmemory", (DL_FUNC) &_gaston2_LD_chunk_EM_bigmemory, 7},
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
     {"_gaston2_computeSNPStats", (DL_FUNC) &_gaston2_computeSNPStats, 1},

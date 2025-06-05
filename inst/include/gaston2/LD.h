@@ -5,7 +5,6 @@
 #include <stdexcept>
 #include "debug.h"
 
-  // Question : getSNP ne pourrait pas renvoyer une référence à un snp ? A-t-on jamais besoin de récupérer le shared pointeur ?
 
 #ifndef _LD_matrix_
 #define _LD_matrix_

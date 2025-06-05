@@ -7,7 +7,7 @@ Rcpp::DataFrame DataStructToDataFrame(const DataStruct & DS);
 
 // [[Rcpp::export]]
 Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix> pM, bool compute = true) {
-  if(compute) pM->compute_indStats();
+  if (compute) pM->compute_indStats(compute); // to force recomputing, if never accessed before, even with no force will compute
   return DataStructToDataFrame( pM->getIndStats() );
 }
 
