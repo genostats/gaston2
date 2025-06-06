@@ -4,7 +4,7 @@
 
 
 // [[Rcpp::export]]
-Rcpp::IntegerVector dimSNPmatrix(Rcpp::XPtr<SNPmatrix> pM) {
+Rcpp::IntegerVector dimSNPmatrix(Rcpp::XPtr<SNPmatrix<>> pM) {
   return Rcpp::IntegerVector::create(pM->nbInds(), pM->nbSNPs());
 }
 

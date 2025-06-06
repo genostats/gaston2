@@ -3,7 +3,7 @@
 #include <Rcpp.h>
 
 // [[Rcpp::export]]
-Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix> pM) {
+Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix<>> pM) {
   unsigned int nbSNPs = pM->nbSNPs();
   unsigned int nbInds = pM->nbInds();
   Rcpp::IntegerMatrix R(nbInds, nbSNPs);

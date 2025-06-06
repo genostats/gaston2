@@ -27,7 +27,7 @@
  * @param M reference to an originally empty SNPmatrix
  */
 
-void readBedFileMemory(std::string bedfile, std::string bimfile, std::string famfile, SNPmatrix & M) {
+void readBedFileMemory(std::string bedfile, std::string bimfile, std::string famfile, SNPmatrix<> & M) {
   // first read bim and fam file, to determine size
   M.readFamFile(famfile);
   M.readBimFile(bimfile);
@@ -63,16 +63,16 @@ void readBedFileMemory(std::string bedfile, std::string bimfile, std::string fam
   file.close();
 }
 
-SNPmatrix readBedFileMemory(std::string bedfile, std::string bimfile, std::string famfile) {
-  SNPmatrix M;
+SNPmatrix<> readBedFileMemory(std::string bedfile, std::string bimfile, std::string famfile) {
+  SNPmatrix<> M;
   readBedFileMemory(bedfile, bimfile, famfile, M);
   return M;
 }
 
 // R exported function
 // [[Rcpp::export]]
-Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string bedfile, std::string bimfile, std::string famfile) {
-  Rcpp::XPtr<SNPmatrix> pM(new SNPmatrix);
+Rcpp::XPtr<SNPmatrix<>> readBedFileMemory_(std::string bedfile, std::string bimfile, std::string famfile) {
+  Rcpp::XPtr<SNPmatrix<>> pM(new SNPmatrix<>);
   readBedFileMemory(bedfile, bimfile, famfile, *pM);
   return pM;
 }

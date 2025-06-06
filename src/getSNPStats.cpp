@@ -6,7 +6,7 @@
 Rcpp::DataFrame DataStructToDataFrame(const DataStruct & DS);
 
 // [[Rcpp::export]]
-Rcpp::DataFrame getSNPStats(Rcpp::XPtr<SNPmatrix> pM) {
+Rcpp::DataFrame getSNPStats(Rcpp::XPtr<SNPmatrix<>> pM) {
   return DataStructToDataFrame( pM->getSNPStats() );
 }
 

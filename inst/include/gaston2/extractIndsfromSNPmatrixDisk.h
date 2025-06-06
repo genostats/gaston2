@@ -8,8 +8,9 @@
 #ifndef _EXTRACTINDMATRIX_DISK_
 #define _EXTRACTINDMATRIX_DISK_
 
-template <typename intVec>
-void extractIndsfromSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, std::string path_str, SNPmatrix & newMat) {
+template <typename SNPvectorClass, typename intVec>
+void extractIndsfromSNPmatrixDisk(const SNPmatrix<SNPvectorClass> &other, const intVec &keep, std::string path_str, 
+                                  SNPmatrix<SNPvectorClass> & newMat) {
 
   std::error_code error;
 
@@ -62,9 +63,9 @@ void extractIndsfromSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, st
   newMat.setIndStats(DataStruct(original_dt, keep));
 }
 
-template <typename intVec>
-SNPmatrix extractIndsfromSNPmatrixDisk(const SNPmatrix &other, const intVec &keep, std::string path_str) {
-  SNPmatrix M;
+template <typename SNPvectorClass, typename intVec>
+SNPmatrix<SNPvectorClass> extractIndsfromSNPmatrixDisk(const SNPmatrix<SNPvectorClass> &other, const intVec &keep, std::string path_str) {
+  SNPmatrix<SNPvectorClass> M;
   extractIndsfromSNPmatrixDisk(other, keep, path_str, M);
   return M;
 }

@@ -12,12 +12,12 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // LD_pair
-double LD_pair(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2);
+double LD_pair(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2);
 RcppExport SEXP _gaston2_LD_pair(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     rcpp_result_gen = Rcpp::wrap(LD_pair(pM, i1, i2));
@@ -25,12 +25,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // LD_square
-Rcpp::NumericMatrix LD_square(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2);
+Rcpp::NumericMatrix LD_square(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2);
 RcppExport SEXP _gaston2_LD_square(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     rcpp_result_gen = Rcpp::wrap(LD_square(pM, i1, i2));
@@ -38,12 +38,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // LD_chunk
-Rcpp::NumericMatrix LD_chunk(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, size_t j1, size_t j2);
+Rcpp::NumericMatrix LD_chunk(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2);
 RcppExport SEXP _gaston2_LD_chunk(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
@@ -53,12 +53,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // LD_pair_EM
-double LD_pair_EM(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2);
+double LD_pair_EM(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2);
 RcppExport SEXP _gaston2_LD_pair_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     rcpp_result_gen = Rcpp::wrap(LD_pair_EM(pM, i1, i2));
@@ -66,12 +66,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // LD_square_EM
-Rcpp::NumericMatrix LD_square_EM(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2);
+Rcpp::NumericMatrix LD_square_EM(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2);
 RcppExport SEXP _gaston2_LD_square_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     rcpp_result_gen = Rcpp::wrap(LD_square_EM(pM, i1, i2));
@@ -79,12 +79,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // LD_chunk_EM
-Rcpp::NumericMatrix LD_chunk_EM(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, size_t j1, size_t j2);
+Rcpp::NumericMatrix LD_chunk_EM(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2);
 RcppExport SEXP _gaston2_LD_chunk_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
@@ -94,11 +94,11 @@ BEGIN_RCPP
 END_RCPP
 }
 // LD_square_bigmemory
-void LD_square_bigmemory(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, std::string path, bool usefloat);
+void LD_square_bigmemory(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, std::string path, bool usefloat);
 RcppExport SEXP _gaston2_LD_square_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
@@ -108,11 +108,11 @@ BEGIN_RCPP
 END_RCPP
 }
 // LD_chunk_bigmemory
-void LD_chunk_bigmemory(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
+void LD_chunk_bigmemory(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
 RcppExport SEXP _gaston2_LD_chunk_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
@@ -124,11 +124,11 @@ BEGIN_RCPP
 END_RCPP
 }
 // LD_square_EM_bigmemory
-void LD_square_EM_bigmemory(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, std::string path, bool usefloat);
+void LD_square_EM_bigmemory(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, std::string path, bool usefloat);
 RcppExport SEXP _gaston2_LD_square_EM_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
@@ -138,11 +138,11 @@ BEGIN_RCPP
 END_RCPP
 }
 // LD_chunk_EM_bigmemory
-void LD_chunk_EM_bigmemory(Rcpp::XPtr<SNPmatrix> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
+void LD_chunk_EM_bigmemory(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
 RcppExport SEXP _gaston2_LD_chunk_EM_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
@@ -154,55 +154,55 @@ BEGIN_RCPP
 END_RCPP
 }
 // SNPMatrixToIntegerMatrix
-Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix> pM);
+Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_SNPMatrixToIntegerMatrix(SEXP pMSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     rcpp_result_gen = Rcpp::wrap(SNPMatrixToIntegerMatrix(pM));
     return rcpp_result_gen;
 END_RCPP
 }
 // SNPMatrixToNumericMatrix
-Rcpp::NumericMatrix SNPMatrixToNumericMatrix(Rcpp::XPtr<SNPmatrix> pM);
+Rcpp::NumericMatrix SNPMatrixToNumericMatrix(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_SNPMatrixToNumericMatrix(SEXP pMSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     rcpp_result_gen = Rcpp::wrap(SNPMatrixToNumericMatrix(pM));
     return rcpp_result_gen;
 END_RCPP
 }
 // computeSNPStats
-void computeSNPStats(Rcpp::XPtr<SNPmatrix> pM);
+void computeSNPStats(Rcpp::XPtr<SNPmatrix<SNPvector>> pM);
 RcppExport SEXP _gaston2_computeSNPStats(SEXP pMSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPvector>> >::type pM(pMSEXP);
     computeSNPStats(pM);
     return R_NilValue;
 END_RCPP
 }
 // dimSNPmatrix
-Rcpp::IntegerVector dimSNPmatrix(Rcpp::XPtr<SNPmatrix> pM);
+Rcpp::IntegerVector dimSNPmatrix(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_dimSNPmatrix(SEXP pMSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     rcpp_result_gen = Rcpp::wrap(dimSNPmatrix(pM));
     return rcpp_result_gen;
 END_RCPP
 }
 // extractIndsfromSNPmatrixDisk_
-Rcpp::XPtr<SNPmatrix> extractIndsfromSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector keep, std::string path_str);
+Rcpp::XPtr<SNPmatrix<>> extractIndsfromSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix<>> other, Rcpp::IntegerVector keep, std::string path_str);
 RcppExport SEXP _gaston2_extractIndsfromSNPmatrixDisk_(SEXP otherSEXP, SEXP keepSEXP, SEXP path_strSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type other(otherSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type keep(keepSEXP);
     Rcpp::traits::input_parameter< std::string >::type path_str(path_strSEXP);
     rcpp_result_gen = Rcpp::wrap(extractIndsfromSNPmatrixDisk_(other, keep, path_str));
@@ -210,80 +210,80 @@ BEGIN_RCPP
 END_RCPP
 }
 // extractIndsfromSNPmatrixMemory_
-Rcpp::XPtr<SNPmatrix> extractIndsfromSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector keep);
+Rcpp::XPtr<SNPmatrix<>> extractIndsfromSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix<>> other, Rcpp::IntegerVector keep);
 RcppExport SEXP _gaston2_extractIndsfromSNPmatrixMemory_(SEXP otherSEXP, SEXP keepSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type other(otherSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type keep(keepSEXP);
     rcpp_result_gen = Rcpp::wrap(extractIndsfromSNPmatrixMemory_(other, keep));
     return rcpp_result_gen;
 END_RCPP
 }
 // extractSNPsfromSNPmatrix_
-Rcpp::XPtr<SNPmatrix> extractSNPsfromSNPmatrix_(Rcpp::XPtr<SNPmatrix> other, Rcpp::IntegerVector keep);
+Rcpp::XPtr<SNPmatrix<>> extractSNPsfromSNPmatrix_(Rcpp::XPtr<SNPmatrix<>> other, Rcpp::IntegerVector keep);
 RcppExport SEXP _gaston2_extractSNPsfromSNPmatrix_(SEXP otherSEXP, SEXP keepSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type other(otherSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type other(otherSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type keep(keepSEXP);
     rcpp_result_gen = Rcpp::wrap(extractSNPsfromSNPmatrix_(other, keep));
     return rcpp_result_gen;
 END_RCPP
 }
 // getIndStats
-Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix> pM, bool compute);
+Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix<>> pM, bool compute);
 RcppExport SEXP _gaston2_getIndStats(SEXP pMSEXP, SEXP computeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< bool >::type compute(computeSEXP);
     rcpp_result_gen = Rcpp::wrap(getIndStats(pM, compute));
     return rcpp_result_gen;
 END_RCPP
 }
 // test_force_compute_indStats
-void test_force_compute_indStats(Rcpp::XPtr<SNPmatrix> pM);
+void test_force_compute_indStats(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_test_force_compute_indStats(SEXP pMSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     test_force_compute_indStats(pM);
     return R_NilValue;
 END_RCPP
 }
 // getMode
-std::string getMode(Rcpp::XPtr<SNPmatrix> pM);
+std::string getMode(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_getMode(SEXP pMSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     rcpp_result_gen = Rcpp::wrap(getMode(pM));
     return rcpp_result_gen;
 END_RCPP
 }
 // getSNPStats
-Rcpp::DataFrame getSNPStats(Rcpp::XPtr<SNPmatrix> pM);
+Rcpp::DataFrame getSNPStats(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_getSNPStats(SEXP pMSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     rcpp_result_gen = Rcpp::wrap(getSNPStats(pM));
     return rcpp_result_gen;
 END_RCPP
 }
 // grm
-Rcpp::NumericMatrix grm(Rcpp::XPtr<SNPmatrix> pM);
+Rcpp::NumericMatrix grm(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_grm(SEXP pMSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     rcpp_result_gen = Rcpp::wrap(grm(pM));
     return rcpp_result_gen;
 END_RCPP
@@ -300,7 +300,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // readBedFileDisk_
-Rcpp::XPtr<SNPmatrix> readBedFileDisk_(std::string bedfile, std::string bimfile, std::string famfile);
+Rcpp::XPtr<SNPmatrix<>> readBedFileDisk_(std::string bedfile, std::string bimfile, std::string famfile);
 RcppExport SEXP _gaston2_readBedFileDisk_(SEXP bedfileSEXP, SEXP bimfileSEXP, SEXP famfileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -313,7 +313,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // readBedFileMemory_
-Rcpp::XPtr<SNPmatrix> readBedFileMemory_(std::string bedfile, std::string bimfile, std::string famfile);
+Rcpp::XPtr<SNPmatrix<>> readBedFileMemory_(std::string bedfile, std::string bimfile, std::string famfile);
 RcppExport SEXP _gaston2_readBedFileMemory_(SEXP bedfileSEXP, SEXP bimfileSEXP, SEXP famfileSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -326,33 +326,33 @@ BEGIN_RCPP
 END_RCPP
 }
 // readBimFile
-void readBimFile(Rcpp::XPtr<SNPmatrix> pM, std::string bimFile);
+void readBimFile(Rcpp::XPtr<SNPmatrix<>> pM, std::string bimFile);
 RcppExport SEXP _gaston2_readBimFile(SEXP pMSEXP, SEXP bimFileSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< std::string >::type bimFile(bimFileSEXP);
     readBimFile(pM, bimFile);
     return R_NilValue;
 END_RCPP
 }
 // readFamFile
-void readFamFile(Rcpp::XPtr<SNPmatrix> pM, std::string famFile);
+void readFamFile(Rcpp::XPtr<SNPmatrix<>> pM, std::string famFile);
 RcppExport SEXP _gaston2_readFamFile(SEXP pMSEXP, SEXP famFileSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< std::string >::type famFile(famFileSEXP);
     readFamFile(pM, famFile);
     return R_NilValue;
 END_RCPP
 }
 // setMode
-void setMode(Rcpp::XPtr<SNPmatrix> pM, std::string mode);
+void setMode(Rcpp::XPtr<SNPmatrix<>> pM, std::string mode);
 RcppExport SEXP _gaston2_setMode(SEXP pMSEXP, SEXP modeSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< std::string >::type mode(modeSEXP);
     setMode(pM, mode);
     return R_NilValue;

@@ -15,6 +15,7 @@
  * (either SNPvectorDisk or SNPvectorMemory)
  *
  */
+template<typename SNPvectorClass = SNPvector>
 class SNPmatrix
 {
 public:
@@ -23,7 +24,7 @@ public:
    * SNPs of the matrix. /!\ will check if the SNP added is matching in size
    *
    */
-  void push_back(std::shared_ptr<SNPvector> v)
+  void push_back(std::shared_ptr<SNPvectorClass> v)
   {
     // if at least one loaded, everySNPs must have same size
     if (nbSNPs() > 0 && nbInds() != v->nbInds())
@@ -78,8 +79,8 @@ public:
    * @return the new SNPmatrix
    */
   template <typename intVec>
-  SNPmatrix(const SNPmatrix &other, intVec keep) {
-    const std::vector<std::shared_ptr<SNPvector>> otherSNPs = other.getSNPs();
+  SNPmatrix(const SNPmatrix<SNPvectorClass> &other, intVec keep) {
+    const std::vector<std::shared_ptr<SNPvectorClass>> otherSNPs = other.getSNPs();
     for (auto keep_idx : keep) {
       this->push_back(otherSNPs.at(keep_idx)); // at is supposed to do bound checking
     }
@@ -87,7 +88,7 @@ public:
     // so c° is setting indStatsComputed_ to false by default
   }
 
-#pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
+// #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
     initializer(omp_priv = decltype(omp_orig)(omp_orig.size(), 0))
 
 // Stocking in Datastruct indStats_ the number of occurrences of 0, 1, 2, and NAs for all individuals,
@@ -105,7 +106,7 @@ public:
     //filled with 0 by default
     std::vector<int> unordered_stats(nbInds * 4, 0); // DO NOT USE nbCHars ! rounded up !
 
-#pragma omp parallel for reduction(vec_int_plus : unordered_stats)
+// #pragma omp parallel for reduction(vec_int_plus : unordered_stats)
     for (size_t i = 0; i < nbSNPs; i++) { // parcourt tous les SNPs
       SNPs_[i]->compute_indStats(unordered_stats);
     }
@@ -132,12 +133,12 @@ public:
     indStatsComputed_ = true;
   }
 
-  const std::vector<std::shared_ptr<SNPvector>> &getSNPs() const
+  const std::vector<std::shared_ptr<SNPvectorClass>> &getSNPs() const
   {
     return SNPs_;
   }
 
-  const std::shared_ptr<SNPvector> &getSNP(size_t i) const
+  const std::shared_ptr<SNPvectorClass> &getSNP(size_t i) const
   {
     return SNPs_[i];
   }
@@ -220,7 +221,7 @@ private:
   // stats and informations
   DataStruct indStats_;   // will contain fam file + statistiques
   DataStruct snpStats_;   // will contain bim file + ?
-  std::vector<std::shared_ptr<SNPvector>> SNPs_;
+  std::vector<std::shared_ptr<SNPvectorClass>> SNPs_;
   bool indStatsComputed_ = false;
   Mode mode_ = RAW_VALUES;
 };

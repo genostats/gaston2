@@ -10,8 +10,8 @@
 
 
 // filling up a new SNPmatrix with only the individuals at index specified in "keep"
-template <typename intVec>
-void extractIndsfromSNPmatrixMemory(const SNPmatrix &other, const intVec &keep, SNPmatrix & newMat) {
+template <typename SNPvectorClass, typename intVec>
+void extractIndsfromSNPmatrixMemory(const SNPmatrix<SNPvectorClass> &other, const intVec &keep, SNPmatrix<SNPvectorClass> & newMat) {
 
   const std::vector<std::shared_ptr<SNPvector>> otherSNPs = other.getSNPs();
 
@@ -23,9 +23,9 @@ void extractIndsfromSNPmatrixMemory(const SNPmatrix &other, const intVec &keep, 
   newMat.setIndStats(DataStruct(original_dt, keep));
 }
 
-template <typename intVec>
-SNPmatrix extractIndsfromSNPmatrixMemory(const SNPmatrix &other, const intVec &keep) {
-  SNPmatrix M;
+template <typename SNPvectorClass, typename intVec>
+SNPmatrix<SNPvectorClass> extractIndsfromSNPmatrixMemory(const SNPmatrix<SNPvectorClass> &other, const intVec &keep) {
+  SNPmatrix<SNPvectorClass> M;
   extractIndsfromSNPmatrixMemory(other, keep, M);
   return M;
 }

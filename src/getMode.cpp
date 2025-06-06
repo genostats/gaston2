@@ -4,7 +4,7 @@
 
 
 // [[Rcpp::export]]
-std::string getMode(Rcpp::XPtr<SNPmatrix> pM) {
+std::string getMode(Rcpp::XPtr<SNPmatrix<>> pM) {
   return modeToString(pM->mode());
 }
 

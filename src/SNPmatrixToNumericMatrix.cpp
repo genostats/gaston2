@@ -3,7 +3,7 @@
 #include <Rcpp.h>
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix SNPMatrixToNumericMatrix(Rcpp::XPtr<SNPmatrix> pM) {
+Rcpp::NumericMatrix SNPMatrixToNumericMatrix(Rcpp::XPtr<SNPmatrix<>> pM) {
   unsigned int nbSNPs = pM->nbSNPs();
   unsigned int nbInds = pM->nbInds();
   Rcpp::NumericMatrix R(nbInds, nbSNPs);

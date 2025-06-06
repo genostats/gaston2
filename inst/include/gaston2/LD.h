@@ -15,14 +15,14 @@ enum LDalgorithm { moments, EM };
 // of partial specialization of templated functions
 //
 // calcule le LD d'une pair de SNP...
-template<LDalgorithm Algo, typename scalar_t = double>
+template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass = SNPvector>
 class LD_pair_f;
 
 // ... par la méthode des moments
-template<typename scalar_t> 
-class LD_pair_f<LDalgorithm::moments, scalar_t>{
+template<typename scalar_t, typename SNPvectorClass>
+class LD_pair_f<LDalgorithm::moments, scalar_t, SNPvectorClass>{
   public:
-  inline scalar_t operator()(SNPmatrix & M, size_t i1, size_t i2) {
+  inline scalar_t operator()(SNPmatrix<SNPvectorClass> & M, size_t i1, size_t i2) {
     SNPvector & snp1 = *(M.getSNP(i1));
     SNPvector & snp2 = *(M.getSNP(i2));
     return snp1.LD<scalar_t>(snp2);
@@ -30,10 +30,10 @@ class LD_pair_f<LDalgorithm::moments, scalar_t>{
 };
 
 // ... par l'algo EM
-template<typename scalar_t>
-class LD_pair_f<LDalgorithm::EM, scalar_t> {
+template<typename scalar_t, typename SNPvectorClass>
+class LD_pair_f<LDalgorithm::EM, scalar_t, SNPvectorClass> {
   public:
-  inline scalar_t operator()(SNPmatrix & M, size_t i1, size_t i2) {
+  inline scalar_t operator()(SNPmatrix<SNPvectorClass> & M, size_t i1, size_t i2) {
     richArray<9, unsigned int> table;
     SNPvector & snp1 = *(M.getSNP(i1));
     SNPvector & snp2 = *(M.getSNP(i2));
@@ -49,8 +49,8 @@ class LD_pair_f<LDalgorithm::EM, scalar_t> {
 // doit être ok avec n'importe quelle classe de matrice qui a des membres nrow() ncol() et l'affectation par M(i,j) = ...
 // (column major mode matrix)
  
-template<LDalgorithm Algo, typename scalar_t = double, typename matrixType>
-void LD_matrix(SNPmatrix & A, size_t c1, size_t c2, matrixType & M) {
+template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
+void LD_matrix(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, matrixType & M) {
   if(c1 >= A.size() || c2 >= A.size()) throw std::runtime_error("Bad bound in LD_matrix");
   const size_t n = c2-c1+1;
   if(n != M.nrow() || n != M.ncol()) {
@@ -90,8 +90,8 @@ void LD_matrix(SNPmatrix & A, size_t c1, size_t c2, matrixType & M) {
 /**** DON'T CALL THESE FUNCTIONS DIRECTLY, USE THE FINAL FUNCTION WHICH DOES THE DISPATCHING ****/
 
 // Intervalles c1 c2 et d1 d2 disjoints [sauf possiblement un point sur la diagonale, mais pas de calculs en double]
-template<LDalgorithm Algo, typename scalar_t = double, typename matrixType>
-void LD_chunk_0(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
+void LD_chunk_0(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
   if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_0");
 
@@ -105,8 +105,8 @@ void LD_chunk_0(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matri
 }
 
 // c1 <= d1 < c2 <= d2
-template<LDalgorithm Algo, typename scalar_t = double, typename matrixType>
-void LD_chunk_1(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
+void LD_chunk_1(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
   if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_1");
 
@@ -135,8 +135,8 @@ void LD_chunk_1(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matri
 
 
 // d1 <= c1 < d2 < =c2
-template<LDalgorithm Algo, typename scalar_t = double, typename matrixType>
-void LD_chunk_2(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
+void LD_chunk_2(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
   if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_2");
 
@@ -164,8 +164,8 @@ void LD_chunk_2(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matri
 }
 
 // d1 < c1 <= c2 < d2
-template<LDalgorithm Algo, typename scalar_t = double, typename matrixType>
-void LD_chunk_3(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
+void LD_chunk_3(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
   if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_3");
 
@@ -194,8 +194,8 @@ void LD_chunk_3(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matri
 
 
 // c1 <= d1 <= d2 <= c2 
-template<LDalgorithm Algo, typename scalar_t = double, typename matrixType>
-void LD_chunk_4(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
+void LD_chunk_4(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
   if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_4");
 
@@ -224,8 +224,8 @@ void LD_chunk_4(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matri
 
 
 // Cette fonction fait le choix de la bonne fonction
-template<LDalgorithm Algo, typename scalar_t = double, typename matrixType>
-void LD_chunk(SNPmatrix & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
+void LD_chunk(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
   if(c2 <= d1 || d2 <= c1)
     LD_chunk_0<Algo, scalar_t>(A, c1, c2, d1, d2, M);
   else if(c1 <= d1 && c2 <= d2)

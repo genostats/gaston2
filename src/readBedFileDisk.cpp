@@ -18,8 +18,7 @@
 #include <cstring>
 #include <Rcpp.h>
 
-
-void readBedFileDisk(std::string bedfile, std::string bimfile, std::string famfile, SNPmatrix & M) {
+void readBedFileDisk(std::string bedfile, std::string bimfile, std::string famfile, SNPmatrix<> & M) {
   // first read bim and fam file, to determine size
   M.readFamFile(famfile);
   M.readBimFile(bimfile);
@@ -80,8 +79,8 @@ void readBedFileDisk(std::string bedfile, std::string bimfile, std::string famfi
  * @return a SNPmatrix, stocking shared_ptrs to SNPvectorDisk 
 */
 
-SNPmatrix readBedFileDisk(std::string bedfile, std::string bimfile, std::string famfile) {
-  SNPmatrix M;
+SNPmatrix<> readBedFileDisk(std::string bedfile, std::string bimfile, std::string famfile) {
+  SNPmatrix<> M;
   readBedFileDisk(bedfile, bimfile, famfile, M);
   return M;
 }
@@ -89,8 +88,8 @@ SNPmatrix readBedFileDisk(std::string bedfile, std::string bimfile, std::string 
 
 // R exported function
 // [[Rcpp::export]]
-Rcpp::XPtr<SNPmatrix> readBedFileDisk_(std::string bedfile, std::string bimfile, std::string famfile) {
-  Rcpp::XPtr<SNPmatrix> pM(new SNPmatrix);
+Rcpp::XPtr<SNPmatrix<>> readBedFileDisk_(std::string bedfile, std::string bimfile, std::string famfile) {
+  Rcpp::XPtr<SNPmatrix<>> pM(new SNPmatrix<>);
   readBedFileDisk(bedfile, bimfile, famfile, *pM);
   return pM;
 }

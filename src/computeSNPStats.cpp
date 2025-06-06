@@ -2,6 +2,6 @@
 #include <Rcpp.h>
 
 // [[Rcpp::export]]
-void computeSNPStats(Rcpp::XPtr<SNPmatrix> pM) {
+void computeSNPStats(Rcpp::XPtr<SNPmatrix<SNPvector>> pM) {
   pM->computeSNPStats();
 }

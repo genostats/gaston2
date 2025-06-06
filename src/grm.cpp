@@ -3,7 +3,7 @@
 #include <Rcpp.h>
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix grm(Rcpp::XPtr<SNPmatrix> pM) {
+Rcpp::NumericMatrix grm(Rcpp::XPtr<SNPmatrix<>> pM) {
   unsigned int nbSNPs = pM->nbSNPs();
   unsigned int nbInds = pM->nbInds();
   std::vector<float> V( (nbInds*(nbInds + 1))/2 );
