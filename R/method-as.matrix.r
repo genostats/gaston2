@@ -1,3 +1,5 @@
+#' @name as.matrix.snp.matrix
+#'
 #' @exportS3Method as.matrix snp.matrix
 as.matrix.snp.matrix <- function(x, ...) {
   mode <- get.mode(x)

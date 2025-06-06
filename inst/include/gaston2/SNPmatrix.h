@@ -34,6 +34,7 @@ public:
       std::cerr << "Pb loading SNP" << std::endl;
       throw std::out_of_range("Attempting to load a SNP with a different nb of individuals");
     }
+    v->setMode(mode_);
     SNPs_.push_back(v);
     indStatsComputed_ = false; // si on ajoute des SNP les stats individuelles doivent être recalculées
   }
@@ -213,7 +214,7 @@ public:
     mode_ = mode;
   }
 
-  // TODO (to thinkà there might be a problem if SNPs are not all in the same mode...
+  // TODO (to think) there might be a problem if SNPs are not all in the same mode...
   // possible solution : enforce mode when push_back is done ?
   inline Mode mode() {
     return mode_;
