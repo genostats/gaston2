@@ -1,9 +1,10 @@
 #include "SNPmatrix.h"
+#include "SNPdosage.h"
 #include <iostream>
 #include <Rcpp.h>
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix SNPMatrixToNumericMatrix(Rcpp::XPtr<SNPmatrix<>> pM) {
+Rcpp::NumericMatrix DoseMatrixToNumericMatrix(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM) {
   unsigned int nbSNPs = pM->nbSNPs();
   unsigned int nbInds = pM->nbInds();
   Rcpp::NumericMatrix R(nbInds, nbSNPs);
@@ -16,5 +17,3 @@ Rcpp::NumericMatrix SNPMatrixToNumericMatrix(Rcpp::XPtr<SNPmatrix<>> pM) {
   }
   return R;
 }
-
-

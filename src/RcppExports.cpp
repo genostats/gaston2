@@ -11,6 +11,17 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// DoseMatrixToNumericMatrix
+Rcpp::NumericMatrix DoseMatrixToNumericMatrix(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM);
+RcppExport SEXP _gaston2_DoseMatrixToNumericMatrix(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type pM(pMSEXP);
+    rcpp_result_gen = Rcpp::wrap(DoseMatrixToNumericMatrix(pM));
+    return rcpp_result_gen;
+END_RCPP
+}
 // LD_pair
 double LD_pair(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2);
 RcppExport SEXP _gaston2_LD_pair(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
@@ -336,6 +347,32 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// readDosFileMemory_
+Rcpp::XPtr<SNPmatrix<SNPdosage>> readDosFileMemory_(std::string bedfile, std::string bimfile, std::string famfile);
+RcppExport SEXP _gaston2_readDosFileMemory_(SEXP bedfileSEXP, SEXP bimfileSEXP, SEXP famfileSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type bedfile(bedfileSEXP);
+    Rcpp::traits::input_parameter< std::string >::type bimfile(bimfileSEXP);
+    Rcpp::traits::input_parameter< std::string >::type famfile(famfileSEXP);
+    rcpp_result_gen = Rcpp::wrap(readDosFileMemory_(bedfile, bimfile, famfile));
+    return rcpp_result_gen;
+END_RCPP
+}
+// readDosFileDisk_
+Rcpp::XPtr<SNPmatrix<SNPdosage>> readDosFileDisk_(std::string bedfile, std::string bimfile, std::string famfile);
+RcppExport SEXP _gaston2_readDosFileDisk_(SEXP bedfileSEXP, SEXP bimfileSEXP, SEXP famfileSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type bedfile(bedfileSEXP);
+    Rcpp::traits::input_parameter< std::string >::type bimfile(bimfileSEXP);
+    Rcpp::traits::input_parameter< std::string >::type famfile(famfileSEXP);
+    rcpp_result_gen = Rcpp::wrap(readDosFileDisk_(bedfile, bimfile, famfile));
+    return rcpp_result_gen;
+END_RCPP
+}
 // readFamFile
 void readFamFile(Rcpp::XPtr<SNPmatrix<>> pM, std::string famFile);
 RcppExport SEXP _gaston2_readFamFile(SEXP pMSEXP, SEXP famFileSEXP) {
@@ -651,6 +688,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_gaston2_DoseMatrixToNumericMatrix", (DL_FUNC) &_gaston2_DoseMatrixToNumericMatrix, 1},
     {"_gaston2_LD_pair", (DL_FUNC) &_gaston2_LD_pair, 3},
     {"_gaston2_LD_square", (DL_FUNC) &_gaston2_LD_square, 3},
     {"_gaston2_LD_chunk", (DL_FUNC) &_gaston2_LD_chunk, 5},
@@ -677,6 +715,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_readBedFileDisk_", (DL_FUNC) &_gaston2_readBedFileDisk_, 3},
     {"_gaston2_readBedFileMemory_", (DL_FUNC) &_gaston2_readBedFileMemory_, 3},
     {"_gaston2_readBimFile", (DL_FUNC) &_gaston2_readBimFile, 2},
+    {"_gaston2_readDosFileMemory_", (DL_FUNC) &_gaston2_readDosFileMemory_, 3},
+    {"_gaston2_readDosFileDisk_", (DL_FUNC) &_gaston2_readDosFileDisk_, 3},
     {"_gaston2_readFamFile", (DL_FUNC) &_gaston2_readFamFile, 2},
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},
     {"_gaston2_test_ds", (DL_FUNC) &_gaston2_test_ds, 2},

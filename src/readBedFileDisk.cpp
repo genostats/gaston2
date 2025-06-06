@@ -55,15 +55,12 @@ void readBedFileDisk(std::string bedfile, std::string bimfile, std::string famfi
     throw std::runtime_error("Not a bed file in SNP major mode");
   }
 
-  auto file_offset = 3; // BCOS MAGIC BYTES 
   for(size_t i = 0; i < n_snp; i++) {
     std::shared_ptr<SNPvectorDisk<mio::access_mode::read>> snpVec(new SNPvectorDisk<mio::access_mode::read>(n_ind,file_ptr, i));
     //data should be taken by file_ptr
 
     size_t n = snpVec->nbChars(); // func inherited from SNPVec, gives back size used by SNP
     M.push_back(snpVec);
-    // Increment the file offset based on the size of the data
-    file_offset += n;
   }
 }
 
