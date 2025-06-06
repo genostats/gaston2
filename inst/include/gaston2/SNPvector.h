@@ -77,12 +77,6 @@ protected: // can be accessed also by class inheriting
   double mu_ = 0;
   double sigma_ = 0;
 
-  // just a small helper f° to extract an individual genotype from a byte
-  inline uint8_t read_ind(uint8_t byte, size_t ind_idx) {
-    byte >>= (2 * (ind_idx % 4));
-    return byte & 3; // extraction des bits correspondant
-  }
-
   // an array for transformed genotype (either centered, standardized, etc)
   // values can be changed by function setMode
   // default values = "raw genotypes" with a 3 for NA (could be set to NaN ? to be considered)
@@ -151,6 +145,12 @@ protected: // can be accessed also by class inheriting
       default:
         throw std::runtime_error("Private function computeScaledMode called with bad mode value");
     }
+  }
+
+  // just a small helper f° to extract an individual genotype from a byte
+  inline uint8_t read_ind(uint8_t byte, size_t ind_idx) {
+    byte >>= (2 * (ind_idx % 4));
+    return byte & 3; // extraction des bits correspondant
   }
 
 public:
@@ -339,6 +339,43 @@ public:
     /* FINALLY : updating the "mode" enum that acts as a filter
      to get calculated via mu_and sigma_*/
     computeMode();
+  }
+
+
+  // Adding in unordered_stats 
+  // (a vector with an index for N0, N1, N2, NA for every ind in the SNP)
+  // the gen value for every ind for this SNP 
+  // this vector has to be seen as a 'flatten' matrix with 4 rows (N0 N1 N2 NAs)
+  // and nbInds columns
+  void compute_indStats(std::vector<int> &unordered_stats) {
+    
+    //hardcoded to read in PLINK
+    const unsigned int g[4] = {0, 3, 1, 2};
+
+    size_t nbc_m1 = nbChars() - 1;
+
+    // parcourt le SNP byte by byte
+//#pragma omp parallel for //num_threads(4)
+    for (size_t byte = 0; byte < nbc_m1; byte++) {
+      uint8_t d = data()[byte];
+      size_t byteoffset = byte * 4;
+
+      for (int ind = 0; ind < 4; ind++) {
+        unsigned int val_plink = g[ d&3 ];
+        unordered_stats[(byteoffset + ind) * 4 + val_plink]++;
+        d >>= 2;
+      }
+    }
+    // last byte read separately
+    unsigned int BitsInLastByte = (nbInds() & 3)?(nbInds() & 3):4;
+    uint8_t d = data()[nbc_m1];
+    size_t byteoffset = nbc_m1 * 4;
+
+    for (int ind = 0; ind <  BitsInLastByte; ind++) {
+      unsigned int val_plink = g[ d&3 ];
+      unordered_stats[(byteoffset + ind) * 4 + val_plink]++;
+      d >>= 2;
+    }
   }
 
   // for scalar product :

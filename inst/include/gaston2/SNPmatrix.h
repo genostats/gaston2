@@ -1,12 +1,9 @@
 #include "SNPvector.h"
-#include "SNPvectorDisk.h"
 #include <vector>     // for omp reduction
 #include <memory>     // for shared_ptr
 #include <stdexcept>  // for out of range exceptions
 #include <fstream>    // for ifstream
 #include "Datastruct.h"
-
-#include "SNPvectorMemory.h"
 
 #include <omp.h>
 
@@ -93,45 +90,24 @@ public:
 #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
     initializer(omp_priv = decltype(omp_orig)(omp_orig.size(), 0))
 
+// Stocking in Datastruct indStats_ the number of occurrences of 0, 1, 2, and NAs for all individuals,
+// accross all SNPs currently in the SNPmatrix (need to be recalled if another SNP is pushed back after)
   void compute_indStats(bool force = false)  {
     if(!force && indStatsComputed_) return; // stats déjà calculées, on ne recalcule pas
 
     size_t nbSNPs = SNPs_.size();
  
-    // TODO is this really needed?
     if (nbSNPs == 0)
       throw std::out_of_range("No SNPs loaded into the SNPMatrix !");
 
     size_t nbInds = SNPs_[0]->nbInds();
+    //a vector keeping for every inds NOs, N1s, N2s and NAs
+    //filled with 0 by default
     std::vector<int> unordered_stats(nbInds * 4, 0); // DO NOT USE nbCHars ! rounded up !
 
-    const unsigned int g[4] = {0, 3, 1, 2};
 #pragma omp parallel for reduction(vec_int_plus : unordered_stats)
     for (size_t i = 0; i < nbSNPs; i++) { // parcourt tous les SNPs
-      auto snp = SNPs_[i];
-      size_t nbBytes = snp->nbChars();
-
-      // parcourt le SNP[i], byte by byte
-      size_t nbc_m1 = snp->nbChars() - 1;
-      for (size_t byte = 0; byte < nbc_m1; byte++) {
-        uint8_t d = snp->data()[byte];
-        size_t byteoffset = byte * 4;
-
-        for (int ind = 0; ind < 4; ind++) {
-          unsigned int val_plink = g[ d&3 ];
-          unordered_stats[(byteoffset + ind) * 4 + val_plink]++;
-          d >>= 2;
-        }
-      }
-      // last byte read separately
-      unsigned int BitsInLastByte = (nbInds & 3)?(nbInds & 3):4;
-      uint8_t d = snp->data()[nbc_m1];
-      size_t byteoffset = nbc_m1 * 4;
-      for (int ind = 0; ind <  BitsInLastByte; ind++) {
-        unsigned int val_plink = g[ d&3 ];
-        unordered_stats[(byteoffset + ind) * 4 + val_plink]++;
-        d >>= 2;
-      }
+      SNPs_[i]->compute_indStats(unordered_stats);
     }
 
     // isolate columns from unordered_stats

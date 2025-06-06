@@ -19,6 +19,6 @@ x <- gaston::as.bed.matrix(LCT.gen, LCT.fam, LCT.bim)
 
 # checking stat values 
 cn <- c("N0", "N1", "N2", "NAs")
-stopifnot( all(ind.stats(a)[,cn] == x@ped[,cn]) )
+stopifnot( all(ind.stats(a, TRUE)[,cn] == x@ped[,cn]) )
 
 
