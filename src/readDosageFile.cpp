@@ -17,8 +17,8 @@
 #include <Rcpp.h>
 
 #include "SNPdosage.h"
-#include "readDosFileMemory.h"
-#include "readDosFileDisk.h"
+#include "readDosageFileMemory.h"
+#include "readDosageFileDisk.h"
 
 /**
  * @brief Reading a .dosf file, storing SNPs in a SNPmatrix returned
@@ -31,16 +31,16 @@
 
 // R exported function
 // [[Rcpp::export]]
-Rcpp::XPtr<SNPmatrix<SNPdosage>> readDosFileMemory_(std::string bedfile, std::string bimfile, std::string famfile) {
+Rcpp::XPtr<SNPmatrix<SNPdosage>> readDosageFileMemory_(std::string bedfile, std::string bimfile, std::string famfile) {
   Rcpp::XPtr<SNPmatrix<SNPdosage>> pM(new SNPmatrix<SNPdosage>);
-  readDosFileMemory(bedfile, bimfile, famfile, *pM);
+  readDosageFileMemory(bedfile, bimfile, famfile, *pM);
   return pM;
 }
 
 // R exported function
 // [[Rcpp::export]]
-Rcpp::XPtr<SNPmatrix<SNPdosage>> readDosFileDisk_(std::string bedfile, std::string bimfile, std::string famfile) {
+Rcpp::XPtr<SNPmatrix<SNPdosage>> readDosageFileDisk_(std::string bedfile, std::string bimfile, std::string famfile) {
   Rcpp::XPtr<SNPmatrix<SNPdosage>> pM(new SNPmatrix<SNPdosage>);
-  readDosFileDisk(bedfile, bimfile, famfile, *pM);
+  readDosageFileDisk(bedfile, bimfile, famfile, *pM);
   return pM;
 }

@@ -1,5 +1,5 @@
 /**
- * @file readDosFileMemory.cpp
+ * @file readDosageFileMemory.cpp
  * @author Hervé Perdry
  * @brief Main file with functions to interact with SNPvector and SNPmatrix
  * @date 2023-12-11
@@ -29,7 +29,7 @@
  * @param M reference to an originally empty SNPmatrix
  */
 
-inline void readDosFileMemory(std::string dosfile, std::string bimfile, std::string famfile, SNPmatrix<SNPdosage> & M) {
+inline void readDosageFileMemory(std::string dosfile, std::string bimfile, std::string famfile, SNPmatrix<SNPdosage> & M) {
   // first read bim and fam file, to determine size  
   M.readFamFile(famfile);
   M.readBimFile(bimfile);
@@ -53,9 +53,9 @@ inline void readDosFileMemory(std::string dosfile, std::string bimfile, std::str
   file.close();
 }
 
-inline SNPmatrix<SNPdosage> readDosFileMemory(std::string bedfile, std::string bimfile, std::string famfile) {
+inline SNPmatrix<SNPdosage> readDosageFileMemory(std::string bedfile, std::string bimfile, std::string famfile) {
   SNPmatrix<SNPdosage> M;
-  readDosFileMemory(bedfile, bimfile, famfile, M);
+  readDosageFileMemory(bedfile, bimfile, famfile, M);
   return M;
 }
 

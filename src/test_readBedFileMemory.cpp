@@ -9,6 +9,8 @@
 #include <fstream>
 #include <unistd.h>
 #include <omp.h>
+#include "SNPdosageMemory.h"
+#include "readDosageFileMemory.h"
 //#include "Datastruct.h"
 
 using namespace Rcpp;
@@ -1146,6 +1148,15 @@ void testsuite(bool verbose = true)
   if (total[8]) {
     if (verbose) std::cout << GREEN << "Test for selected snps to extract in new matrix passed!" << RESET << std::endl;
   }
+
+  if (verbose) std::cout << "Trying to instanciate a SNPmatrix with dosages from truc.dosf.bim...\n";
+  SNPmatrix<SNPdosage> test = readDosageFileMemory("truc.dosf", "truc.bim", "truc.fam");
+  if (verbose) {
+    std::cout << "This is number of loaded SNPs (86) :" << test.nbSNPs() << "\n";
+    std::cout << "This is number of loaded nbInds (812) :" << test.nbInds() << "\n";
+    std::cout << "Done   !";
+  }
+
 
 conclusion:
   // std::count(vect.begin(), vect.end(), 0) should == 0 (all 1s) so !0 = true

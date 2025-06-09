@@ -57,8 +57,20 @@ computeSNPStats <- function(pM) {
     invisible(.Call(`_gaston2_computeSNPStats`, pM))
 }
 
+dimDosematrix <- function(pM) {
+    .Call(`_gaston2_dimDosematrix`, pM)
+}
+
 dimSNPmatrix <- function(pM) {
     .Call(`_gaston2_dimSNPmatrix`, pM)
+}
+
+extractIndsfromDosagematrixDisk_ <- function(other, keep, path_str) {
+    .Call(`_gaston2_extractIndsfromDosagematrixDisk_`, other, keep, path_str)
+}
+
+extractIndsfromDosagematrixMemory_ <- function(other, keep) {
+    .Call(`_gaston2_extractIndsfromDosagematrixMemory_`, other, keep)
 }
 
 extractIndsfromSNPmatrixDisk_ <- function(other, keep, path_str) {
@@ -69,12 +81,20 @@ extractIndsfromSNPmatrixMemory_ <- function(other, keep) {
     .Call(`_gaston2_extractIndsfromSNPmatrixMemory_`, other, keep)
 }
 
+extractSNPsfromDosagematrix_ <- function(other, keep) {
+    .Call(`_gaston2_extractSNPsfromDosagematrix_`, other, keep)
+}
+
 extractSNPsfromSNPmatrix_ <- function(other, keep) {
     .Call(`_gaston2_extractSNPsfromSNPmatrix_`, other, keep)
 }
 
 getIndStats <- function(pM, compute = TRUE) {
     .Call(`_gaston2_getIndStats`, pM, compute)
+}
+
+getIndStatsDosage <- function(pM, compute = TRUE) {
+    .Call(`_gaston2_getIndStatsDosage`, pM, compute)
 }
 
 test_force_compute_indStats <- function(pM) {
@@ -85,8 +105,16 @@ getMode <- function(pM) {
     .Call(`_gaston2_getMode`, pM)
 }
 
+getModeDosage <- function(pM) {
+    .Call(`_gaston2_getModeDosage`, pM)
+}
+
 getSNPStats <- function(pM) {
     .Call(`_gaston2_getSNPStats`, pM)
+}
+
+getSNPStatsDosage <- function(pM) {
+    .Call(`_gaston2_getSNPStatsDosage`, pM)
 }
 
 grm <- function(pM) {
@@ -109,12 +137,12 @@ readBimFile <- function(pM, bimFile) {
     invisible(.Call(`_gaston2_readBimFile`, pM, bimFile))
 }
 
-readDosFileMemory_ <- function(bedfile, bimfile, famfile) {
-    .Call(`_gaston2_readDosFileMemory_`, bedfile, bimfile, famfile)
+readDosageFileMemory_ <- function(bedfile, bimfile, famfile) {
+    .Call(`_gaston2_readDosageFileMemory_`, bedfile, bimfile, famfile)
 }
 
-readDosFileDisk_ <- function(bedfile, bimfile, famfile) {
-    .Call(`_gaston2_readDosFileDisk_`, bedfile, bimfile, famfile)
+readDosageFileDisk_ <- function(bedfile, bimfile, famfile) {
+    .Call(`_gaston2_readDosageFileDisk_`, bedfile, bimfile, famfile)
 }
 
 readFamFile <- function(pM, famFile) {

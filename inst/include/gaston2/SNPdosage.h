@@ -257,34 +257,7 @@ public:
   // this vector has to be seen as a 'flatten' matrix with 4 rows (N0 N1 N2 NAs)
   // and nbInds columns
   void compute_indStats(std::vector<int> &unordered_stats) {
-    
-//     //hardcoded to read in PLINK
-//     const unsigned int g[4] = {0, 3, 1, 2};
-
-//     size_t nbc_m1 = nbChars() - 1;
-
-//     // parcourt le SNP byte by byte
-// //#pragma omp parallel for //num_threads(4)
-//     for (size_t byte = 0; byte < nbc_m1; byte++) {
-//       uint8_t d = data()[byte];
-    //   size_t byteoffset = byte * 4;
-
-    //   for (int ind = 0; ind < 4; ind++) {
-    //     unsigned int val_plink = g[ d&3 ];
-    //     unordered_stats[(byteoffset + ind) * 4 + val_plink]++;
-    //     d >>= 2;
-    //   }
-    // }
-    // // last byte read separately
-    // unsigned int BitsInLastByte = (nbInds() & 3)?(nbInds() & 3):4;
-    // uint8_t d = data()[nbc_m1];
-    // size_t byteoffset = nbc_m1 * 4;
-
-    // for (int ind = 0; ind <  BitsInLastByte; ind++) {
-    //   unsigned int val_plink = g[ d&3 ];
-    //   unordered_stats[(byteoffset + ind) * 4 + val_plink]++;
-    //   d >>= 2;
-    // }
+    throw std::logic_error("You should not be trying to compute stats for dosages for now !");
   }
 
   template<typename scalar_t = double>
