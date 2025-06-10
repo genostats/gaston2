@@ -1,3 +1,5 @@
+#' Converting dose matrices to R matrices
+#'
 #' @name as.matrix.dose.matrix
 #'
 #' @exportS3Method as.matrix dose.matrix

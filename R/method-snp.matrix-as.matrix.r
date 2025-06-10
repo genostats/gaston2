@@ -1,3 +1,5 @@
+#' Converting snp matrices to R matrices
+#' 
 #' @name as.matrix.snp.matrix
 #'
 #' @exportS3Method as.matrix snp.matrix
