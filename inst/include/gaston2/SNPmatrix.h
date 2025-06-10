@@ -211,8 +211,8 @@ public:
     std::ifstream in(bimFile);
     if(!in.good()) 
       throw std::runtime_error("Can't open bim file");
-    std::vector<datatype> colTypes = { datatype::STRING, datatype::STRING, datatype::INT, datatype::DOUBLE, datatype::STRING, datatype::STRING };
-    std::vector<std::string> colNames = { "chr", "id", "pos", "dist", "A1", "A2" };
+    std::vector<datatype> colTypes = { datatype::INT, datatype::STRING, datatype::DOUBLE, datatype::INT, datatype::STRING, datatype::STRING };
+    std::vector<std::string> colNames = { "chr", "id", "dist", "pos", "A1", "A2" };
     snpStats_ = DataStruct(colTypes, colNames);
     snpStats_.readFile(in);
   }

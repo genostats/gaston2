@@ -164,6 +164,20 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// LD_thin_
+void LD_thin_(Rcpp::XPtr<SNPmatrix<>> pM, double threshold, int max_dist_bp, double max_dist_cM, Rcpp::LogicalVector which_keep);
+RcppExport SEXP _gaston2_LD_thin_(SEXP pMSEXP, SEXP thresholdSEXP, SEXP max_dist_bpSEXP, SEXP max_dist_cMSEXP, SEXP which_keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< int >::type max_dist_bp(max_dist_bpSEXP);
+    Rcpp::traits::input_parameter< double >::type max_dist_cM(max_dist_cMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type which_keep(which_keepSEXP);
+    LD_thin_(pM, threshold, max_dist_bp, max_dist_cM, which_keep);
+    return R_NilValue;
+END_RCPP
+}
 // SNPMatrixToIntegerMatrix
 Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_SNPMatrixToIntegerMatrix(SEXP pMSEXP) {
@@ -781,6 +795,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_LD_chunk_bigmemory", (DL_FUNC) &_gaston2_LD_chunk_bigmemory, 7},
     {"_gaston2_LD_square_EM_bigmemory", (DL_FUNC) &_gaston2_LD_square_EM_bigmemory, 5},
     {"_gaston2_LD_chunk_EM_bigmemory", (DL_FUNC) &_gaston2_LD_chunk_EM_bigmemory, 7},
+    {"_gaston2_LD_thin_", (DL_FUNC) &_gaston2_LD_thin_, 5},
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
     {"_gaston2_computeSNPStats", (DL_FUNC) &_gaston2_computeSNPStats, 1},
