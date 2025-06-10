@@ -1,4 +1,5 @@
 #include "SNPmatrix.h"
+#include "SNPdosage.h"
 #include "mode.h"
 #include <Rcpp.h>
 

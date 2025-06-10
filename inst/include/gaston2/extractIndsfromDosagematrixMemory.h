@@ -1,5 +1,5 @@
 #include "SNPmatrix.h"
-//#include "SNPdosageMemory.h" // will include SNPdosage also
+#include "SNPdosageMemory.h" // will include SNPdosage also
 #include <iostream>
 #include <memory> // shared_ptr
 #include <cstring>
