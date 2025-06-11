@@ -61,6 +61,8 @@ void extractIndsfromSNPmatrixDisk(const SNPmatrix<SNPvectorClass> &other, const 
   //extract stats now and set stats_set_ to true
   DataStruct original_dt = other.getIndStats();
   newMat.setIndStats(DataStruct(original_dt, keep));
+  // keeping all SNPStats
+  newMat.setSnpStats(other.getSNPStats());
 }
 
 template <typename SNPvectorClass, typename intVec>

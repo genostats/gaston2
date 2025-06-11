@@ -257,7 +257,8 @@ public:
   // this vector has to be seen as a 'flatten' matrix with 4 rows (N0 N1 N2 NAs)
   // and nbInds columns
   void compute_indStats(std::vector<int> &unordered_stats) {
-    throw std::logic_error("You should not be trying to compute stats for dosages for now !");
+    std::cout << "You should not be trying to compute stats for dosages for now ! Will only print you fam file.\n";
+    //throw std::logic_error("You should not be trying to compute stats for dosages for now !");
   }
 
   template<typename scalar_t = double>

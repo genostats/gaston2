@@ -768,6 +768,40 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// ToDosagematrixMemory_
+Rcpp::XPtr<SNPmatrix<SNPdosageMemory>> ToDosagematrixMemory_(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM);
+RcppExport SEXP _gaston2_ToDosagematrixMemory_(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type pM(pMSEXP);
+    rcpp_result_gen = Rcpp::wrap(ToDosagematrixMemory_(pM));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ToSNPmatrixDisk_
+Rcpp::XPtr<SNPmatrix<SNPvectorDisk<mio::access_mode::write>>> ToSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix<SNPvector>> pM, std::string newfile_name);
+RcppExport SEXP _gaston2_ToSNPmatrixDisk_(SEXP pMSEXP, SEXP newfile_nameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPvector>> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< std::string >::type newfile_name(newfile_nameSEXP);
+    rcpp_result_gen = Rcpp::wrap(ToSNPmatrixDisk_(pM, newfile_name));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ToSNPmatrixMemory_
+Rcpp::XPtr<SNPmatrix<SNPvectorMemory>> ToSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix<SNPvector>> pM);
+RcppExport SEXP _gaston2_ToSNPmatrixMemory_(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPvector>> >::type pM(pMSEXP);
+    rcpp_result_gen = Rcpp::wrap(ToSNPmatrixMemory_(pM));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_DoseMatrixToNumericMatrix", (DL_FUNC) &_gaston2_DoseMatrixToNumericMatrix, 1},
@@ -834,6 +868,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_test_first_scnd_ind", (DL_FUNC) &_gaston2_test_first_scnd_ind, 0},
     {"_gaston2_set_num_thread", (DL_FUNC) &_gaston2_set_num_thread, 1},
     {"_gaston2_testsuite", (DL_FUNC) &_gaston2_testsuite, 1},
+    {"_gaston2_ToDosagematrixMemory_", (DL_FUNC) &_gaston2_ToDosagematrixMemory_, 1},
+    {"_gaston2_ToSNPmatrixDisk_", (DL_FUNC) &_gaston2_ToSNPmatrixDisk_, 2},
+    {"_gaston2_ToSNPmatrixMemory_", (DL_FUNC) &_gaston2_ToSNPmatrixMemory_, 1},
     {NULL, NULL, 0}
 };
 

@@ -11,7 +11,6 @@
 
 // To be sure that I'm only extracting from a SNPmatrix with dosages,
 // I removed the template of the SNPmatrix (previously SNPmatrix<SNPvectorClass>)
-// 
 
 template <typename intVec>
 void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> &other, const intVec &keep, std::string path_str,
@@ -57,9 +56,13 @@ void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> &other, const in
   for (const auto &snp : otherSNPs){
     newMat.push_back(std::make_shared<SNPdosageDisk<mio::access_mode::write>>(snp, file_ptr, SNPindex++, keep));
   }
+  // keeping all SNPStats
+  DataStruct og_snp_stats = other.getSNPStats();
+  newMat.setSnpStats(og_snp_stats);
   //extract stats now and set stats_set_ to true
   DataStruct original_dt = other.getIndStats();
-  newMat.setIndStats(DataStruct(original_dt, keep));
+  newMat.setIndStats(DataStruct(original_dt, keep)); // for now does nothing else than fam file
+  // but will when compute_IndStats will be implemented
 }
 
 template <typename intVec>
