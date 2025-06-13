@@ -257,6 +257,10 @@ testsuite <- function(verbose = TRUE) {
     invisible(.Call(`_gaston2_testsuite`, verbose))
 }
 
+ToDosagematrixDisk_ <- function(pM, newfile_name) {
+    .Call(`_gaston2_ToDosagematrixDisk_`, pM, newfile_name)
+}
+
 ToDosagematrixMemory_ <- function(pM) {
     .Call(`_gaston2_ToDosagematrixMemory_`, pM)
 }
