@@ -192,6 +192,30 @@ class SNPmatrix {
     }
   }
 
+  void exportSNPStats() {
+
+    std::vector<int> vecN0s;
+    std::vector<int> vecN1s;
+    std::vector<int> vecN2s;
+    std::vector<int> vecNAs;
+
+    for (auto &snp : SNPs_) {
+      if (snp->stats_set() == 0) snp->compute_stats();
+      const int* stats = snp->getStats();
+
+      vecN0s.push_back(stats[0]);
+      vecN1s.push_back(stats[1]);
+      vecN2s.push_back(stats[2]);
+      vecNAs.push_back(stats[3]);
+    }
+
+    snpStats_.setColumn(Column(vecN0s), "N0");
+    snpStats_.setColumn(Column(vecN1s), "N1");
+    snpStats_.setColumn(Column(vecN2s), "N2");
+    snpStats_.setColumn(Column(vecNAs), "NAs");
+
+  }
+
   // comute SNP stats for snp i with i1 <= i <= i2
   // SHOULD THIS CHANGE TO i1 <= i < i2 ?
   void computeSNPStats(size_t i1, size_t i2) {

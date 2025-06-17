@@ -196,6 +196,36 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// computeSNPStatsDosage
+void computeSNPStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM);
+RcppExport SEXP _gaston2_computeSNPStatsDosage(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type pM(pMSEXP);
+    computeSNPStatsDosage(pM);
+    return R_NilValue;
+END_RCPP
+}
+// exportSNPStats
+void exportSNPStats(Rcpp::XPtr<SNPmatrix<SNPvector>> pM);
+RcppExport SEXP _gaston2_exportSNPStats(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPvector>> >::type pM(pMSEXP);
+    exportSNPStats(pM);
+    return R_NilValue;
+END_RCPP
+}
+// exportSNPStatsDosage
+void exportSNPStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM);
+RcppExport SEXP _gaston2_exportSNPStatsDosage(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type pM(pMSEXP);
+    exportSNPStatsDosage(pM);
+    return R_NilValue;
+END_RCPP
+}
 // dimDosematrix
 Rcpp::IntegerVector dimDosematrix(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_dimDosematrix(SEXP pMSEXP) {
@@ -830,6 +860,9 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
     {"_gaston2_computeSNPStats", (DL_FUNC) &_gaston2_computeSNPStats, 1},
+    {"_gaston2_computeSNPStatsDosage", (DL_FUNC) &_gaston2_computeSNPStatsDosage, 1},
+    {"_gaston2_exportSNPStats", (DL_FUNC) &_gaston2_exportSNPStats, 1},
+    {"_gaston2_exportSNPStatsDosage", (DL_FUNC) &_gaston2_exportSNPStatsDosage, 1},
     {"_gaston2_dimDosematrix", (DL_FUNC) &_gaston2_dimDosematrix, 1},
     {"_gaston2_dimSNPmatrix", (DL_FUNC) &_gaston2_dimSNPmatrix, 1},
     {"_gaston2_extractIndsfromDosagematrixDisk_", (DL_FUNC) &_gaston2_extractIndsfromDosagematrixDisk_, 3},

@@ -57,6 +57,18 @@ computeSNPStats <- function(pM) {
     invisible(.Call(`_gaston2_computeSNPStats`, pM))
 }
 
+computeSNPStatsDosage <- function(pM) {
+    invisible(.Call(`_gaston2_computeSNPStatsDosage`, pM))
+}
+
+exportSNPStats <- function(pM) {
+    invisible(.Call(`_gaston2_exportSNPStats`, pM))
+}
+
+exportSNPStatsDosage <- function(pM) {
+    invisible(.Call(`_gaston2_exportSNPStatsDosage`, pM))
+}
+
 dimDosematrix <- function(pM) {
     .Call(`_gaston2_dimDosematrix`, pM)
 }
