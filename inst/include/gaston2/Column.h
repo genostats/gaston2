@@ -145,7 +145,7 @@ struct Column {
     // ceci fait le boulot pour le constructeur ci dessus
     // c'est privé puisque l'utilisateur peut appeller le constructeur (qui n'a pas besoin
     // d'etre templaté pour le type de la colonne)
-  private:
+    private:
     template<typename T, typename intVec>
     Column ColumnExtract(const Column col, const intVec & keep) {
       const std::vector<T> * vec = col.get<T>();
@@ -154,6 +154,51 @@ struct Column {
       for(size_t i : keep)
         filtered.push_back(vec->at(i));
       return Column(filtered);
+    }
+
+    public : 
+    // un constructeur qui retourne une copie
+    // d'un append de col2 dans col
+    Column(const Column col1, const Column col2) {
+      // je pars du principe que les Columns doivent être du même type
+      // à voir si possible pour chr ?
+      type_ = col1.type();
+      if (type_ != col2.type()) {
+        throw std::runtime_error("Failing to append columns beacause of mismatched types");
+      }
+
+      switch (type_) {
+        case INT: {
+          *this = ColumnAppend<int>(col1, col2);
+          break;
+        }
+        case FLOAT: {
+          *this = ColumnAppend<float>(col1, col2);
+          break;
+        }
+        case DOUBLE: {          
+          *this = ColumnAppend<double>(col1, col2);
+          break;
+        }
+        case STRING: {          
+          *this = ColumnAppend<std::string>(col1, col2);
+          break;
+        }
+        default:
+          throw std::runtime_error("Cannot append columns of type NONE");
+      }
+    }
+
+    private :
+    // /!\ if vec1 has the same ptr as vec2 it will cause big pb :/
+    // but this should never happen as they are not handled with ptr
+    template <typename T>
+    Column ColumnAppend(const Column& col1, const Column& col2) {
+      const std::vector<T> * vec1 = col1.get<T>();
+      const std::vector<T> * vec2 = col2.get<T>();
+      std::vector<T> vec(*vec1);
+      vec.insert(vec.end(), vec2->begin(), vec2->end());
+      return Column(vec);
     }
 
   public:

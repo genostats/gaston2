@@ -6,9 +6,9 @@
 #include <vector>     // for omp reduction
 
 #include "Datastruct.h"
-// TODO : temporary !!
-//#include "SNPdosage.h"
-//#include "SNPdosageMemory.h"
+// // TODO : temporary !!
+//  #include "SNPdosage.h"
+//  #include "SNPdosageMemory.h"
 #include "SNPvector.h"
 
 #ifndef _snpmatrix_
@@ -84,7 +84,7 @@ class SNPmatrix {
     for (auto keep_idx : keep) {
       this->push_back(otherSNPs.at(keep_idx));  // at is supposed to do bound checking
     }
-    
+
     // now inheriting the SNPStats_ of the SNPs specified in keep
     DataStruct original_snpStats = other.getSNPStats();
     snpStats_ = DataStruct(original_snpStats, keep);
@@ -92,6 +92,54 @@ class SNPmatrix {
     indStats_ = other.getIndStats();
     // Still not automatically computing indStats back,
     // so c° is setting indStatsComputed_ to false by default
+  }
+
+
+  /**
+   * @brief Constructor concatenating 2 SNPmatrix,
+   * and also their stats
+   * (doesn't matter if one is on Disk and the other in Memory)
+   * BUT it needs to be 
+   * @param first
+   * SNPmatrix to append to
+   * @param second
+   * SNPmatrix that will be appended to "first"
+   * @return the new concatenated SNPmatrix
+   */
+  SNPmatrix(const SNPmatrix<SNPvectorClass> &first, const SNPmatrix<SNPvectorClass> &second) {
+    // I prefer to throw an error here, but push_back would also do it (to think...)
+    if (first.nbInds() != second.nbInds())
+      throw std::logic_error("You should not be concatenating 2 SNPmatrix with a different number of individuals !");
+    const std::vector<std::shared_ptr<SNPvectorClass>> firstSNPs = first.getSNPs();
+    for (auto first_snp : firstSNPs) {
+      this->push_back(first_snp);
+    }
+    const std::vector<std::shared_ptr<SNPvectorClass>> scdSNPs = second.getSNPs();
+
+    // if (scdSNPs.size()) {
+    //   auto ptr = scdSNPs.at(0);
+    //   std::cout << "Is scd SNPmatrix containing SNPdosage ? (0 = false) "
+    //   << (dynamic_cast<SNPdosage*>(ptr.get()) != nullptr)
+    //   << "\n";
+    //   std::cout << "Is scd SNPmatrix containing SNPvector ? (0 = false) "
+    //   << (dynamic_cast<SNPvector*>(ptr.get()) != nullptr)
+    //   << "\n";
+    // }
+
+    for (auto scd_snp : scdSNPs) {
+      this->push_back(scd_snp);
+    }
+    // Because all individual stats are changed (N0, N1, N2...)
+    indStatsComputed_ = false;
+    // but the fam stay the same !
+    indStats_ = first.indStats_; // there should be the same inds in first and scd !!!
+    // For snpStats_, don't have to touch, so only appending
+    snpStats_ = DataStruct(first.snpStats_, second.snpStats_); 
+
+    // recompute stats for everything, 
+    // maybe not the most efficient (but if already computed will just take the available value so fine),
+    // but the less error prone solution
+    this->exportSNPStats();
   }
 
   // #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
@@ -131,6 +179,8 @@ class SNPmatrix {
       vecNAs.push_back(unordered_stats[idxnzeros + 3]);
     }
 
+    // using setColumn will check if the Column exists 
+    // and replace it, else it will push_back
     indStats_.setColumn(Column(vecN0s), "N0");
     indStats_.setColumn(Column(vecN1s), "N1");
     indStats_.setColumn(Column(vecN2s), "N2");
@@ -150,15 +200,15 @@ class SNPmatrix {
   // get the DataStruct containing individual stats
   const DataStruct &getIndStats() const {
     // TO DEBUG : will print the type of what the SNPmat has
-    //if (SNPs_.size()) {
-      //auto ptr = getSNP(0);
-      //std::cout << "Is current SNPmatrix containing SNPdosage ? (0 = false) "
-                //<< (dynamic_cast<SNPdosage*>(ptr.get()) != nullptr)
-                //<< "\n";  
-      //std::cout << "Is current SNPmatrix containing SNPdosageMemory ? (0 = false) "
-      //<< (dynamic_cast<SNPdosageMemory*>(ptr.get()) != nullptr)
-      //<< "\n";   }
-      return indStats_;
+    // if (SNPs_.size()) {
+    // auto ptr = getSNP(0);
+    // std::cout << "Is current SNPmatrix containing SNPdosage ? (0 = false) "
+    //<< (dynamic_cast<SNPdosage*>(ptr.get()) != nullptr)
+    //<< "\n";
+    // std::cout << "Is current SNPmatrix containing SNPdosageMemory ? (0 = false) "
+    //<< (dynamic_cast<SNPdosageMemory*>(ptr.get()) != nullptr)
+    //<< "\n";   }
+    return indStats_;
   }
 
   // get the DataStruct containing snp stats
@@ -193,7 +243,6 @@ class SNPmatrix {
   }
 
   void exportSNPStats() {
-
     std::vector<int> vecN0s;
     std::vector<int> vecN1s;
     std::vector<int> vecN2s;
@@ -201,7 +250,7 @@ class SNPmatrix {
 
     for (auto &snp : SNPs_) {
       if (snp->stats_set() == 0) snp->compute_stats();
-      const int* stats = snp->getStats();
+      const int *stats = snp->getStats();
 
       vecN0s.push_back(stats[0]);
       vecN1s.push_back(stats[1]);
@@ -213,7 +262,6 @@ class SNPmatrix {
     snpStats_.setColumn(Column(vecN1s), "N1");
     snpStats_.setColumn(Column(vecN2s), "N2");
     snpStats_.setColumn(Column(vecNAs), "NAs");
-
   }
 
   // comute SNP stats for snp i with i1 <= i <= i2
@@ -262,8 +310,8 @@ class SNPmatrix {
 
  private:
   // stats and informations
-  DataStruct indStats_;  // will contain fam file + statistiques
-  DataStruct snpStats_;  // will contain bim file + ?
+  DataStruct indStats_;  // will contain fam file + statistics of Inds
+  DataStruct snpStats_;  // will contain bim file + statistics of SNP
   std::vector<std::shared_ptr<SNPvectorClass>> SNPs_;
   bool indStatsComputed_ = false;
   Mode mode_ = RAW_VALUES;

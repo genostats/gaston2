@@ -53,6 +53,14 @@ SNPMatrixToNumericMatrix <- function(pM) {
     .Call(`_gaston2_SNPMatrixToNumericMatrix`, pM)
 }
 
+cbind_SNPmatrix <- function(first_matrix, scd_matrix) {
+    .Call(`_gaston2_cbind_SNPmatrix`, first_matrix, scd_matrix)
+}
+
+cbind_Dosagematrix <- function(first_matrix, scd_matrix) {
+    .Call(`_gaston2_cbind_Dosagematrix`, first_matrix, scd_matrix)
+}
+
 computeSNPStats <- function(pM) {
     invisible(.Call(`_gaston2_computeSNPStats`, pM))
 }
