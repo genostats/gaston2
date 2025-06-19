@@ -9,6 +9,7 @@
 #include <algorithm> // for omp reduction ?
 
 #include "mode.h"
+#include "chrType.h"
 #include "debug.h"
 
 #ifndef _SNPdosage_
@@ -29,6 +30,7 @@ protected: // can be accessed also by class inheriting
 
   const size_t nbInds_;
   enum Mode mode_ = Mode::RAW_VALUES;
+  enum chrType chr_type_ = chrType::UNKNOWN;
 
     /* Containing N0, N1, N2, NAs on the whole SNP,
   following Plink format
@@ -164,6 +166,17 @@ public:
     return mode_;
   }
 
+
+  // -------------------- chrType -----------------------------------
+  void setChrType(chrType ty) {
+    chr_type_ = ty;
+  }
+
+  chrType getChrType() {
+    return chr_type_;
+  }
+
+  // ----------------------------------------------------------------
   // get values
   const double * values() const {
     return g_trans;

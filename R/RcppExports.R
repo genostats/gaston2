@@ -93,6 +93,10 @@ extractSNPsfromSNPmatrix_ <- function(other, keep) {
     .Call(`_gaston2_extractSNPsfromSNPmatrix_`, other, keep)
 }
 
+getGastonOptions_ <- function() {
+    .Call(`_gaston2_getGastonOptions_`)
+}
+
 getIndStats <- function(pM, compute = TRUE) {
     .Call(`_gaston2_getIndStats`, pM, compute)
 }
@@ -151,6 +155,10 @@ readDosageFileDisk_ <- function(bedfile, bimfile, famfile) {
 
 readFamFile <- function(pM, famFile) {
     invisible(.Call(`_gaston2_readFamFile`, pM, famFile))
+}
+
+setGastonOptions <- function(L) {
+    invisible(.Call(`_gaston2_setGastonOptions`, L))
 }
 
 setMode <- function(pM, mode) {

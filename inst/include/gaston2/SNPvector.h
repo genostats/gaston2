@@ -9,6 +9,7 @@
 #include <algorithm> // for omp reduction ?
 
 #include "mode.h"
+#include "chrType.h"
 #include "debug.h"
 
 #ifndef _SNPvector_
@@ -66,6 +67,7 @@ protected: // can be accessed also by class inheriting
 
   const size_t nbInds_;
   enum Mode mode_ = Mode::RAW_VALUES;
+  enum chrType chr_type_ = chrType::UNKNOWN;
 
   /* Containing N0, N1, N2, NAs on the whole SNP,
   following Plink format
@@ -84,6 +86,8 @@ protected: // can be accessed also by class inheriting
   double g_trans[4] = {0, 3, 1, 2};
 
   // constructor allowing to set nbInds and mode (to be called by derived classes)
+  // TODO setting mode at construction is not really usefull. 
+  //      get rid of this. 
   SNPvector(size_t nbInds, Mode mode = Mode::RAW_VALUES) : nbInds_(nbInds), mode_(mode) {}
 
   inline void computeMode() { 
@@ -168,8 +172,8 @@ public:
     return nbInds_;
   }
 
-  // BY DEFAULT, RAW_VALUES format, with 01 = missing genotype
-  // double currentMode_[5][4] = {{0, 3, 1, 2}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 1, 2, 3}, {0, 0, 0, 0}};
+
+  // ------------------------- mode ---------------------------------
 
   // To use set mode and compute g_trans value accordingly
   void setMode(Mode mode) { 
@@ -210,6 +214,16 @@ public:
     return mode_;
   }
 
+  // -------------------- chrType -----------------------------------
+  void setChrType(chrType ty) {
+    chr_type_ = ty;
+  }
+
+  chrType getChrType() {
+    return chr_type_;
+  }
+
+  // ----------------------------------------------------------------
   // get values
   const double * values() const {
     return g_trans;
@@ -243,6 +257,10 @@ public:
     return sigma_;
   }
 
+  // ----------------------------------------------------------------
+  // TODO get rid of these three functions
+  //      I am afraid it would break things in the test suite
+  //      should not be used anywhere else finally
   void setMu(double mu) {
     mu_ = mu;
     computeMode(); // recompute mode
@@ -258,7 +276,11 @@ public:
     sigma_ = sigma;
     computeMode(); // recompute mode
   }
+  // ----------------------------------------------------------------
 
+  // ----------------------------------------------------------------
+  // Keep this one for testing ?
+  //
   // dummy function summing the n first individuals from the SNP, if no n specified, summing all SNPs available
   double sum(int n = -1) {
     double S = 0;
@@ -279,6 +301,7 @@ public:
     return S;
   }
 
+  // ----------------------------------------------------------------
   // This function overwrites mu and/or sigma, according to the arguments
   void compute_mu_sigma(bool set_mu = true, bool set_sigma = true) {
     if(!set_mu && !set_sigma) return;    // do nothing
@@ -299,6 +322,7 @@ public:
     }
   }
 
+  // ----------------------------------------------------------------
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
   void compute_stats(bool set_mu = true, bool set_sigma = true) {
     // if already called, do nothing
@@ -342,8 +366,9 @@ public:
   }
 
 
-  // Adding in unordered_stats 
-  // (a vector with an index for N0, N1, N2, NA for every ind in the SNP)
+  // ----------------------------------------------------------------
+  // Incrementing 'unordered_stats',
+  // a vector with an index for N0, N1, N2, NA for every ind in the SNP)
   // the gen value for every ind for this SNP 
   // this vector has to be seen as a 'flatten' matrix with 4 rows (N0 N1 N2 NAs)
   // and nbInds columns
@@ -378,6 +403,7 @@ public:
     }
   }
 
+  // ----------------------------------------------------------------
   // for scalar product :
   // CAVEAT: stats are supposed set! 
   template<typename scalar_t = double>
@@ -440,6 +466,7 @@ public:
     return r;
   }
 
+  // ----------------------------------------------------------------
   // function filling a 9 (unsigned) int vector corresponding to a contigency table of genotypes over 2 SNPs
   // intVec must have members size() and []
   template<typename intVec>
@@ -483,6 +510,8 @@ public:
     contingencyTable[8] = table[15];
   }
 
+  // ----------------------------------------------------------------
+  // pour la GRM
   // on va incrémenter un vecteur de scalar_t [n'importe quoi qui a un opérateur [] et size())
   // size = n * (n + 1) / 2 = la moitié d'une matrice symmétrique, diagonale incluse
   // si on voit V comme une matrice c'est V += SNP . SNP'
@@ -618,6 +647,7 @@ public:
   }
 
 
+  // ----------------------------------------------------------------
   class Iterator {
   private:
     size_t currentChar;     // ii dans le code RV, correspond au byte sur lequel je suis

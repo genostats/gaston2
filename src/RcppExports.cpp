@@ -306,6 +306,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getGastonOptions_
+Rcpp::List getGastonOptions_();
+RcppExport SEXP _gaston2_getGastonOptions_() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(getGastonOptions_());
+    return rcpp_result_gen;
+END_RCPP
+}
 // getIndStats
 Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix<>> pM, bool compute);
 RcppExport SEXP _gaston2_getIndStats(SEXP pMSEXP, SEXP computeSEXP) {
@@ -477,6 +487,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< std::string >::type famFile(famFileSEXP);
     readFamFile(pM, famFile);
+    return R_NilValue;
+END_RCPP
+}
+// setGastonOptions
+void setGastonOptions(Rcpp::List L);
+RcppExport SEXP _gaston2_setGastonOptions(SEXP LSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type L(LSEXP);
+    setGastonOptions(L);
     return R_NilValue;
 END_RCPP
 }
@@ -807,6 +827,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_extractIndsfromSNPmatrixMemory_", (DL_FUNC) &_gaston2_extractIndsfromSNPmatrixMemory_, 2},
     {"_gaston2_extractSNPsfromDosagematrix_", (DL_FUNC) &_gaston2_extractSNPsfromDosagematrix_, 2},
     {"_gaston2_extractSNPsfromSNPmatrix_", (DL_FUNC) &_gaston2_extractSNPsfromSNPmatrix_, 2},
+    {"_gaston2_getGastonOptions_", (DL_FUNC) &_gaston2_getGastonOptions_, 0},
     {"_gaston2_getIndStats", (DL_FUNC) &_gaston2_getIndStats, 2},
     {"_gaston2_getIndStatsDosage", (DL_FUNC) &_gaston2_getIndStatsDosage, 2},
     {"_gaston2_test_force_compute_indStats", (DL_FUNC) &_gaston2_test_force_compute_indStats, 1},
@@ -822,6 +843,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_readDosageFileMemory_", (DL_FUNC) &_gaston2_readDosageFileMemory_, 3},
     {"_gaston2_readDosageFileDisk_", (DL_FUNC) &_gaston2_readDosageFileDisk_, 3},
     {"_gaston2_readFamFile", (DL_FUNC) &_gaston2_readFamFile, 2},
+    {"_gaston2_setGastonOptions", (DL_FUNC) &_gaston2_setGastonOptions, 1},
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},
     {"_gaston2_test_ds", (DL_FUNC) &_gaston2_test_ds, 2},
     {"_gaston2_test_ds2", (DL_FUNC) &_gaston2_test_ds2, 0},
