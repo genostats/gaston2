@@ -405,6 +405,50 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// isAutosome_
+Rcpp::LogicalVector isAutosome_(Rcpp::IntegerVector chr);
+RcppExport SEXP _gaston2_isAutosome_(SEXP chrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type chr(chrSEXP);
+    rcpp_result_gen = Rcpp::wrap(isAutosome_(chr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// isX_
+Rcpp::LogicalVector isX_(Rcpp::IntegerVector chr);
+RcppExport SEXP _gaston2_isX_(SEXP chrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type chr(chrSEXP);
+    rcpp_result_gen = Rcpp::wrap(isX_(chr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// isY_
+Rcpp::LogicalVector isY_(Rcpp::IntegerVector chr);
+RcppExport SEXP _gaston2_isY_(SEXP chrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type chr(chrSEXP);
+    rcpp_result_gen = Rcpp::wrap(isY_(chr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// isMt_
+Rcpp::LogicalVector isMt_(Rcpp::IntegerVector chr);
+RcppExport SEXP _gaston2_isMt_(SEXP chrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type chr(chrSEXP);
+    rcpp_result_gen = Rcpp::wrap(isMt_(chr));
+    return rcpp_result_gen;
+END_RCPP
+}
 // isnullptr
 bool isnullptr(SEXP pointer);
 RcppExport SEXP _gaston2_isnullptr(SEXP pointerSEXP) {
@@ -836,6 +880,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_getSNPStats", (DL_FUNC) &_gaston2_getSNPStats, 1},
     {"_gaston2_getSNPStatsDosage", (DL_FUNC) &_gaston2_getSNPStatsDosage, 1},
     {"_gaston2_grm", (DL_FUNC) &_gaston2_grm, 1},
+    {"_gaston2_isAutosome_", (DL_FUNC) &_gaston2_isAutosome_, 1},
+    {"_gaston2_isX_", (DL_FUNC) &_gaston2_isX_, 1},
+    {"_gaston2_isY_", (DL_FUNC) &_gaston2_isY_, 1},
+    {"_gaston2_isMt_", (DL_FUNC) &_gaston2_isMt_, 1},
     {"_gaston2_isnullptr", (DL_FUNC) &_gaston2_isnullptr, 1},
     {"_gaston2_readBedFileDisk_", (DL_FUNC) &_gaston2_readBedFileDisk_, 3},
     {"_gaston2_readBedFileMemory_", (DL_FUNC) &_gaston2_readBedFileMemory_, 3},

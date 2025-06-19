@@ -129,6 +129,22 @@ grm <- function(pM) {
     .Call(`_gaston2_grm`, pM)
 }
 
+isAutosome_ <- function(chr) {
+    .Call(`_gaston2_isAutosome_`, chr)
+}
+
+isX_ <- function(chr) {
+    .Call(`_gaston2_isX_`, chr)
+}
+
+isY_ <- function(chr) {
+    .Call(`_gaston2_isY_`, chr)
+}
+
+isMt_ <- function(chr) {
+    .Call(`_gaston2_isMt_`, chr)
+}
+
 isnullptr <- function(pointer) {
     .Call(`_gaston2_isnullptr`, pointer)
 }
