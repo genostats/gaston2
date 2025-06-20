@@ -1,4 +1,5 @@
 #include <set>
+#include "debug.h"
 
 #ifndef _gaston_options_
 #define _gaston_options_
@@ -16,13 +17,14 @@ class gastonOptions {
 //
 // even if the function is declared inline, the linker will merge them 
 // this way the static variable inside is shared between compilation units
-inline gastonOptions & getGastonOptions() {
+inline gastonOptions & getGastonOptions() { 
   static gastonOptions opt;
   return opt;
 }
 
 inline void setGastonOptions(std::set<int> & autosomes, std::set<int> & x, std::set<int> & y, std::set<int> & mt) {
-  gastonOptions & opt = getGastonOptions();
+  // static = shared with getGastonOptions which is called only once (does not matter really here)
+  static gastonOptions & opt = getGastonOptions();
   opt.autosomes = autosomes;
   opt.x = x;
   opt.y = y;

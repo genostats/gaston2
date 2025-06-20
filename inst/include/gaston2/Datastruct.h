@@ -69,6 +69,7 @@ class DataStruct {
       }
     }
 
+    // ---- setColumn ----
     // vérifie si la colonne existe et la remplace, et sinon fait un push_back
     // a priori la colonne est copiée lors du passage de l'argument
     inline void setColumn(const Column & col, std::string name) {
@@ -95,7 +96,8 @@ class DataStruct {
 #endif
     }
 
-    // idem avec toutes les colonnes d'uutre data struct (forme simple de merge)
+    // ---- setColumns ----
+    // idem avec toutes les colonnes d'un autre data struct (forme simple de merge)
     inline void setColumns(const DataStruct & D) {
 #if DEBUG_DS
   std::cout << "Entering setColumns\n";
@@ -111,22 +113,33 @@ class DataStruct {
 #endif
     }
 
+    // ---- get column at ----
     inline const Column & at(size_t pos) const { 
       return cols.at(pos); 
     }
 
-    inline const Column & getColumn(std::string name) const {
-      return at(findColumn(name));
-    }
-
+    // non const version
     inline Column & at(size_t pos) { 
       return cols.at(pos); 
     }
 
+    // ---- get column by name ----
+    inline const Column & getColumn(std::string name) const {
+      return at(findColumn(name));
+    }
+
+    // non const version
     inline Column & getColumn(std::string name) {
       return at(findColumn(name));
     }
 
+    // ---- has column ? ----
+    inline bool hasColumn(std::string name) {
+      size_t i = findColumn(name);
+      return i < size();
+    }
+
+    // ---- constructeurs ----
     // constructeur vide...
     DataStruct() {}
 
@@ -151,6 +164,8 @@ class DataStruct {
 #endif
     }
 
+    // ---- read File ----
+    //
     // fonction qui lit (append) un fichier sans header dans des colonnes
     // déjà créées
     // pas très perfectionné (uniquement space delimited values,

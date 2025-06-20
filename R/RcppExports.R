@@ -173,6 +173,10 @@ readFamFile <- function(pM, famFile) {
     invisible(.Call(`_gaston2_readFamFile`, pM, famFile))
 }
 
+setChrType <- function(pM) {
+    invisible(.Call(`_gaston2_setChrType`, pM))
+}
+
 setGastonOptions <- function(L) {
     invisible(.Call(`_gaston2_setGastonOptions`, L))
 }

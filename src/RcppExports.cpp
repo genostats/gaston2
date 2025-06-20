@@ -534,6 +534,16 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// setChrType
+void setChrType(Rcpp::XPtr<SNPmatrix<SNPvector>> pM);
+RcppExport SEXP _gaston2_setChrType(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPvector>> >::type pM(pMSEXP);
+    setChrType(pM);
+    return R_NilValue;
+END_RCPP
+}
 // setGastonOptions
 void setGastonOptions(Rcpp::List L);
 RcppExport SEXP _gaston2_setGastonOptions(SEXP LSEXP) {
@@ -891,6 +901,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_readDosageFileMemory_", (DL_FUNC) &_gaston2_readDosageFileMemory_, 3},
     {"_gaston2_readDosageFileDisk_", (DL_FUNC) &_gaston2_readDosageFileDisk_, 3},
     {"_gaston2_readFamFile", (DL_FUNC) &_gaston2_readFamFile, 2},
+    {"_gaston2_setChrType", (DL_FUNC) &_gaston2_setChrType, 1},
     {"_gaston2_setGastonOptions", (DL_FUNC) &_gaston2_setGastonOptions, 1},
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},
     {"_gaston2_test_ds", (DL_FUNC) &_gaston2_test_ds, 2},

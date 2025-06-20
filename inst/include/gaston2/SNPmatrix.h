@@ -217,6 +217,23 @@ public:
     snpStats_.readFile(in);
   }
 
+  // to call once bim file is loaded, to set chromosome type in SNPs
+  // nothing done yet for loading haploptypes...
+  void setChrType() {
+    if(!snpStats_.hasColumn("chr")) 
+      throw std::runtime_error("No column 'chr' in snp stats (was bim file loaded?)");
+
+    std::vector<int> & chr = *snpStats_.getColumn("chr").get<int>();
+    size_t n = nbSNPs();
+    if(n != chr.size())
+      throw std::runtime_error("chr data size doesn't match SNPmatrix size");
+
+#pragma omp parallel for
+    for(size_t i = 0; i < n; i++) {
+      SNPs_[i]->setChrType( intToChrType(chr[i]) );
+    }
+  }
+
 private:
   // stats and informations
   DataStruct indStats_;   // will contain fam file + statistiques
