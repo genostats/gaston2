@@ -164,6 +164,20 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// LD_thin_
+void LD_thin_(Rcpp::XPtr<SNPmatrix<>> pM, double threshold, int max_dist_bp, double max_dist_cM, Rcpp::LogicalVector which_keep);
+RcppExport SEXP _gaston2_LD_thin_(SEXP pMSEXP, SEXP thresholdSEXP, SEXP max_dist_bpSEXP, SEXP max_dist_cMSEXP, SEXP which_keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< int >::type max_dist_bp(max_dist_bpSEXP);
+    Rcpp::traits::input_parameter< double >::type max_dist_cM(max_dist_cMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type which_keep(which_keepSEXP);
+    LD_thin_(pM, threshold, max_dist_bp, max_dist_cM, which_keep);
+    return R_NilValue;
+END_RCPP
+}
 // SNPMatrixToIntegerMatrix
 Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_SNPMatrixToIntegerMatrix(SEXP pMSEXP) {
@@ -346,6 +360,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getGastonOptions_
+Rcpp::List getGastonOptions_();
+RcppExport SEXP _gaston2_getGastonOptions_() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(getGastonOptions_());
+    return rcpp_result_gen;
+END_RCPP
+}
 // getIndStats
 Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix<>> pM, bool compute);
 RcppExport SEXP _gaston2_getIndStats(SEXP pMSEXP, SEXP computeSEXP) {
@@ -435,6 +459,50 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// isAutosome_
+Rcpp::LogicalVector isAutosome_(Rcpp::IntegerVector chr);
+RcppExport SEXP _gaston2_isAutosome_(SEXP chrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type chr(chrSEXP);
+    rcpp_result_gen = Rcpp::wrap(isAutosome_(chr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// isX_
+Rcpp::LogicalVector isX_(Rcpp::IntegerVector chr);
+RcppExport SEXP _gaston2_isX_(SEXP chrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type chr(chrSEXP);
+    rcpp_result_gen = Rcpp::wrap(isX_(chr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// isY_
+Rcpp::LogicalVector isY_(Rcpp::IntegerVector chr);
+RcppExport SEXP _gaston2_isY_(SEXP chrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type chr(chrSEXP);
+    rcpp_result_gen = Rcpp::wrap(isY_(chr));
+    return rcpp_result_gen;
+END_RCPP
+}
+// isMt_
+Rcpp::LogicalVector isMt_(Rcpp::IntegerVector chr);
+RcppExport SEXP _gaston2_isMt_(SEXP chrSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type chr(chrSEXP);
+    rcpp_result_gen = Rcpp::wrap(isMt_(chr));
+    return rcpp_result_gen;
+END_RCPP
+}
 // isnullptr
 bool isnullptr(SEXP pointer);
 RcppExport SEXP _gaston2_isnullptr(SEXP pointerSEXP) {
@@ -517,6 +585,26 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< std::string >::type famFile(famFileSEXP);
     readFamFile(pM, famFile);
+    return R_NilValue;
+END_RCPP
+}
+// setChrType
+void setChrType(Rcpp::XPtr<SNPmatrix<SNPvector>> pM);
+RcppExport SEXP _gaston2_setChrType(SEXP pMSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPvector>> >::type pM(pMSEXP);
+    setChrType(pM);
+    return R_NilValue;
+END_RCPP
+}
+// setGastonOptions
+void setGastonOptions(Rcpp::List L);
+RcppExport SEXP _gaston2_setGastonOptions(SEXP LSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type L(LSEXP);
+    setGastonOptions(L);
     return R_NilValue;
 END_RCPP
 }
@@ -881,6 +969,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_LD_chunk_bigmemory", (DL_FUNC) &_gaston2_LD_chunk_bigmemory, 7},
     {"_gaston2_LD_square_EM_bigmemory", (DL_FUNC) &_gaston2_LD_square_EM_bigmemory, 5},
     {"_gaston2_LD_chunk_EM_bigmemory", (DL_FUNC) &_gaston2_LD_chunk_EM_bigmemory, 7},
+    {"_gaston2_LD_thin_", (DL_FUNC) &_gaston2_LD_thin_, 5},
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
     {"_gaston2_cbind_SNPmatrix", (DL_FUNC) &_gaston2_cbind_SNPmatrix, 2},
@@ -897,6 +986,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_extractIndsfromSNPmatrixMemory_", (DL_FUNC) &_gaston2_extractIndsfromSNPmatrixMemory_, 2},
     {"_gaston2_extractSNPsfromDosagematrix_", (DL_FUNC) &_gaston2_extractSNPsfromDosagematrix_, 2},
     {"_gaston2_extractSNPsfromSNPmatrix_", (DL_FUNC) &_gaston2_extractSNPsfromSNPmatrix_, 2},
+    {"_gaston2_getGastonOptions_", (DL_FUNC) &_gaston2_getGastonOptions_, 0},
     {"_gaston2_getIndStats", (DL_FUNC) &_gaston2_getIndStats, 2},
     {"_gaston2_getIndStatsDosage", (DL_FUNC) &_gaston2_getIndStatsDosage, 2},
     {"_gaston2_test_force_compute_indStats", (DL_FUNC) &_gaston2_test_force_compute_indStats, 1},
@@ -905,6 +995,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_getSNPStats", (DL_FUNC) &_gaston2_getSNPStats, 1},
     {"_gaston2_getSNPStatsDosage", (DL_FUNC) &_gaston2_getSNPStatsDosage, 1},
     {"_gaston2_grm", (DL_FUNC) &_gaston2_grm, 1},
+    {"_gaston2_isAutosome_", (DL_FUNC) &_gaston2_isAutosome_, 1},
+    {"_gaston2_isX_", (DL_FUNC) &_gaston2_isX_, 1},
+    {"_gaston2_isY_", (DL_FUNC) &_gaston2_isY_, 1},
+    {"_gaston2_isMt_", (DL_FUNC) &_gaston2_isMt_, 1},
     {"_gaston2_isnullptr", (DL_FUNC) &_gaston2_isnullptr, 1},
     {"_gaston2_readBedFileDisk_", (DL_FUNC) &_gaston2_readBedFileDisk_, 3},
     {"_gaston2_readBedFileMemory_", (DL_FUNC) &_gaston2_readBedFileMemory_, 3},
@@ -912,6 +1006,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_readDosageFileMemory_", (DL_FUNC) &_gaston2_readDosageFileMemory_, 3},
     {"_gaston2_readDosageFileDisk_", (DL_FUNC) &_gaston2_readDosageFileDisk_, 3},
     {"_gaston2_readFamFile", (DL_FUNC) &_gaston2_readFamFile, 2},
+    {"_gaston2_setChrType", (DL_FUNC) &_gaston2_setChrType, 1},
+    {"_gaston2_setGastonOptions", (DL_FUNC) &_gaston2_setGastonOptions, 1},
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},
     {"_gaston2_test_ds", (DL_FUNC) &_gaston2_test_ds, 2},
     {"_gaston2_test_ds2", (DL_FUNC) &_gaston2_test_ds2, 0},

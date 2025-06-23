@@ -302,13 +302,30 @@ class SNPmatrix {
     std::ifstream in(bimFile);
     if (!in.good())
       throw std::runtime_error("Can't open bim file");
-    std::vector<datatype> colTypes = {datatype::STRING, datatype::STRING, datatype::INT, datatype::DOUBLE, datatype::STRING, datatype::STRING};
-    std::vector<std::string> colNames = {"chr", "id", "pos", "dist", "A1", "A2"};
+    std::vector<datatype> colTypes = { datatype::INT, datatype::STRING, datatype::DOUBLE, datatype::INT, datatype::STRING, datatype::STRING };
+    std::vector<std::string> colNames = { "chr", "id", "dist", "pos", "A1", "A2" };
     snpStats_ = DataStruct(colTypes, colNames);
     snpStats_.readFile(in);
   }
 
- private:
+  // to call once bim file is loaded, to set chromosome type in SNPs
+  // nothing done yet for loading haploptypes...
+  void setChrType() {
+    if(!snpStats_.hasColumn("chr")) 
+      throw std::runtime_error("No column 'chr' in snp stats (was bim file loaded?)");
+
+    std::vector<int> & chr = *snpStats_.getColumn("chr").get<int>();
+    size_t n = nbSNPs();
+    if(n != chr.size())
+      throw std::runtime_error("chr data size doesn't match SNPmatrix size");
+
+#pragma omp parallel for
+    for(size_t i = 0; i < n; i++) {
+      SNPs_[i]->setChrType( intToChrType(chr[i]) );
+    }
+  }
+
+private:
   // stats and informations
   DataStruct indStats_;  // will contain fam file + statistics of Inds
   DataStruct snpStats_;  // will contain bim file + statistics of SNP

@@ -45,6 +45,10 @@ LD_chunk_EM_bigmemory <- function(pM, i1, i2, j1, j2, path, usefloat = TRUE) {
     invisible(.Call(`_gaston2_LD_chunk_EM_bigmemory`, pM, i1, i2, j1, j2, path, usefloat))
 }
 
+LD_thin_ <- function(pM, threshold, max_dist_bp, max_dist_cM, which_keep) {
+    invisible(.Call(`_gaston2_LD_thin_`, pM, threshold, max_dist_bp, max_dist_cM, which_keep))
+}
+
 SNPMatrixToIntegerMatrix <- function(pM) {
     .Call(`_gaston2_SNPMatrixToIntegerMatrix`, pM)
 }
@@ -109,6 +113,10 @@ extractSNPsfromSNPmatrix_ <- function(other, keep) {
     .Call(`_gaston2_extractSNPsfromSNPmatrix_`, other, keep)
 }
 
+getGastonOptions_ <- function() {
+    .Call(`_gaston2_getGastonOptions_`)
+}
+
 getIndStats <- function(pM, compute = TRUE) {
     .Call(`_gaston2_getIndStats`, pM, compute)
 }
@@ -141,6 +149,22 @@ grm <- function(pM) {
     .Call(`_gaston2_grm`, pM)
 }
 
+isAutosome_ <- function(chr) {
+    .Call(`_gaston2_isAutosome_`, chr)
+}
+
+isX_ <- function(chr) {
+    .Call(`_gaston2_isX_`, chr)
+}
+
+isY_ <- function(chr) {
+    .Call(`_gaston2_isY_`, chr)
+}
+
+isMt_ <- function(chr) {
+    .Call(`_gaston2_isMt_`, chr)
+}
+
 isnullptr <- function(pointer) {
     .Call(`_gaston2_isnullptr`, pointer)
 }
@@ -167,6 +191,14 @@ readDosageFileDisk_ <- function(bedfile, bimfile, famfile) {
 
 readFamFile <- function(pM, famFile) {
     invisible(.Call(`_gaston2_readFamFile`, pM, famFile))
+}
+
+setChrType <- function(pM) {
+    invisible(.Call(`_gaston2_setChrType`, pM))
+}
+
+setGastonOptions <- function(L) {
+    invisible(.Call(`_gaston2_setGastonOptions`, L))
 }
 
 setMode <- function(pM, mode) {
