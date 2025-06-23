@@ -73,7 +73,7 @@ protected: // can be accessed also by class inheriting
   following Plink format
   populated by compute_stats()*/
 
-  unsigned int stats_[4] = {0, 0, 0, 0};
+  int stats_[4] = {0, 0, 0, 0};
   bool stats_set_ = false;
 
   double mu_ = 0;
@@ -245,7 +245,7 @@ public:
     return n / 4 + ((n % 4 == 0u) ? 0 : 1);
   }
 
-  const unsigned int *getStats() const {
+  const int *getStats() const {
     return stats_;
   }
 
@@ -326,7 +326,10 @@ public:
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
   void compute_stats(bool set_mu = true, bool set_sigma = true) {
     // if already called, do nothing
-    if(stats_set_) return;
+    if(stats_set_) {
+      //std::cout << "Not recomputing !\n";
+      return;
+    }
 
     size_t nbc_m1 = nbChars() - 1;
 

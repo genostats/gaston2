@@ -36,7 +36,7 @@ protected: // can be accessed also by class inheriting
   following Plink format
   populated by compute_stats()*/
 
-  unsigned int stats_[4] = {0, 0, 0, 0};
+  int stats_[4] = {0, 0, 0, 0};
   bool stats_set_ = false;
 
   double mu_ = 0;
@@ -198,7 +198,7 @@ public:
     return n / 4 + ((n % 4 == 0u) ? 0 : 1);
   }
 
-  const unsigned int *getStats() const {
+  const int *getStats() const {
     return stats_;
   }
 
@@ -246,12 +246,26 @@ public:
     }
   }
 
-  // TODO : 
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
   void compute_stats(bool set_mu = true, bool set_sigma = true) {
     // if already called, do nothing
-    if(stats_set_) return;
+    if(stats_set_) {
+      //std::cout << "Not recomputing !\n";
+      return;
+    }
     // to think, most likely do a hardcall
+    for (size_t ind = 0; ind < nbInds_; ind++) {
+      float val = data()[ind];
+      if (std::isnan(val))
+        stats_[3]++; // NA == 3
+      else
+        // TODO : think of the sanity check 
+        // no sanity check ??
+        stats_[static_cast<int>(val + 0.5f)]++;
+    }
+
+    // stats are set !!
+    stats_set_ = true;
 
     // THEN : computing mu and sigma (according to arguments)
     compute_mu_sigma(set_mu, set_sigma);
@@ -262,15 +276,27 @@ public:
   }
 
 
-  // TODO : to implement !
-
   // Adding in unordered_stats 
   // (a vector with an index for N0, N1, N2, NA for every ind in the SNP)
   // the gen value for every ind for this SNP 
   // this vector has to be seen as a 'flatten' matrix with 4 rows (N0 N1 N2 NAs)
   // and nbInds columns
-  void compute_indStats(std::vector<int> &unordered_stats) {
-    throw std::logic_error("You should not be trying to compute stats for dosages for now !");
+  void compute_indStats(std::vector<int> &unordered_stats) {  
+    //#pragma omp parallel for //num_threads(4)      
+    for (size_t ind = 0; ind < nbInds_; ind++) {
+      float val = data()[ind];
+      if (std::isnan(val))
+        unordered_stats[ind * 4 + 3]++; // NA is the third value
+      else {
+        // https://stackoverflow.com/questions/485525/round-for-float-in-c
+        int round = static_cast<int>(val + 0.5f);//std::round(val);
+        if (round > -1 && round < 3) { // don't know if really usefull, and slows down
+            unordered_stats[ind * 4 + round]++;
+        } else { // could be NA but I prefer to throw an exception for now
+            throw std::logic_error("The rounding of a dosage value failed !");
+        }
+      }
+    }
   }
 
   template<typename scalar_t = double>

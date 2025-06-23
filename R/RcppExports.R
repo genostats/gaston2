@@ -57,8 +57,28 @@ SNPMatrixToNumericMatrix <- function(pM) {
     .Call(`_gaston2_SNPMatrixToNumericMatrix`, pM)
 }
 
+cbind_SNPmatrix <- function(first_matrix, scd_matrix) {
+    .Call(`_gaston2_cbind_SNPmatrix`, first_matrix, scd_matrix)
+}
+
+cbind_Dosagematrix <- function(first_matrix, scd_matrix) {
+    .Call(`_gaston2_cbind_Dosagematrix`, first_matrix, scd_matrix)
+}
+
 computeSNPStats <- function(pM) {
     invisible(.Call(`_gaston2_computeSNPStats`, pM))
+}
+
+computeSNPStatsDosage <- function(pM) {
+    invisible(.Call(`_gaston2_computeSNPStatsDosage`, pM))
+}
+
+exportSNPStats <- function(pM) {
+    invisible(.Call(`_gaston2_exportSNPStats`, pM))
+}
+
+exportSNPStatsDosage <- function(pM) {
+    invisible(.Call(`_gaston2_exportSNPStatsDosage`, pM))
 }
 
 dimDosematrix <- function(pM) {
@@ -287,5 +307,21 @@ set_num_thread <- function(num) {
 
 testsuite <- function(verbose = TRUE) {
     invisible(.Call(`_gaston2_testsuite`, verbose))
+}
+
+ToDosagematrixDisk_ <- function(pM, newfile_name) {
+    .Call(`_gaston2_ToDosagematrixDisk_`, pM, newfile_name)
+}
+
+ToDosagematrixMemory_ <- function(pM) {
+    .Call(`_gaston2_ToDosagematrixMemory_`, pM)
+}
+
+ToSNPmatrixDisk_ <- function(pM, newfile_name) {
+    .Call(`_gaston2_ToSNPmatrixDisk_`, pM, newfile_name)
+}
+
+ToSNPmatrixMemory_ <- function(pM) {
+    .Call(`_gaston2_ToSNPmatrixMemory_`, pM)
 }
 

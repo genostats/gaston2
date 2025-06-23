@@ -18,9 +18,11 @@ void extractIndsfromDosagematrixMemory(const SNPmatrix<SNPvectorClass> &other, c
   for (const auto &snp : otherSNPs){
     newMat.push_back(std::make_shared<SNPdosageMemory>(snp, keep));
   }
-  //extract stats now and set stats_set_ to true
+  // extract stats now and set stats_set_ to true
   DataStruct original_dt = other.getIndStats();
   newMat.setIndStats(DataStruct(original_dt, keep));
+  // keeping all SNPStats
+  newMat.setSnpStats(other.getSNPStats());
 }
 
 template <typename SNPvectorClass, typename intVec>

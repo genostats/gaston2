@@ -72,6 +72,7 @@ class DataStruct {
     // ---- setColumn ----
     // vérifie si la colonne existe et la remplace, et sinon fait un push_back
     // a priori la colonne est copiée lors du passage de l'argument
+    // /!\ si c'est une colonne avec le nom == "", va remplacer la 1ère colonne sans nom !
     inline void setColumn(const Column & col, std::string name) {
 #if DEBUG_DS
   std::cout << "Entering setColumn\n";
@@ -162,6 +163,43 @@ class DataStruct {
 #if DEBUG_DS
   std::cout << "colonnes vides créées\n";
 #endif
+    }
+
+    // I am stupid and this is not usefull for now but could be later on
+    // // fonction qui enlève les colonnes (ainsi que leurs noms)
+    // // spécifiés dans to_remove
+    // void remove(DataStruct & D, std::vector<std::string> & to_remove) {
+    //   for (const auto& name : to_remove) {
+    //     size_t pos = D.findColumn(name);
+    //     if (pos != D.size()) {
+    //       D.cols.erase(D.cols.begin() + pos);
+    //       D.colNames.erase(D.colNames.begin() + pos);
+    //     } else {
+    //       // commented because it is bound to happen 
+    //         //throw std::runtime_error("Failed to remove Column " + name);
+    //     }
+    //   }
+    // }
+
+    // ---- rbind two DataStruct ----
+    DataStruct(const DataStruct& dt1, const DataStruct& dt2) {
+      size_t nb_cols = dt1.size();
+      size_t nb_cols_dt2 = dt2.size();
+
+      for(size_t i = 0; i < nb_cols; i++) {
+        std::string name = dt1.colName(i);
+        // if name is "", skipping it
+        if (name != "") {
+          // only keep and append Column that exists in both
+          size_t i2 = dt2.findColumn(name);
+          if(i2 != nb_cols_dt2) {
+            // call constructor of Column that will merge the 2 columns
+            push_back(Column(dt1.at(i), dt2.at(i2)), name);
+          }
+            // if a Column with this name 
+            // doesn't exist in dt2, then not adding it
+        }
+      }
     }
 
     // ---- read File ----
