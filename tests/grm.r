@@ -1,10 +1,13 @@
 library(gaston2)
-a <- readBedFileMemory_("inst/extdata/LCT.bed", 503, 607)
-A <- SNPMatrixToNumericMatrix(a)
+
+
+a <- read.snp.matrix("inst/extdata/LCT.bed")
+
+set.mode(a, "standardized.p")
+A <- as.matrix(a)
 
 # test GRM
-
-g1 <- grm(a)
+g1 <- gaston2:::grm(a@ptr)
 
 g2 <- tcrossprod(A) / ncol(A)
 stopifnot( max(abs(g1 - g2)) < 5e-5 ) # ces calculs sont en float !
@@ -18,15 +21,15 @@ stopifnot( max(abs(g1 - g3)) < 5e-5 )
 
 if(TRUE) {
 RcppParallel::setThreadOptions(1)
-set_num_thread(1)
-mb1 <- microbenchmark::microbenchmark(grm(a), tcrossprod(A), gaston::GRM(x))
+gaston2:::set_num_thread(1)
+mb1 <- microbenchmark::microbenchmark(gaston2:::grm(a@ptr), tcrossprod(A), gaston::GRM(x))
 
 RcppParallel::setThreadOptions(4)
-set_num_thread(4)
-mb4 <- microbenchmark::microbenchmark(grm(a), gaston::GRM(x))
+gaston2:::set_num_thread(4)
+mb4 <- microbenchmark::microbenchmark(gaston2:::grm(a@ptr), gaston::GRM(x))
 
 RcppParallel::setThreadOptions(8)
-set_num_thread(8)
-mb8 <- microbenchmark::microbenchmark(grm(a), gaston::GRM(x))
+gaston2:::set_num_thread(8)
+mb8 <- microbenchmark::microbenchmark(gaston2:::grm(a@ptr), gaston::GRM(x))
 }
 

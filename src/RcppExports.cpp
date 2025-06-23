@@ -200,30 +200,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cbind_SNPmatrix
-Rcpp::XPtr<SNPmatrix<>> cbind_SNPmatrix(Rcpp::XPtr<SNPmatrix<>> first_matrix, Rcpp::XPtr<SNPmatrix<>> scd_matrix);
-RcppExport SEXP _gaston2_cbind_SNPmatrix(SEXP first_matrixSEXP, SEXP scd_matrixSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type first_matrix(first_matrixSEXP);
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type scd_matrix(scd_matrixSEXP);
-    rcpp_result_gen = Rcpp::wrap(cbind_SNPmatrix(first_matrix, scd_matrix));
-    return rcpp_result_gen;
-END_RCPP
-}
-// cbind_Dosagematrix
-Rcpp::XPtr<SNPmatrix<SNPdosage>> cbind_Dosagematrix(Rcpp::XPtr<SNPmatrix<SNPdosage>> first_matrix, Rcpp::XPtr<SNPmatrix<SNPdosage>> scd_matrix);
-RcppExport SEXP _gaston2_cbind_Dosagematrix(SEXP first_matrixSEXP, SEXP scd_matrixSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type first_matrix(first_matrixSEXP);
-    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type scd_matrix(scd_matrixSEXP);
-    rcpp_result_gen = Rcpp::wrap(cbind_Dosagematrix(first_matrix, scd_matrix));
-    return rcpp_result_gen;
-END_RCPP
-}
 // computeSNPStats
 void computeSNPStats(Rcpp::XPtr<SNPmatrix<SNPvector>> pM);
 RcppExport SEXP _gaston2_computeSNPStats(SEXP pMSEXP) {
@@ -972,8 +948,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_LD_thin_", (DL_FUNC) &_gaston2_LD_thin_, 5},
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
-    {"_gaston2_cbind_SNPmatrix", (DL_FUNC) &_gaston2_cbind_SNPmatrix, 2},
-    {"_gaston2_cbind_Dosagematrix", (DL_FUNC) &_gaston2_cbind_Dosagematrix, 2},
     {"_gaston2_computeSNPStats", (DL_FUNC) &_gaston2_computeSNPStats, 1},
     {"_gaston2_computeSNPStatsDosage", (DL_FUNC) &_gaston2_computeSNPStatsDosage, 1},
     {"_gaston2_exportSNPStats", (DL_FUNC) &_gaston2_exportSNPStats, 1},

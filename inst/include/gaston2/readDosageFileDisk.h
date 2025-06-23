@@ -58,6 +58,8 @@ inline void readDosageFileDisk(std::string dosfile, std::string bimfile, std::st
     std::shared_ptr<SNPdosageDisk<mio::access_mode::read>> snpVec(new SNPdosageDisk<mio::access_mode::read>(n_ind, file_ptr, i));
     M.push_back(snpVec);
   }
+
+  M.setChrType();
 }
 
 inline SNPmatrix<SNPdosage> readDosageFileDisk(std::string bedfile, std::string bimfile, std::string famfile) {

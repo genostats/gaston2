@@ -51,6 +51,8 @@ inline void readDosageFileMemory(std::string dosfile, std::string bimfile, std::
     M.push_back(snpVec);
   }
   file.close();
+
+  M.setChrType();
 }
 
 inline SNPmatrix<SNPdosage> readDosageFileMemory(std::string bedfile, std::string bimfile, std::string famfile) {

@@ -1,38 +1,47 @@
 #include "SNPmatrix.h"
+#include "GRM.h"
+#include "chrType.h"
 #include <iostream>
+#include <stdexcept>
 #include <Rcpp.h>
+#include "debug.h"
 
 // [[Rcpp::export]]
 Rcpp::NumericMatrix grm(Rcpp::XPtr<SNPmatrix<>> pM) {
   unsigned int nbSNPs = pM->nbSNPs();
   unsigned int nbInds = pM->nbInds();
-  std::vector<float> V( (nbInds*(nbInds + 1))/2 );
+  Rcpp::NumericMatrix R(nbInds, nbInds);
+
+  // TODO repenser à ces préliminaires,
+  // est-ce que c'est souhaitable d'en faire un membre de SNPmatrix ?
+
+  // -------- préparation appel GRM ----------
+  //
+  // il faut que tous les SNPs soient 
+  // convenablement standardisés
+  
+  // d'abord on calcule les stats
   pM->computeSNPStats();
+
+  // on compte les SNPs autosomaux
+  int nbAutosomalSNPs = 0;
   for(size_t i = 0; i < nbSNPs; i++) {  
     auto SNP = pM->getSNP(i);
-    // TODO repenser à ceci... peut-etre créer une fonction dans SNPmatrix.h pour
-    // appliquer à tous les SNPs ?
-    SNP->setScaledMode( STANDARDIZED_P, std::sqrt(nbSNPs) );
-    SNP->tcrossprod<float>(V);
-  }
- 
-  // on symmétrise mais ça pourrait être intéressant de
-  // renvoyer une matrice symétrique du package Matrix...!
-  Rcpp::NumericMatrix R(nbInds, nbInds);
-  size_t k = 0;
-  for(size_t i = 0; i < nbInds; i++) {
-    for(size_t j = 0; j <= i; j++) {
-      R(j,i) = (double) V[k++];
-    }
+    if(SNP->getChrType() == chrType::AUTOSOME) nbAutosomalSNPs++;
   }
 
-  // symmetriser
-  k = 0;
-  for(size_t i = 0; i < nbInds; i++) {
-    for(size_t j = 0; j <= i; j++) {
-      R(i,j) = (double) V[k++]; // ou R(j,i)
-    }
+  if(nbAutosomalSNPs == 0) Rcpp::stop("No autosomal SNPs");
+
+  // on les met à l'échelle voulue
+  for(size_t i = 0; i < nbSNPs; i++) {  
+    auto SNP = pM->getSNP(i);
+    SNP->setScaledMode( STANDARDIZED_P, std::sqrt(nbAutosomalSNPs) );
   }
+  // ----------------------------------------------
+
+  // calcul effectif de la GRM
+  GRM(*pM, R);  
+
   return R;
 }
 
