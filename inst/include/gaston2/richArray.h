@@ -1,5 +1,8 @@
 #include<stdexcept>
 
+#ifndef _richArray_
+#define _richArray_
+
 // this class allows to declare arrays that can be used with a part of the vector interface
 // they have members size(), begin(), end(), at()
 // (but no push_back etc)
@@ -19,3 +22,4 @@ class richArray {
   inline T * end() { return data + size_; }
 };
 
+#endif

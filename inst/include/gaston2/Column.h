@@ -216,11 +216,19 @@ struct Column {
     }
 
     // une fonction push_back 
-    // on fait un check_type... 
+    // on fait un check_type, on cast et on appelle psuh_back
     template <typename T>
     void push_back(T x) {
       checkType<T>();
       ((std::vector<T> *) handler.get())->push_back(x);
+    }
+
+    // une fonction at
+    // même démarche que push_back
+    template <typename T>
+    T at(size_t i) const {
+      checkType<T>();
+      return ((std::vector<T> *) handler.get())->at(i);
     }
 
     // une fonction push_back qui va convertir une chaine de caractères
