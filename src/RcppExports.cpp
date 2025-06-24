@@ -186,6 +186,56 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// bindIndstoDosagematrixDisk_
+Rcpp::XPtr<SNPmatrix<SNPdosageDisk<mio::access_mode::write>>> bindIndstoDosagematrixDisk_(Rcpp::XPtr<SNPmatrix<SNPdosage>> first, Rcpp::XPtr<SNPmatrix<SNPdosage>> second, std::string path);
+RcppExport SEXP _gaston2_bindIndstoDosagematrixDisk_(SEXP firstSEXP, SEXP secondSEXP, SEXP pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type first(firstSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type second(secondSEXP);
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(bindIndstoDosagematrixDisk_(first, second, path));
+    return rcpp_result_gen;
+END_RCPP
+}
+// bindIndstoDosagematrixMemory_
+Rcpp::XPtr<SNPmatrix<SNPdosageMemory>> bindIndstoDosagematrixMemory_(Rcpp::XPtr<SNPmatrix<SNPdosage>> first, Rcpp::XPtr<SNPmatrix<SNPdosage>> second);
+RcppExport SEXP _gaston2_bindIndstoDosagematrixMemory_(SEXP firstSEXP, SEXP secondSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type first(firstSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type second(secondSEXP);
+    rcpp_result_gen = Rcpp::wrap(bindIndstoDosagematrixMemory_(first, second));
+    return rcpp_result_gen;
+END_RCPP
+}
+// bindIndstoSNPmatrixDisk_
+Rcpp::XPtr<SNPmatrix<SNPvectorDisk<mio::access_mode::write>>> bindIndstoSNPmatrixDisk_(Rcpp::XPtr<SNPmatrix<SNPvector>> first, Rcpp::XPtr<SNPmatrix<SNPvector>> second, std::string newmatrix_path);
+RcppExport SEXP _gaston2_bindIndstoSNPmatrixDisk_(SEXP firstSEXP, SEXP secondSEXP, SEXP newmatrix_pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPvector>> >::type first(firstSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPvector>> >::type second(secondSEXP);
+    Rcpp::traits::input_parameter< std::string >::type newmatrix_path(newmatrix_pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(bindIndstoSNPmatrixDisk_(first, second, newmatrix_path));
+    return rcpp_result_gen;
+END_RCPP
+}
+// bindIndstoSNPmatrixMemory_
+Rcpp::XPtr<SNPmatrix<SNPvectorMemory>> bindIndstoSNPmatrixMemory_(Rcpp::XPtr<SNPmatrix<SNPvector>> first, Rcpp::XPtr<SNPmatrix<SNPvector>> second);
+RcppExport SEXP _gaston2_bindIndstoSNPmatrixMemory_(SEXP firstSEXP, SEXP secondSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPvector>> >::type first(firstSEXP);
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPvector>> >::type second(secondSEXP);
+    rcpp_result_gen = Rcpp::wrap(bindIndstoSNPmatrixMemory_(first, second));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cbind_SNPmatrix
 Rcpp::XPtr<SNPmatrix<>> cbind_SNPmatrix(Rcpp::XPtr<SNPmatrix<>> first_matrix, Rcpp::XPtr<SNPmatrix<>> scd_matrix);
 RcppExport SEXP _gaston2_cbind_SNPmatrix(SEXP first_matrixSEXP, SEXP scd_matrixSEXP) {
@@ -883,6 +933,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_LD_chunk_EM_bigmemory", (DL_FUNC) &_gaston2_LD_chunk_EM_bigmemory, 7},
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
+    {"_gaston2_bindIndstoDosagematrixDisk_", (DL_FUNC) &_gaston2_bindIndstoDosagematrixDisk_, 3},
+    {"_gaston2_bindIndstoDosagematrixMemory_", (DL_FUNC) &_gaston2_bindIndstoDosagematrixMemory_, 2},
+    {"_gaston2_bindIndstoSNPmatrixDisk_", (DL_FUNC) &_gaston2_bindIndstoSNPmatrixDisk_, 3},
+    {"_gaston2_bindIndstoSNPmatrixMemory_", (DL_FUNC) &_gaston2_bindIndstoSNPmatrixMemory_, 2},
     {"_gaston2_cbind_SNPmatrix", (DL_FUNC) &_gaston2_cbind_SNPmatrix, 2},
     {"_gaston2_cbind_Dosagematrix", (DL_FUNC) &_gaston2_cbind_Dosagematrix, 2},
     {"_gaston2_computeSNPStats", (DL_FUNC) &_gaston2_computeSNPStats, 1},

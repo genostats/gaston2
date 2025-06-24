@@ -89,6 +89,60 @@ class SNPvectorDisk : public SNPvector {
     }
   }
 
+
+  // constructeur concatenant 2 vecteurs 
+  SNPvectorDisk(const std::shared_ptr<SNPvector> first, const std::shared_ptr<SNPvector> second, std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> newfile, size_t SNP_index ) : SNPvector(first->nbInds() + second->nbInds()), file_ref_(newfile) {
+
+    // Initializing properly with the right size and zeros everywhere
+    data_ = (uint8_t*)(newfile->data() + 3 + (nbInds_/4 + ((nbInds_%4 == 0u)?0:1)) * SNP_index);
+    std::fill(data_, data_ + (nbInds_ / 4 + ((nbInds_ % 4 == 0u) ? 0 : 1)), 0);
+
+    // COPYING THE FIRST SNP
+    std::copy(first->data(), first->data() + first->nbChars(), data_);
+
+    // IF the first snp ends right with a byte, I just append it with the second one
+    int BitsOnlastByte_first = first->nbInds()%4 * 2;
+    if (BitsOnlastByte_first == 0u)  {
+      // this should copy everything
+      std::copy(second->data(), second->data() + second->nbChars(), data_ + first->nbChars());
+    } else {  // FRANKENSTEINING THE SNP :  
+      // I cannot simply do that simply because in case of padding I will have holes 
+      // so I need to shift everything if that is the case
+
+      uint8_t first_byte = 0;  
+      uint8_t second_byte = 0;
+      uint8_t carry_over = data_[first->nbChars() - 1];
+
+      int useless_bits_first = 8 - BitsOnlastByte_first;
+      int useless_bits_scd = 8 - useless_bits_first;
+
+      // still need to clean up the last byte of first snp just in case
+      // to ensure padding is with zeros, and no garbage bits are left for the |= in the loop
+      carry_over <<= useless_bits_first;
+
+      size_t new_i = (first->nbChars() - 1);
+      // parcourir tout le deuxième à partir du premier 
+      for (size_t i = 0; i < second->nbChars(); i++) { // TODO : check que le i soit correct
+        // je setup les bytes que je vais manipuler
+        first_byte = carry_over;
+        second_byte = *(second->data() + i);
+        carry_over = second_byte;
+
+        // putting the parts to be merged at the lowest bits possible
+        first_byte >>= useless_bits_first;
+        data_[new_i] = first_byte;
+
+        // preparing the second byte to be merged on the lowest bits 
+        // not conflicting with first byte
+        second_byte <<= useless_bits_scd;
+
+        // then mask the first and the second together to write
+        data_[new_i] |= second_byte;
+        new_i++;
+      }
+    }
+  }
+
   ~SNPvectorDisk() {
     //std::cout << "Destroying a SNP, here's the count of file_ref_ : " << file_ref_.use_count() << "\n";
   }
