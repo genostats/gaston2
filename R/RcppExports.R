@@ -57,6 +57,30 @@ SNPMatrixToNumericMatrix <- function(pM) {
     .Call(`_gaston2_SNPMatrixToNumericMatrix`, pM)
 }
 
+bindIndstoDosagematrixDisk_ <- function(first, second, path) {
+    .Call(`_gaston2_bindIndstoDosagematrixDisk_`, first, second, path)
+}
+
+bindIndstoDosagematrixMemory_ <- function(first, second) {
+    .Call(`_gaston2_bindIndstoDosagematrixMemory_`, first, second)
+}
+
+bindIndstoSNPmatrixDisk_ <- function(first, second, newmatrix_path) {
+    .Call(`_gaston2_bindIndstoSNPmatrixDisk_`, first, second, newmatrix_path)
+}
+
+bindIndstoSNPmatrixMemory_ <- function(first, second) {
+    .Call(`_gaston2_bindIndstoSNPmatrixMemory_`, first, second)
+}
+
+cbind_SNPmatrix <- function(first_matrix, scd_matrix) {
+    .Call(`_gaston2_cbind_SNPmatrix`, first_matrix, scd_matrix)
+}
+
+cbind_Dosagematrix <- function(first_matrix, scd_matrix) {
+    .Call(`_gaston2_cbind_Dosagematrix`, first_matrix, scd_matrix)
+}
+
 computeSNPStats <- function(pM) {
     invisible(.Call(`_gaston2_computeSNPStats`, pM))
 }

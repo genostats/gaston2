@@ -35,7 +35,8 @@ class SNPdosageDisk : public SNPdosage {
   // on donne à ce constructeur un shared ptr vers fichier ouvert par mio + le nb d'individus, et le SNP index à pointer
   SNPdosageDisk(size_t nbInds, std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref, size_t SNP_index) : 
     SNPdosage(nbInds),
-    data_( ((float *) file_ref->data()) + nbInds * SNP_index ), 
+    // no need for sizeof float because the cast is global !
+    data_( ((float *) file_ref->data()) + nbInds * SNP_index), 
     file_ref_(file_ref) {}
  
 
@@ -49,7 +50,7 @@ class SNPdosageDisk : public SNPdosage {
                 std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> file_ref, 
                 size_t SNP_index) : 
       SNPdosage(source->nbInds()), 
-      data_( ((float *) file_ref->data()) + nbInds_ * SNP_index ), 
+      data_( ((float *) file_ref->data()) + nbInds_ * SNP_index), 
       file_ref_(file_ref) {
     // on copie les données de source dans le fichier, à la bonne place qui est pointée par data_a
     const float * sourceData = source->data();
@@ -65,19 +66,32 @@ class SNPdosageDisk : public SNPdosage {
     std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> newfile, size_t SNP_index, intVec &keep) : 
     SNPdosage(keep.size()), file_ref_(newfile) {
     
-    data_ = (float *) (newfile->data() + nbInds_* SNP_index); // bcos mio sends back a char *
-    const float * sourceData = source->data();
+    data_ = ((float *) newfile->data()) + nbInds_* SNP_index ; // bcos mio sends back a char *
     const float * refdata = source->data();
 
-    uint8_t newdata = 0;
-    size_t new_byte = 0;
-    size_t new_2bits = 0;
-
     for(size_t i = 0; i < nbInds_; i++) {
-      for (size_t i = 0; i < nbInds_; i++) {
-        int ind_idx = keep[i];
-        data_[i] = refdata[ind_idx];
-      }
+      int ind_idx = keep[i];
+      data_[i] = refdata[ind_idx];
+    }
+  }
+
+
+  // constructeur concatenant 2 vecteurs, et les écrivant dans le nouveau fichier 
+  SNPdosageDisk(const std::shared_ptr<SNPdosage> first, const std::shared_ptr<SNPdosage> second, std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> newfile, size_t SNP_index ) 
+  : SNPdosage(first->nbInds() + second->nbInds()), file_ref_(newfile) {
+
+    // pointing to the right place for this SNP in the file
+    data_ = ((float*) newfile->data()) + nbInds_ * SNP_index;
+    const float * firstData = first->data();
+    const float * secondData = second->data();
+
+    size_t i = 0;// will use i to write through both snps
+    for (; i < first->nbInds(); i++) {
+      data_[i] = firstData[i];
+    }
+
+    for (size_t j = 0; j < second->nbInds(); j++) {
+      data_[i++] = secondData[j];
     }
   }
 
@@ -88,4 +102,4 @@ class SNPdosageDisk : public SNPdosage {
   }
 
 };
-#endif // SNPMMATRIX
+#endif
