@@ -62,6 +62,8 @@ void readBedFileDisk(std::string bedfile, std::string bimfile, std::string famfi
     size_t n = snpVec->nbChars(); // func inherited from SNPVec, gives back size used by SNP
     M.push_back(snpVec);
   }
+
+  M.setChrType();
 }
 
 /** @fn SNPmatrix readBedFileDisk(std::string path, size_t n_ind, size_t n_snp)

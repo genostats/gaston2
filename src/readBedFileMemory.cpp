@@ -61,6 +61,8 @@ void readBedFileMemory(std::string bedfile, std::string bimfile, std::string fam
   }
   
   file.close();
+
+  M.setChrType();
 }
 
 SNPmatrix<> readBedFileMemory(std::string bedfile, std::string bimfile, std::string famfile) {
