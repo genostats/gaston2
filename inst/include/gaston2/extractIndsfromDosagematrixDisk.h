@@ -63,6 +63,11 @@ void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> &other, const in
   DataStruct original_dt = other.getIndStats();
   newMat.setIndStats(DataStruct(original_dt, keep)); // for now does nothing else than fam file
   // but will when compute_IndStats will be implemented
+
+  // updating the N0, N1, N2 in the SNPs to have an accurate mu_ & sigma_,
+  // and read with a coherent mode (will change nothing for "RAW")
+  newMat.computeSNPStats();
+  newMat.setMode(other.getMode());
 }
 
 template <typename intVec>

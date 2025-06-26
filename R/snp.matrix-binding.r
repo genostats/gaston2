@@ -27,7 +27,7 @@
 
 # rbind
 rbind2_snp_memory <- function(x, y, ...) {
-  print("Calling bindIndstoSNPmatrixMemory_")
+  # print("Calling bindIndstoSNPmatrixMemory_")
   new_ptr <- bindIndstoSNPmatrixMemory_(x@ptr, y@ptr)
   new("snp.matrix", ptr = new_ptr, file = NULL, type = "memory")
 }
@@ -35,7 +35,7 @@ rbind2_snp_memory <- function(x, y, ...) {
 #' @export
 rbind2_snp_disk <- function(x, y, file, ...) {
   # add a check that file correct ?or let c++ do it ?
-  print("Calling bindIndstoSNPmatrixDisk_")
+  # print("Calling bindIndstoSNPmatrixDisk_")
   new_ptr <- bindIndstoSNPmatrixDisk_(x@ptr, y@ptr, file)
   new("snp.matrix", ptr = new_ptr, file = file, type = "disk")
 }
@@ -44,7 +44,7 @@ rbind2_snp_disk <- function(x, y, file, ...) {
 #' @export
 setMethod("rbind2", c(x = "snp.matrix", y = "snp.matrix"),
   function(x, y, ..., file = NULL) {
-    print("using my rbind")
+    #print("using my rbind")
     if(...length() > 0)
       type <- match.arg(..1, c("disk", "memory"))
     else
@@ -84,7 +84,7 @@ setMethod("rbind2", c(x = "snp.matrix", y = "snp.matrix"),
 #' @export
 setMethod("cbind2", c(x = "snp.matrix", y = "snp.matrix"), 
   function(x, y, ...) {
-  print("Calling cbind_SNPmatrix")
+  #print("Calling cbind_SNPmatrix")
   new_ptr <- cbind_SNPmatrix(x@ptr, y@ptr)
   new("snp.matrix", ptr = new_ptr, type = "memory")
   }

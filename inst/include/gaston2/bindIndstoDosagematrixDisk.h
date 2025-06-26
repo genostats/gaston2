@@ -67,7 +67,7 @@ void bindIndstoDosagematrixDisk(const SNPmatrix<SNPdosage> &first, const SNPmatr
   newMat.setIndStats(DataStruct(first.getIndStats(), second.getIndStats()));
   // SNP stats need to be recomputed
   newMat.setSnpStats(first.getSNPStats());
-
+  newMat.setMode(first.getMode());
 }
 
 SNPmatrix<SNPdosageDisk<mio::access_mode::write>> bindIndstoDosagematrixDisk(const SNPmatrix<SNPdosage> &first, const SNPmatrix<SNPdosage> &second, std::string path_str) {

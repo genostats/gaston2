@@ -90,6 +90,8 @@ protected: // can be accessed also by class inheriting
   //      get rid of this. 
   SNPvector(size_t nbInds, Mode mode = Mode::RAW_VALUES) : nbInds_(nbInds), mode_(mode) {}
 
+  // will update to the choosen mode 
+  // /!\ BUT NOT recompute the stats
   inline void computeMode() { 
     switch(mode_) {
       case Mode::RAW_VALUES: {
@@ -176,6 +178,8 @@ public:
   // ------------------------- mode ---------------------------------
 
   // To use set mode and compute g_trans value accordingly
+  // will NOT recompute mu & sigma, need to call 
+  // compute_stats or compute_mu_sigma directly if you want that
   void setMode(Mode mode) { 
     if(mode == mode_) return; // didn't change, do nothing
     if(mode == Mode::CUSTOM) 
@@ -324,6 +328,7 @@ public:
 
   // ----------------------------------------------------------------
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
+  // /!\ only if stats are not set !
   void compute_stats(bool set_mu = true, bool set_sigma = true) {
     // if already called, do nothing
     if(stats_set_) {

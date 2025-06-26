@@ -51,41 +51,6 @@ protected: // can be accessed also by class inheriting
   // constructor allowing to set nbInds and mode (to be called by derived classes)
   SNPdosage(size_t nbInds, Mode mode = Mode::RAW_VALUES) : nbInds_(nbInds), mode_(mode) {}
 
-  inline void computeMode() { 
-    switch(mode_) {
-      case Mode::RAW_VALUES: {
-        g_trans[0] = 0; 
-        g_trans[1] = 3;   // or NAN ?
-        g_trans[2] = 1;
-        g_trans[3] = 2;
-        break;
-      }
-      case Mode::CENTERED: {
-        g_trans[0] = 0 - mu_; 
-        g_trans[1] = 0;
-        g_trans[2] = 1 - mu_;
-        g_trans[3] = 2 - mu_;
-        break;
-      }
-      case Mode::STANDARDIZED_MU_SIGMA: {
-        g_trans[0] = (0 - mu_)/sigma_; 
-        g_trans[1] = 0;
-        g_trans[2] = (1 - mu_)/sigma_;
-        g_trans[3] = (2 - mu_)/sigma_;
-        break;
-      }
-      case Mode::STANDARDIZED_P: {
-        double s = sqrt( mu_*(1 - mu_/2) ); // sqrt 2p(1-p)
-        g_trans[0] = (0 - mu_)/s; 
-        g_trans[1] = 0;
-        g_trans[2] = (1 - mu_)/s;
-        g_trans[3] = (2 - mu_)/s;
-        break;
-      }
-      default:
-        throw std::runtime_error("Private function computeMode called with bad mode value");
-    }
-  }
 
   // n'utilise pas le mode courant, et multiplie l'écart type par scale (typiquement sqrt(nbSNPs))
   // deux modes possibles seulement
@@ -128,12 +93,17 @@ public:
   }
 
   // To use set mode and compute g_trans value accordingly
-  void setMode(Mode mode) { 
+  // will NOT recompute mu & sigma, need to call 
+  // compute_stats or compute_mu_sigma directly if you want that
+  void setMode(Mode mode) {
     if(mode == mode_) return; // didn't change, do nothing
     if(mode == Mode::CUSTOM) 
       throw std::runtime_error("Can't set custom mode this way");
+    if(mode == Mode::STANDARDIZED_P)
+      throw std::logic_error("You should not be trying to read a standardized_p dosage");
     mode_ = mode;
-    computeMode();
+    // no need for a computed mode because we can't precalculate 4 values
+    // like we did in SNPvector
   }
 
   // Will set the mode to CUSTOM !!
@@ -212,18 +182,15 @@ public:
 
   void setMu(double mu) {
     mu_ = mu;
-    computeMode(); // recompute mode
   }
 
   void setSigma(double sigma) {
     sigma_ = sigma;
-    computeMode(); // recompute mode
   }
   
   void setMuSigma(double mu, double sigma) {
     mu_ = mu;
     sigma_ = sigma;
-    computeMode(); // recompute mode
   }
 
   // This function overwrites mu and/or sigma, according to the arguments
@@ -269,10 +236,6 @@ public:
 
     // THEN : computing mu and sigma (according to arguments)
     compute_mu_sigma(set_mu, set_sigma);
-
-    /* FINALLY : updating the "mode" enum that acts as a filter
-     to get calculated via mu_and sigma_*/
-    computeMode();
   }
 
 
@@ -334,7 +297,7 @@ public:
         throw std::out_of_range("End Iterator is too far !");
     }
 
-    // operateur * const : renvoie la valeur 2bits par 2bits
+    // operateur * const : renvoie la valeur individus par individus
     double operator*() {
       float val= iterated.data()[currentInd];
       switch(iterated.mode_) {

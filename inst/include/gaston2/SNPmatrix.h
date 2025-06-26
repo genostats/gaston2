@@ -6,9 +6,6 @@
 #include <vector>     // for omp reduction
 
 #include "Datastruct.h"
-// // TODO : temporary !!
-//  #include "SNPdosage.h"
-//  #include "SNPdosageMemory.h"
 #include "SNPvector.h"
 
 #ifndef _snpmatrix_
@@ -71,6 +68,8 @@ class SNPmatrix {
    * @brief Constructor "by copy",
    * but only copying the SNPs from SNPmatrix "other"
    * specified in "keep".
+   * /!\ If the mode is changed in the new matrix,
+   * it will be changed also for the snps of the old matrix
    * @param other
    * SNPmatrix acting as a reference to extract from
    * @param keep,
@@ -92,6 +91,9 @@ class SNPmatrix {
     indStats_ = other.getIndStats();
     // Still not automatically computing indStats back,
     // so c° is setting indStatsComputed_ to false by default
+
+    // propagating the mode, BEWARE will change
+    mode_ = other.getMode();
   }
 
 
@@ -115,16 +117,6 @@ class SNPmatrix {
       this->push_back(first_snp);
     }
     const std::vector<std::shared_ptr<SNPvectorClass>> scdSNPs = second.getSNPs();
-
-    // if (scdSNPs.size()) {
-    //   auto ptr = scdSNPs.at(0);
-    //   std::cout << "Is scd SNPmatrix containing SNPdosage ? (0 = false) "
-    //   << (dynamic_cast<SNPdosage*>(ptr.get()) != nullptr)
-    //   << "\n";
-    //   std::cout << "Is scd SNPmatrix containing SNPvector ? (0 = false) "
-    //   << (dynamic_cast<SNPvector*>(ptr.get()) != nullptr)
-    //   << "\n";
-    // }
 
     for (auto scd_snp : scdSNPs) {
       this->push_back(scd_snp);
@@ -249,7 +241,9 @@ class SNPmatrix {
     std::vector<int> vecNAs;
 
     for (auto &snp : SNPs_) {
-      if (snp->stats_set() == 0) snp->compute_stats();
+      if (snp->stats_set() == 0) {
+        snp->compute_stats();
+      }
       const int *stats = snp->getStats();
 
       vecN0s.push_back(stats[0]);
@@ -257,7 +251,6 @@ class SNPmatrix {
       vecN2s.push_back(stats[2]);
       vecNAs.push_back(stats[3]);
     }
-
     snpStats_.setColumn(Column(vecN0s), "N0");
     snpStats_.setColumn(Column(vecN1s), "N1");
     snpStats_.setColumn(Column(vecN2s), "N2");
@@ -285,6 +278,14 @@ class SNPmatrix {
   // TODO (to think) there might be a problem if SNPs are not all in the same mode...
   // possible solution : enforce mode when push_back is done ?
   inline Mode mode() {
+    return mode_;
+  }
+
+  Mode getMode() const {
+    return mode_;
+  }
+
+  Mode getMode() {
     return mode_;
   }
 

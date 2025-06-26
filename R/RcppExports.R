@@ -221,6 +221,10 @@ setMode <- function(pM, mode) {
     invisible(.Call(`_gaston2_setMode`, pM, mode))
 }
 
+setModeDosage <- function(pM, mode) {
+    invisible(.Call(`_gaston2_setModeDosage`, pM, mode))
+}
+
 test_ds <- function(DF, In) {
     .Call(`_gaston2_test_ds`, DF, In)
 }

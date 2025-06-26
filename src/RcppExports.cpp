@@ -669,6 +669,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// setModeDosage
+void setModeDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, std::string mode);
+RcppExport SEXP _gaston2_setModeDosage(SEXP pMSEXP, SEXP modeSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< std::string >::type mode(modeSEXP);
+    setModeDosage(pM, mode);
+    return R_NilValue;
+END_RCPP
+}
 // test_ds
 Rcpp::DataFrame test_ds(Rcpp::DataFrame DF, Rcpp::IntegerVector In);
 RcppExport SEXP _gaston2_test_ds(SEXP DFSEXP, SEXP InSEXP) {
@@ -1063,6 +1074,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_setChrType", (DL_FUNC) &_gaston2_setChrType, 1},
     {"_gaston2_setGastonOptions", (DL_FUNC) &_gaston2_setGastonOptions, 1},
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},
+    {"_gaston2_setModeDosage", (DL_FUNC) &_gaston2_setModeDosage, 2},
     {"_gaston2_test_ds", (DL_FUNC) &_gaston2_test_ds, 2},
     {"_gaston2_test_ds2", (DL_FUNC) &_gaston2_test_ds2, 0},
     {"_gaston2_test_readBedFileMemory", (DL_FUNC) &_gaston2_test_readBedFileMemory, 4},

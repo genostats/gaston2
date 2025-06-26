@@ -23,6 +23,9 @@ void extractIndsfromDosagematrixMemory(const SNPmatrix<SNPvectorClass> &other, c
   newMat.setIndStats(DataStruct(original_dt, keep));
   // keeping all SNPStats
   newMat.setSnpStats(other.getSNPStats());
+
+  newMat.computeSNPStats();
+  newMat.setMode(other.getMode());
 }
 
 template <typename SNPvectorClass, typename intVec>

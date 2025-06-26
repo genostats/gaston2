@@ -72,6 +72,7 @@ void bindIndstoSNPmatrixDisk(const SNPmatrix<SNPvector> &first, const SNPmatrix<
   newMat.setIndStats(DataStruct(first.getIndStats(), second.getIndStats()));
   // SNP stats need to be recomputed
   newMat.setSnpStats(first.getSNPStats());
+  newMat.setMode(first.getMode());
 
 }
 

@@ -1,5 +1,4 @@
 #include <cassert>
-#include <filesystem>
 #include <fstream> // for ofstream, loading the file
 #include <iostream> // for std::cout
 #include <stdexcept>

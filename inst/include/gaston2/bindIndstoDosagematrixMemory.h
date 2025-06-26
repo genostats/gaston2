@@ -28,7 +28,7 @@ void bindIndstoDosagematrixMemory(const SNPmatrix<SNPdosage> &first, const SNPma
   newMat.setIndStats(DataStruct(first.getIndStats(), second.getIndStats()));
   // SNP stats need to be recomputed
   newMat.setSnpStats(first.getSNPStats());
-
+  newMat.setMode(first.getMode());
 }
 
 SNPmatrix<SNPdosageMemory> bindIndstoDosagematrixMemory(const SNPmatrix<SNPdosage> &first, const SNPmatrix<SNPdosage> &second) {

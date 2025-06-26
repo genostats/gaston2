@@ -1,14 +1,14 @@
 
 # rbind
 rbind2_dose_memory <- function(x, y, ...) {
-  print("Calling bindIndstoDosagematrixMemory_")
+  #print("Calling bindIndstoDosagematrixMemory_")
   new_ptr <- bindIndstoDosagematrixMemory_(x@ptr, y@ptr)
   new("dose.matrix", ptr = new_ptr, file = NULL, type = "memory")
 }
 
 #' @export
 rbind2_dose_disk <- function(x, y, file, ...) {
-  print("Calling bindIndstoSNPmatrixDisk_")
+  #print("Calling bindIndstoSNPmatrixDisk_")
   # add a check that file correct ?or let c++ do it ?
   new_ptr <- bindIndstoDosagematrixDisk_(x@ptr, y@ptr, file)
   new("dose.matrix", ptr = new_ptr, file = file, type = "disk")
@@ -18,7 +18,7 @@ rbind2_dose_disk <- function(x, y, file, ...) {
 #' @export
 setMethod("rbind2", c(x = "dose.matrix", y = "dose.matrix"),
   function(x, y, ..., file = NULL) {
-    print("using my rbinf dose.mat")
+    #print("using my rbinf dose.mat")
     if(...length() > 0)
       type <- match.arg(..1, c("disk", "memory"))
     else
@@ -58,7 +58,7 @@ setMethod("rbind2", c(x = "dose.matrix", y = "dose.matrix"),
 #' @export
 setMethod("cbind2", c(x = "dose.matrix", y = "dose.matrix"), 
   function(x, y, ...) {
-  print("Calling cbind_Dosagematrix")
+  #print("Calling cbind_Dosagematrix")
   new_ptr <- cbind_Dosagematrix(x@ptr, y@ptr)
   new("dose.matrix", ptr = new_ptr, type = "memory")
   }

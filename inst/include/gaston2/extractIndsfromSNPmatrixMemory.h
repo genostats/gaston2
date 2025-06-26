@@ -2,6 +2,7 @@
 #include "SNPvectorMemory.h"
 #include <iostream>
 #include <memory> // shared_ptr
+#include "mode.h" // for mode manipulation, tmp
 #include <cstring>
 #include <Rcpp.h>
 
@@ -23,6 +24,9 @@ void extractIndsfromSNPmatrixMemory(const SNPmatrix<SNPvectorClass> &other, cons
   newMat.setIndStats(DataStruct(original_dt, keep));
   // keeping all SNPStats
   newMat.setSnpStats(other.getSNPStats());
+
+  newMat.computeSNPStats();
+  newMat.setMode(other.getMode());
 }
 
 template <typename SNPvectorClass, typename intVec>
