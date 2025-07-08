@@ -29,24 +29,28 @@ LD_chunk_EM <- function(pM, i1, i2, j1, j2) {
     .Call(`_gaston2_LD_chunk_EM`, pM, i1, i2, j1, j2)
 }
 
-LD_square_bigmemory <- function(pM, i1, i2, path, usefloat = TRUE) {
-    invisible(.Call(`_gaston2_LD_square_bigmemory`, pM, i1, i2, path, usefloat))
+LD_square_mmatrix <- function(pM, i1, i2, path, usefloat = TRUE) {
+    .Call(`_gaston2_LD_square_mmatrix`, pM, i1, i2, path, usefloat)
 }
 
-LD_chunk_bigmemory <- function(pM, i1, i2, j1, j2, path, usefloat = TRUE) {
-    invisible(.Call(`_gaston2_LD_chunk_bigmemory`, pM, i1, i2, j1, j2, path, usefloat))
+LD_chunk_mmatrix <- function(pM, i1, i2, j1, j2, path, usefloat = TRUE) {
+    .Call(`_gaston2_LD_chunk_mmatrix`, pM, i1, i2, j1, j2, path, usefloat)
 }
 
-LD_square_EM_bigmemory <- function(pM, i1, i2, path, usefloat = TRUE) {
-    invisible(.Call(`_gaston2_LD_square_EM_bigmemory`, pM, i1, i2, path, usefloat))
+LD_square_EM_mmatrix <- function(pM, i1, i2, path, usefloat = TRUE) {
+    .Call(`_gaston2_LD_square_EM_mmatrix`, pM, i1, i2, path, usefloat)
 }
 
-LD_chunk_EM_bigmemory <- function(pM, i1, i2, j1, j2, path, usefloat = TRUE) {
-    invisible(.Call(`_gaston2_LD_chunk_EM_bigmemory`, pM, i1, i2, j1, j2, path, usefloat))
+LD_chunk_EM_mmatrix <- function(pM, i1, i2, j1, j2, path, usefloat = TRUE) {
+    .Call(`_gaston2_LD_chunk_EM_mmatrix`, pM, i1, i2, j1, j2, path, usefloat)
 }
 
 LD_thin_ <- function(pM, threshold, max_dist_bp, max_dist_cM, which_keep) {
     invisible(.Call(`_gaston2_LD_thin_`, pM, threshold, max_dist_bp, max_dist_cM, which_keep))
+}
+
+MMatrixToNumericMatrix <- function(pM, datatype) {
+    .Call(`_gaston2_MMatrixToNumericMatrix`, pM, datatype)
 }
 
 SNPMatrixToIntegerMatrix <- function(pM) {
@@ -161,8 +165,8 @@ getSNPStatsDosage <- function(pM) {
     .Call(`_gaston2_getSNPStatsDosage`, pM)
 }
 
-grm <- function(pM) {
-    .Call(`_gaston2_grm`, pM)
+grm_ <- function(pM) {
+    .Call(`_gaston2_grm_`, pM)
 }
 
 isAutosome_ <- function(chr) {
@@ -207,6 +211,10 @@ readDosageFileDisk_ <- function(bedfile, bimfile, famfile) {
 
 readFamFile <- function(pM, famFile) {
     invisible(.Call(`_gaston2_readFamFile`, pM, famFile))
+}
+
+restore_mmatrix_ <- function(datatype, file, nrow, ncol) {
+    .Call(`_gaston2_restore_mmatrix_`, datatype, file, nrow, ncol)
 }
 
 setChrType <- function(pM) {

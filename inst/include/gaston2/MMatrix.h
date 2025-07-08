@@ -11,7 +11,9 @@
 
 /*
  The goal of this class is to add the possibility for big matrices
- to become a memory mapped file using mio library */
+ to become a memory mapped file using mio library 
+ IT IS COLUMN MAJOR !
+ */
 template <typename T>
 class MMatrix
 {
@@ -38,8 +40,6 @@ public:
     template <typename U>
     std::vector<U> sum() const;
 
-    //  helper function, creates and loads a descriptor path
-    void create_descriptor_file();
 
 protected:
     // Number of columns of the matrix, (base 1).
@@ -47,6 +47,8 @@ protected:
     // Number of rows of the matrix (base 1).
     size_t nrow_;
     size_t size_;
+    // TODO : add R-style array !!
+    //std::vector dim;
     // (Relative ?) path of the file containing the matrix
     std::string path_;
     // Mio object handling the matrix.

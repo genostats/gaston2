@@ -21,3 +21,13 @@ setMethod("show", "dose.matrix",
     }
   } 
 )
+
+# de ce que je comprends pas besoin du setGeneric again, compilé à class-2-snp.matrix
+#' @export
+setMethod("add.descriptor.file", "dose.matrix", 
+function(object) {
+  # no need to check if memory or disk ?
+  # TODO : add check NULL on file
+  # RV's function : mk.descriptor.file <- function(path, nrow, ncol, type)
+  mk.descriptor.file(object@file, nrow(object), ncol(object), "double")
+})

@@ -7,7 +7,7 @@
 #include "debug.h"
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix grm(Rcpp::XPtr<SNPmatrix<>> pM) {
+Rcpp::NumericMatrix grm_(Rcpp::XPtr<SNPmatrix<>> pM) {
   unsigned int nbSNPs = pM->nbSNPs();
   unsigned int nbInds = pM->nbInds();
   Rcpp::NumericMatrix R(nbInds, nbInds);

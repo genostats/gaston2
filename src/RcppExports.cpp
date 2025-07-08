@@ -104,24 +104,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// LD_square_bigmemory
-void LD_square_bigmemory(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, std::string path, bool usefloat);
-RcppExport SEXP _gaston2_LD_square_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+// LD_square_mmatrix
+SEXP LD_square_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, std::string path, bool usefloat);
+RcppExport SEXP _gaston2_LD_square_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
     Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
-    LD_square_bigmemory(pM, i1, i2, path, usefloat);
-    return R_NilValue;
+    rcpp_result_gen = Rcpp::wrap(LD_square_mmatrix(pM, i1, i2, path, usefloat));
+    return rcpp_result_gen;
 END_RCPP
 }
-// LD_chunk_bigmemory
-void LD_chunk_bigmemory(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
-RcppExport SEXP _gaston2_LD_chunk_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+// LD_chunk_mmatrix
+SEXP LD_chunk_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
+RcppExport SEXP _gaston2_LD_chunk_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
@@ -130,28 +132,30 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type j2(j2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
     Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
-    LD_chunk_bigmemory(pM, i1, i2, j1, j2, path, usefloat);
-    return R_NilValue;
+    rcpp_result_gen = Rcpp::wrap(LD_chunk_mmatrix(pM, i1, i2, j1, j2, path, usefloat));
+    return rcpp_result_gen;
 END_RCPP
 }
-// LD_square_EM_bigmemory
-void LD_square_EM_bigmemory(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, std::string path, bool usefloat);
-RcppExport SEXP _gaston2_LD_square_EM_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+// LD_square_EM_mmatrix
+SEXP LD_square_EM_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, std::string path, bool usefloat);
+RcppExport SEXP _gaston2_LD_square_EM_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
     Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
-    LD_square_EM_bigmemory(pM, i1, i2, path, usefloat);
-    return R_NilValue;
+    rcpp_result_gen = Rcpp::wrap(LD_square_EM_mmatrix(pM, i1, i2, path, usefloat));
+    return rcpp_result_gen;
 END_RCPP
 }
-// LD_chunk_EM_bigmemory
-void LD_chunk_EM_bigmemory(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
-RcppExport SEXP _gaston2_LD_chunk_EM_bigmemory(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+// LD_chunk_EM_mmatrix
+SEXP LD_chunk_EM_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
+RcppExport SEXP _gaston2_LD_chunk_EM_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
@@ -160,8 +164,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type j2(j2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
     Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
-    LD_chunk_EM_bigmemory(pM, i1, i2, j1, j2, path, usefloat);
-    return R_NilValue;
+    rcpp_result_gen = Rcpp::wrap(LD_chunk_EM_mmatrix(pM, i1, i2, j1, j2, path, usefloat));
+    return rcpp_result_gen;
 END_RCPP
 }
 // LD_thin_
@@ -176,6 +180,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type which_keep(which_keepSEXP);
     LD_thin_(pM, threshold, max_dist_bp, max_dist_cM, which_keep);
     return R_NilValue;
+END_RCPP
+}
+// MMatrixToNumericMatrix
+Rcpp::NumericMatrix MMatrixToNumericMatrix(SEXP pM, std::string datatype);
+RcppExport SEXP _gaston2_MMatrixToNumericMatrix(SEXP pMSEXP, SEXP datatypeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< std::string >::type datatype(datatypeSEXP);
+    rcpp_result_gen = Rcpp::wrap(MMatrixToNumericMatrix(pM, datatype));
+    return rcpp_result_gen;
 END_RCPP
 }
 // SNPMatrixToIntegerMatrix
@@ -498,14 +514,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// grm
-Rcpp::NumericMatrix grm(Rcpp::XPtr<SNPmatrix<>> pM);
-RcppExport SEXP _gaston2_grm(SEXP pMSEXP) {
+// grm_
+Rcpp::NumericMatrix grm_(Rcpp::XPtr<SNPmatrix<>> pM);
+RcppExport SEXP _gaston2_grm_(SEXP pMSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
-    rcpp_result_gen = Rcpp::wrap(grm(pM));
+    rcpp_result_gen = Rcpp::wrap(grm_(pM));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -636,6 +652,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type famFile(famFileSEXP);
     readFamFile(pM, famFile);
     return R_NilValue;
+END_RCPP
+}
+// restore_mmatrix_
+SEXP restore_mmatrix_(std::string datatype, std::string file, size_t nrow, size_t ncol);
+RcppExport SEXP _gaston2_restore_mmatrix_(SEXP datatypeSEXP, SEXP fileSEXP, SEXP nrowSEXP, SEXP ncolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type datatype(datatypeSEXP);
+    Rcpp::traits::input_parameter< std::string >::type file(fileSEXP);
+    Rcpp::traits::input_parameter< size_t >::type nrow(nrowSEXP);
+    Rcpp::traits::input_parameter< size_t >::type ncol(ncolSEXP);
+    rcpp_result_gen = Rcpp::wrap(restore_mmatrix_(datatype, file, nrow, ncol));
+    return rcpp_result_gen;
 END_RCPP
 }
 // setChrType
@@ -1026,11 +1056,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_LD_pair_EM", (DL_FUNC) &_gaston2_LD_pair_EM, 3},
     {"_gaston2_LD_square_EM", (DL_FUNC) &_gaston2_LD_square_EM, 3},
     {"_gaston2_LD_chunk_EM", (DL_FUNC) &_gaston2_LD_chunk_EM, 5},
-    {"_gaston2_LD_square_bigmemory", (DL_FUNC) &_gaston2_LD_square_bigmemory, 5},
-    {"_gaston2_LD_chunk_bigmemory", (DL_FUNC) &_gaston2_LD_chunk_bigmemory, 7},
-    {"_gaston2_LD_square_EM_bigmemory", (DL_FUNC) &_gaston2_LD_square_EM_bigmemory, 5},
-    {"_gaston2_LD_chunk_EM_bigmemory", (DL_FUNC) &_gaston2_LD_chunk_EM_bigmemory, 7},
+    {"_gaston2_LD_square_mmatrix", (DL_FUNC) &_gaston2_LD_square_mmatrix, 5},
+    {"_gaston2_LD_chunk_mmatrix", (DL_FUNC) &_gaston2_LD_chunk_mmatrix, 7},
+    {"_gaston2_LD_square_EM_mmatrix", (DL_FUNC) &_gaston2_LD_square_EM_mmatrix, 5},
+    {"_gaston2_LD_chunk_EM_mmatrix", (DL_FUNC) &_gaston2_LD_chunk_EM_mmatrix, 7},
     {"_gaston2_LD_thin_", (DL_FUNC) &_gaston2_LD_thin_, 5},
+    {"_gaston2_MMatrixToNumericMatrix", (DL_FUNC) &_gaston2_MMatrixToNumericMatrix, 2},
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
     {"_gaston2_bindIndstoDosagematrixDisk_", (DL_FUNC) &_gaston2_bindIndstoDosagematrixDisk_, 3},
@@ -1059,7 +1090,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_getModeDosage", (DL_FUNC) &_gaston2_getModeDosage, 1},
     {"_gaston2_getSNPStats", (DL_FUNC) &_gaston2_getSNPStats, 1},
     {"_gaston2_getSNPStatsDosage", (DL_FUNC) &_gaston2_getSNPStatsDosage, 1},
-    {"_gaston2_grm", (DL_FUNC) &_gaston2_grm, 1},
+    {"_gaston2_grm_", (DL_FUNC) &_gaston2_grm_, 1},
     {"_gaston2_isAutosome_", (DL_FUNC) &_gaston2_isAutosome_, 1},
     {"_gaston2_isX_", (DL_FUNC) &_gaston2_isX_, 1},
     {"_gaston2_isY_", (DL_FUNC) &_gaston2_isY_, 1},
@@ -1071,6 +1102,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_readDosageFileMemory_", (DL_FUNC) &_gaston2_readDosageFileMemory_, 3},
     {"_gaston2_readDosageFileDisk_", (DL_FUNC) &_gaston2_readDosageFileDisk_, 3},
     {"_gaston2_readFamFile", (DL_FUNC) &_gaston2_readFamFile, 2},
+    {"_gaston2_restore_mmatrix_", (DL_FUNC) &_gaston2_restore_mmatrix_, 4},
     {"_gaston2_setChrType", (DL_FUNC) &_gaston2_setChrType, 1},
     {"_gaston2_setGastonOptions", (DL_FUNC) &_gaston2_setGastonOptions, 1},
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},

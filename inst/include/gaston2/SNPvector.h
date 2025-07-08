@@ -388,7 +388,7 @@ public:
     size_t nbc_m1 = nbChars() - 1;
 
     // parcourt le SNP byte by byte
-//#pragma omp parallel for //num_threads(4)
+#pragma omp parallel for
     for (size_t byte = 0; byte < nbc_m1; byte++) {
       uint8_t d = data()[byte];
       size_t byteoffset = byte * 4;

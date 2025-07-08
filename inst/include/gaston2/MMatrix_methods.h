@@ -1,3 +1,6 @@
+#ifndef MMATRIX_METHOD_H
+#define MMATRIX_METHOD_H
+
 #include <cassert>
 #include <fstream> // for ofstream, loading the file
 #include <iostream> // for std::cout
@@ -5,18 +8,17 @@
 #include <system_error> // for std::error_code
 
 #include "mio.hpp"
-#include "mmatrix.h"
+#include "MMatrix.h"
+
 
 // Constructor opening the file containing the matrix if path exists, else
 // creating one.
 template <typename T>
 MMatrix<T>::MMatrix(std::string path, size_t nrow, size_t ncol, bool verbose)
-    : ncol_(ncol)
-    , nrow_(nrow)
-    , path_(path), verbose_(verbose)
+    : ncol_(ncol), nrow_(nrow), path_(path), verbose_(verbose)
 {
     size_ = ncol * nrow;
-    if (!size_) throw std::invalid_argument("Ncol or Nrow are equal 0, cannot map an empty file !");
+    if (!size_) throw std::invalid_argument("Ncol or Nrow is equal to 0, cannot map an empty file !");
     size_t matrix_size = size_ * sizeof(T);
 
 
@@ -209,7 +211,7 @@ std::vector<U> MMatrix<T>::sum() const
 // HELPER FUNCTIONS :
 
 // get_type_name() is to get the template type by comparing it to known types
-// it's necessary to complete the descriptor file
+// was formally used to complete the descriptor file
 template <typename T>
 inline std::string get_type_name()
 {
@@ -235,100 +237,4 @@ inline std::string get_type_name()
     }
 }
 
-#if defined(_WIN32) || defined(_WIN64)
-#    include <windows.h>
-#else // For Posix and Posix compliant (e.g. macOS)
-#    include <limits.h>
-#    include <unistd.h>
 #endif
-
-inline std::string get_path()
-{
-    char buffer[PATH_MAX]; // PATH_MAX defined in limits.h
-
-#if defined(_WIN32) || defined(_WIN64)
-    // For Windows :
-    if (GetCurrentDirectoryA(sizeof(buffer), buffer))
-    {
-        return std::string(buffer);
-    }
-    else
-    {
-        std::string errMsg =
-            "Failed to retrieve the working directory on Windows";
-        throw std::runtime_error(errMsg);
-        return "";
-    }
-#else
-    // For POSIX :
-    if (getcwd(buffer, sizeof(buffer)))
-    {
-        return std::string(buffer);
-    }
-    else
-    {
-        std::string errMsg =
-            "Failed to retrieve the working directory on POSIX";
-        throw std::runtime_error(errMsg);
-        return "";
-    }
-#endif
-}
-
-/* Method to create a descriptor file with metadata
-making the matrix compatible with bigmemory for example
-*/
-
-// Create the descriptor file
-// for now, will only deal with ncols nrows size and paths.
-// will be fed to attach.big.matrix in bigmemory
-// like so : y <- attach.big.matrix(matrix.desc)
-// TODO : for a better readability, check if possible to add \n
-template <typename T>
-void MMatrix<T>::create_descriptor_file()
-{
-    // Generate the descriptor file name
-    std::string descriptor_file_ = path_ + ".desc";
-
-    // Create and write to the descriptor file
-    std::ofstream desc_file(descriptor_file_);
-    if (!desc_file || !desc_file.is_open())
-    {
-        throw std::runtime_error("Failed to open the descriptor file.");
-    }
-
-    desc_file << "new(\"big.matrix.descriptor\", description = list(";
-    desc_file << "sharedType = \"FileBacked\", "; // always TRUE if the
-                                                  // big.matrix is file-backed
-    desc_file << "filename = \"" << path_ << "\", ";
-
-    std::string working_dir = get_path();
-    // TODO : print to debug
-    std::cout << "current directory : " << working_dir << "\n";
-
-    desc_file << "dirname = \"" << working_dir << "\", ";
-    desc_file << "totalRows = " << nrow_ << "L, ";
-    desc_file << "totalCols = " << ncol_ << "L, ";
-    // TODO : same here
-    desc_file << "rowOffset = c(0, " << nrow_ << "), ";
-    desc_file << "colOffset = c(0, " << ncol_ << "), ";
-    desc_file << "nrow = " << nrow_ << ", ";
-    desc_file << "ncol = " << ncol_ << ", ";
-
-    // TODO : Add col names here if necessary
-    desc_file << "rowNames = NULL, colNames = NULL, ";
-
-    std::string type_ = get_type_name<T>();
-    // TODO : print to debug
-    // std::cout << "type in matrix: " << type_ << " \n";
-    desc_file << "type = \"" << type_ << "\", ";
-
-    desc_file << "separated = FALSE"; // from cran bigmemory, use separated
-                                      // column organization of the data;
-    desc_file << "))";
-
-    desc_file.close();
-
-    // TODO : add error codes
-    // TODO : ask myself, keep void as return type ?
-}
