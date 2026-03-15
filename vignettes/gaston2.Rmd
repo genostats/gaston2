@@ -1,0 +1,94 @@
+---
+title: "Gaston 2"
+subtitle: "A new version of gaston, with memory-mapped object objects"
+author: "Juliette Meyniel and Hervé Perdry"
+version: 0.1
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{gaston2}
+  %\VignettePackage{gaston2}
+  %\VignetteDepends{gaston2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = FALSE, results = "hide", message = FALSE}
+oldoptions <- options()
+oldpar <- par()
+options(width = 85)
+require(houba)
+```
+
+<style type="text/css">
+h1.title {
+  font-size: 200%;
+}
+
+h1 {
+  font-size: 160%;
+  margin: 1em 0 0.25em 0;
+}
+
+h2 {
+  font-size: 130%;
+  margin: 0.25em 0 0.25em 0;
+}
+
+pre {
+  padding: 0px;
+  margin: 0 0 0.5em 0;
+}
+
+div.sourceCode {
+  margin: 0px;
+}
+
+</style>
+
+# Gaston 2
+
+Gaston 2 is under development. The first release is planned for mid-May 2026.
+
+## A short overview
+
+The R package `gaston2` is a complete rewrite of `gaston` <https://cran.r-project.org/package=gaston>.  
+`Gaston` was first released in 2015 and works well for datasets of up to 10,000 individuals. `Gaston2` 
+will allow users to manipulate larger datasets without loading them into memory, by using memory-mapped objects. 
+It will also include additional features for dosage data.
+
+The main features of `gaston2` will be:
+
+* Data manipulation and filtering for quality control.
+* Computation of genetic relationship matrices and principal component analysis (PCA).
+* Association studies (LMM and GLMM).
+
+
+## A simple example
+
+Here is a simple example of data manipulation with `gaston2`.
+
+```{r}
+require(gaston2)
+filename <- system.file("extdata", "LCT.bed", package="gaston2")
+
+# reading in memory
+x1 <- read.snp.matrix(filename)
+x1
+# memory mapped object
+x2 <- read.snp.matrix(filename, memory = FALSE)
+x2
+
+# You can control wether the submatrices are in temporary files, or in memmory
+x2[ 1:20, ]
+x2[ 1:20, , "memory"]
+
+# Computing a LD matrix as an R object
+A1 <- LD(x2, c(1, ncol(x2)), measure = "r2")
+str(A1)
+
+# ...or as a memory mapped matrix, thanks to our package 'houba'
+A2 <- LD(x2, c(1, ncol(x2)), measure = "r2", filename = tempfile())
+A2
+```
+

@@ -4,7 +4,15 @@
 \alias{LD}
 \title{Linkage Disequilibrium}
 \usage{
-LD(x, lim, lim2, measure, method, ...)
+LD(
+  x,
+  lim,
+  lim2,
+  measure = c("r2", "r", "D"),
+  method = c("moments", "EM"),
+  filename,
+  float = TRUE
+)
 }
 \arguments{
 \item{x}{A \code{\link{bed.matrix}}}
