@@ -1,9 +1,8 @@
 #' @export
-setGeneric("grm", function(x) standardGeneric("grm"))
-#je crois qu'il manquait un setGeneric
+setGeneric("GRM", function(x) standardGeneric("GRM"))
 
 #' @export
-setMethod("grm", c(x = "snp.matrix"), 
+setMethod("GRM", c(x = "snp.matrix"), 
   function(x) {
   return(grm_(x@ptr))
   }

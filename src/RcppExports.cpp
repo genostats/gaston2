@@ -182,18 +182,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// MMatrixToNumericMatrix
-Rcpp::NumericMatrix MMatrixToNumericMatrix(SEXP pM, std::string datatype);
-RcppExport SEXP _gaston2_MMatrixToNumericMatrix(SEXP pMSEXP, SEXP datatypeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type pM(pMSEXP);
-    Rcpp::traits::input_parameter< std::string >::type datatype(datatypeSEXP);
-    rcpp_result_gen = Rcpp::wrap(MMatrixToNumericMatrix(pM, datatype));
-    return rcpp_result_gen;
-END_RCPP
-}
 // SNPMatrixToIntegerMatrix
 Rcpp::IntegerMatrix SNPMatrixToIntegerMatrix(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_SNPMatrixToIntegerMatrix(SEXP pMSEXP) {
@@ -654,20 +642,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// restore_mmatrix_
-SEXP restore_mmatrix_(std::string datatype, std::string file, size_t nrow, size_t ncol);
-RcppExport SEXP _gaston2_restore_mmatrix_(SEXP datatypeSEXP, SEXP fileSEXP, SEXP nrowSEXP, SEXP ncolSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type datatype(datatypeSEXP);
-    Rcpp::traits::input_parameter< std::string >::type file(fileSEXP);
-    Rcpp::traits::input_parameter< size_t >::type nrow(nrowSEXP);
-    Rcpp::traits::input_parameter< size_t >::type ncol(ncolSEXP);
-    rcpp_result_gen = Rcpp::wrap(restore_mmatrix_(datatype, file, nrow, ncol));
-    return rcpp_result_gen;
-END_RCPP
-}
 // setChrType
 void setChrType(Rcpp::XPtr<SNPmatrix<SNPvector>> pM);
 RcppExport SEXP _gaston2_setChrType(SEXP pMSEXP) {
@@ -1061,7 +1035,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_LD_square_EM_mmatrix", (DL_FUNC) &_gaston2_LD_square_EM_mmatrix, 5},
     {"_gaston2_LD_chunk_EM_mmatrix", (DL_FUNC) &_gaston2_LD_chunk_EM_mmatrix, 7},
     {"_gaston2_LD_thin_", (DL_FUNC) &_gaston2_LD_thin_, 5},
-    {"_gaston2_MMatrixToNumericMatrix", (DL_FUNC) &_gaston2_MMatrixToNumericMatrix, 2},
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
     {"_gaston2_bindIndstoDosagematrixDisk_", (DL_FUNC) &_gaston2_bindIndstoDosagematrixDisk_, 3},
@@ -1102,7 +1075,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_readDosageFileMemory_", (DL_FUNC) &_gaston2_readDosageFileMemory_, 3},
     {"_gaston2_readDosageFileDisk_", (DL_FUNC) &_gaston2_readDosageFileDisk_, 3},
     {"_gaston2_readFamFile", (DL_FUNC) &_gaston2_readFamFile, 2},
-    {"_gaston2_restore_mmatrix_", (DL_FUNC) &_gaston2_restore_mmatrix_, 4},
     {"_gaston2_setChrType", (DL_FUNC) &_gaston2_setChrType, 1},
     {"_gaston2_setGastonOptions", (DL_FUNC) &_gaston2_setGastonOptions, 1},
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},

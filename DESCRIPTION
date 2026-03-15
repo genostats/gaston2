@@ -1,14 +1,14 @@
 Package: gaston2
 Type: Package
-Title: 3 classes for SNPs manipulations, that can also be on disk.
+Title: Gaston 2 le retour
 Version: 1.0
-Date: 2023-11-16
+Date: 2025-03-15
 Encoding: UTF-8
-Author: Juju
+Author: Hervé, Juliette
 Maintainer: Your Name <your@email.com>
-Description: 3 classes keeping SNPs, possibly header only ? 
+Description: Blah blah
 License: GPL (>= 2)
-Depends: bigmemory (>= 4.6.4)
+Depends: houba
 Imports: Rcpp (>= 1.0.11)
-LinkingTo: Rcpp
+LinkingTo: Rcpp, houba
 RoxygenNote: 7.3.2

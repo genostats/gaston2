@@ -49,10 +49,6 @@ LD_thin_ <- function(pM, threshold, max_dist_bp, max_dist_cM, which_keep) {
     invisible(.Call(`_gaston2_LD_thin_`, pM, threshold, max_dist_bp, max_dist_cM, which_keep))
 }
 
-MMatrixToNumericMatrix <- function(pM, datatype) {
-    .Call(`_gaston2_MMatrixToNumericMatrix`, pM, datatype)
-}
-
 SNPMatrixToIntegerMatrix <- function(pM) {
     .Call(`_gaston2_SNPMatrixToIntegerMatrix`, pM)
 }
@@ -211,10 +207,6 @@ readDosageFileDisk_ <- function(bedfile, bimfile, famfile) {
 
 readFamFile <- function(pM, famFile) {
     invisible(.Call(`_gaston2_readFamFile`, pM, famFile))
-}
-
-restore_mmatrix_ <- function(datatype, file, nrow, ncol) {
-    .Call(`_gaston2_restore_mmatrix_`, datatype, file, nrow, ncol)
 }
 
 setChrType <- function(pM) {

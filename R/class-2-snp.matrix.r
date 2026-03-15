@@ -21,14 +21,3 @@ setMethod("show", "snp.matrix",
     }
   } 
 )
-
-#' @export
-setGeneric("add.descriptor.file", function(object) standardGeneric("add.descriptor.file"))
-#' @export
-setMethod("add.descriptor.file", "snp.matrix", 
-function(object) {
-  # no need to check if memory or disk ?
-  # TODO : add check NULL on file
-  # RV's function : mk.descriptor.file <- function(path, nrow, ncol, type)
-  mk.descriptor.file(object@file, nrow(object), ncol(object), "int")
-})

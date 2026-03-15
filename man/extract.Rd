@@ -3,35 +3,35 @@
 %   R/snp.matrix-subsetting.r
 \name{extract}
 \alias{extract}
-\alias{[,dose.matrix,missing,logical,ANY-method}
-\alias{[,dose.matrix,numeric,missing,ANY-method}
-\alias{[,dose.matrix,logical,missing,ANY-method}
-\alias{[,dose.matrix,index,index,ANY-method}
-\alias{[,snp.matrix,missing,logical,ANY-method}
-\alias{[,snp.matrix,numeric,missing,ANY-method}
-\alias{[,snp.matrix,logical,missing,ANY-method}
-\alias{[,snp.matrix,index,index,ANY-method}
+\alias{[,dose.matrix,missing,logical-method}
+\alias{[,dose.matrix,numeric,missing-method}
+\alias{[,dose.matrix,logical,missing-method}
+\alias{[,dose.matrix,index,index-method}
+\alias{[,snp.matrix,missing,logical-method}
+\alias{[,snp.matrix,numeric,missing-method}
+\alias{[,snp.matrix,logical,missing-method}
+\alias{[,snp.matrix,index,index-method}
 \title{Extract parts of DOSE matrix}
 \usage{
-\S4method{[}{dose.matrix,missing,numeric,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{dose.matrix,missing,numeric}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{dose.matrix,missing,logical,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{dose.matrix,missing,logical}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{dose.matrix,numeric,missing,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{dose.matrix,numeric,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{dose.matrix,logical,missing,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{dose.matrix,logical,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{dose.matrix,index,index,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{dose.matrix,index,index}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{snp.matrix,missing,numeric,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{snp.matrix,missing,numeric}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{snp.matrix,missing,logical,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{snp.matrix,missing,logical}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{snp.matrix,numeric,missing,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{snp.matrix,numeric,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{snp.matrix,logical,missing,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{snp.matrix,logical,missing}(x, i, j, ..., drop = TRUE)
 
-\S4method{[}{snp.matrix,index,index,ANY}(x, i, j, ..., drop = TRUE)
+\S4method{[}{snp.matrix,index,index}(x, i, j, ..., drop = TRUE)
 }
 \description{
 Extract columns / lines of a dose.matrix object
