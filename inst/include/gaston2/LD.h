@@ -22,10 +22,10 @@ class LD_pair_f;
 template<typename scalar_t, typename SNPvectorClass>
 class LD_pair_f<LDalgorithm::moments, scalar_t, SNPvectorClass>{
   public:
-  inline scalar_t operator()(SNPmatrix<SNPvectorClass> & M, size_t i1, size_t i2) {
+  inline scalar_t operator()(SNPmatrix<SNPvectorClass> & M, size_t i1, size_t i2, bool r_scale) {
     SNPvector & snp1 = *(M.getSNP(i1));
     SNPvector & snp2 = *(M.getSNP(i2));
-    return snp1.LD<scalar_t>(snp2);
+    return snp1.LD<scalar_t>(snp2, r_scale);
   }
 };
 
@@ -33,15 +33,14 @@ class LD_pair_f<LDalgorithm::moments, scalar_t, SNPvectorClass>{
 template<typename scalar_t, typename SNPvectorClass>
 class LD_pair_f<LDalgorithm::EM, scalar_t, SNPvectorClass> {
   public:
-  inline scalar_t operator()(SNPmatrix<SNPvectorClass> & M, size_t i1, size_t i2) {
+  inline scalar_t operator()(SNPmatrix<SNPvectorClass> & M, size_t i1, size_t i2, bool r_scale) {
     richArray<9, unsigned int> table;
     SNPvector & snp1 = *(M.getSNP(i1));
     SNPvector & snp2 = *(M.getSNP(i2));
     snp1.contingency(snp2, table);
-    return LD_EM<scalar_t>(table);
+    return LD_EM<scalar_t>(table, r_scale);
   }
 };
-
 
 
 
@@ -50,7 +49,7 @@ class LD_pair_f<LDalgorithm::EM, scalar_t, SNPvectorClass> {
 // (column major mode matrix)
  
 template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
-void LD_matrix(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, matrixType & M) {
+void LD_matrix(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, matrixType & M, bool r_scale) {
   if(c1 >= A.size() || c2 >= A.size()) throw std::runtime_error("Bad bound in LD_matrix");
   const size_t n = c2-c1+1;
   if(n != M.nrow() || n != M.ncol()) {
@@ -64,7 +63,7 @@ void LD_matrix(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, matrixType &
     size_t x1 = c1+i1;
     for(size_t i2 = 0; i2 <= i1; i2++) {
       size_t x2 = c1+i2;
-      M(i2, i1) = f(A, x1, x2);
+      M(i2, i1) = f(A, x1, x2, r_scale);
     }
   } 
 
@@ -91,7 +90,7 @@ void LD_matrix(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, matrixType &
 
 // Intervalles c1 c2 et d1 d2 disjoints [sauf possiblement un point sur la diagonale, mais pas de calculs en double]
 template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
-void LD_chunk_0(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+void LD_chunk_0(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M, bool r_scale) {
   if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_0");
 
@@ -99,14 +98,14 @@ void LD_chunk_0(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, 
 #pragma omp parallel for
   for(size_t x2 = d1; x2 <= d2; x2++) {
     for(size_t x1 = c1; x1 <= c2; x1++) {
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
     }
   }
 }
 
 // c1 <= d1 < c2 <= d2
 template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
-void LD_chunk_1(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+void LD_chunk_1(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M, bool r_scale) {
   if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_1");
 
@@ -114,12 +113,12 @@ void LD_chunk_1(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, 
 #pragma omp parallel for
   for(size_t x2 = d1; x2 <= d2; x2++) 
     for(size_t x1 = c1; x1 < d1; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
 
 #pragma omp parallel for
   for(size_t x2 = d1; x2 <= c2; x2++) 
     for(size_t x1 = d1; x1 <= x2; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
 
   // symetriser ce morceau
 #pragma omp parallel for
@@ -130,13 +129,13 @@ void LD_chunk_1(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, 
 #pragma omp parallel for
   for(size_t x2 = c2+1; x2 <= d2; x2++) 
     for(size_t x1 = d1; x1 <= c2; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
 }
 
 
 // d1 <= c1 < d2 < =c2
 template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
-void LD_chunk_2(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+void LD_chunk_2(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M, bool r_scale) {
   if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_2");
 
@@ -144,12 +143,12 @@ void LD_chunk_2(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, 
 #pragma omp parallel for
   for(size_t x2 = d1; x2 < c1; x2++) 
     for(size_t x1 = c1; x1 <= c2; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
   
 #pragma omp parallel for
   for(size_t x2 = c1; x2 <= d2; x2++) 
     for(size_t x1 = c1; x1 <= x2; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
   
   // symetriser ce morceau
 #pragma omp parallel for
@@ -160,12 +159,12 @@ void LD_chunk_2(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, 
 #pragma omp parallel for
   for(size_t x2 = c1; x2 <= d2; x2++) 
     for(size_t x1 = d2+1; x1 <= c2; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
 }
 
 // d1 < c1 <= c2 < d2
 template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
-void LD_chunk_3(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+void LD_chunk_3(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M, bool r_scale) {
   if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_3");
 
@@ -173,12 +172,12 @@ void LD_chunk_3(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, 
 #pragma omp parallel for
   for(size_t x2 = d1; x2 < c1; x2++) 
     for(size_t x1 = c1; x1 <= c2; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
   
 #pragma omp parallel for
   for(size_t x2 = c1; x2 <= c2; x2++) 
     for(size_t x1 = c1; x1 <= x2; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
 
   // symmetriser ce morceau
 #pragma omp parallel for
@@ -189,13 +188,13 @@ void LD_chunk_3(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, 
 #pragma omp parallel for
   for(size_t x2 = c2+1; x2 <= d2; x2++) 
     for(size_t x1 = c1; x1 <= c2; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
 }
 
 
 // c1 <= d1 <= d2 <= c2 
 template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
-void LD_chunk_4(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+void LD_chunk_4(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M, bool r_scale) {
   if(c2-c1+1 != M.nrow() || d2-d1+1 != M.ncol()) 
     throw std::runtime_error("dimension mismatch in LD_chunk_4");
 
@@ -203,12 +202,12 @@ void LD_chunk_4(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, 
 #pragma omp parallel for
   for(size_t x2 = d1; x2 <= d2; x2++) 
     for(size_t x1 = c1; x1 < d1; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
   
 #pragma omp parallel for
   for(size_t x2 = d1; x2 <= d2; x2++) 
     for(size_t x1 = d1; x1 <= x2; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
 
   // symetriser ce morceau
 #pragma omp parallel for
@@ -219,23 +218,23 @@ void LD_chunk_4(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, 
 #pragma omp parallel for
   for(size_t x2 = d1; x2 <= d2; x2++) 
     for(size_t x1 = d2+1; x1 <= c2; x1++) 
-      M(x1 - c1, x2 - d1) = f(A, x1, x2);
+      M(x1 - c1, x2 - d1) = f(A, x1, x2, r_scale);
 }
 
 
 // Cette fonction fait le choix de la bonne fonction
 template<LDalgorithm Algo, typename scalar_t = double, typename SNPvectorClass, typename matrixType>
-void LD_chunk(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M) {
+void LD_chunk(SNPmatrix<SNPvectorClass> & A, size_t c1, size_t c2, size_t d1, size_t d2, matrixType & M, bool r_scale) {
   if(c2 <= d1 || d2 <= c1)
-    LD_chunk_0<Algo, scalar_t>(A, c1, c2, d1, d2, M);
+    LD_chunk_0<Algo, scalar_t>(A, c1, c2, d1, d2, M, r_scale);
   else if(c1 <= d1 && c2 <= d2)
-    LD_chunk_1<Algo, scalar_t>(A, c1, c2, d1, d2, M);
+    LD_chunk_1<Algo, scalar_t>(A, c1, c2, d1, d2, M, r_scale);
   else if(d1 <= c1 && d2 <= c2)
-    LD_chunk_2<Algo, scalar_t>(A, c1, c2, d1, d2, M);
+    LD_chunk_2<Algo, scalar_t>(A, c1, c2, d1, d2, M, r_scale);
   else if(d1 <= c1 && c2 <= d2)
-    LD_chunk_3<Algo, scalar_t>(A, c1, c2, d1, d2, M);
+    LD_chunk_3<Algo, scalar_t>(A, c1, c2, d1, d2, M, r_scale);
   else if(c1 <= d1 && d2 <= c2)
-    LD_chunk_4<Algo, scalar_t>(A, c1, c2, d1, d2, M);
+    LD_chunk_4<Algo, scalar_t>(A, c1, c2, d1, d2, M, r_scale);
   else 
     throw std::runtime_error("Uncatched case, this should not happen");
 }

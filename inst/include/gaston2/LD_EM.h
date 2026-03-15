@@ -4,10 +4,10 @@
 #include <limits>
 
 
-// A function for the EM algorithm to compute LD
+// A function for the EM algorithm to compute LD 
 // x must be an integer vector with size 9. 
 template<typename scalar_t, typename intVec>
-inline scalar_t LD_EM(intVec x, scalar_t eps = std::sqrt(std::numeric_limits<scalar_t>::epsilon())) {
+inline scalar_t LD_EM(intVec x, bool r_scale, scalar_t eps = std::sqrt(std::numeric_limits<scalar_t>::epsilon())) {
 
   if(x.size() != 9) throw std::runtime_error("In LD_EM, bad vector size");
  
@@ -27,8 +27,9 @@ inline scalar_t LD_EM(intVec x, scalar_t eps = std::sqrt(std::numeric_limits<sca
   // that is, the algorithm will converge in one interation
   // NOTE there might be several local maxima. We don't try to check this. This shouldn't
   // happen often when HW holds.
-  scalar_t tau = (scalar_t) (2*x[0] + x[1] + x[3]) * (scalar_t) (2*x[8] + x[5] + x[7]);
-  tau /= tau + (scalar_t) (2*x[2] + x[1] + x[5]) * (scalar_t) (2*x[6] + x[3] + x[7]);
+  //  scalar_t tau = (scalar_t) (2*x[0] + x[1] + x[3]) * (scalar_t) (2*x[8] + x[5] + x[7]);
+  // tau /= tau + (scalar_t) (2*x[2] + x[1] + x[5]) * (scalar_t) (2*x[6] + x[3] + x[7]);
+  scalar_t tau = 0.5; // The above trick gives bad results for some matrices when there's a large departure from HWE
 
   // some edge cases 
   if(tau != tau) { // NaN
@@ -48,8 +49,10 @@ inline scalar_t LD_EM(intVec x, scalar_t eps = std::sqrt(std::numeric_limits<sca
     tau /= (tau + (alpha2 - tau_beta)*(alpha3 - tau_beta));
   } while(std::abs(tau-tau_old) > eps);
 
-  return alpha0 + tau*beta - fA*fB;
+  scalar_t D = alpha0 + tau*beta - fA*fB;
+  if(r_scale) 
+    return D/std::sqrt(fa*fA*fb*fB);
+  else 
+    return D;
 }
-
-
 

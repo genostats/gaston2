@@ -17,7 +17,7 @@
 // le type boolVector est un vecteur de booléens (opérateurs size() et [])
 // le type FUN est soit une fonction soit une classe avec un operateur()
 //
-//  threshold  : seuil de thinning (sur r^2)
+//  threshold  : seuil de thinning (sur abs(r))
 //
 // max_dist_bp : distance en bp au delà de laquelle on ne considère le LD nul sans le calculer
 // max_dist_cM : distance en cM au delà de laquelle on ne considère le LD nul sans le calculer
@@ -82,7 +82,7 @@ void LD_thin(SNPmatrix<SNPvectorClass> & A, float threshold, unsigned int max_di
         j++;
         continue;
       }
-      float ld_ij = ldf(A, i, j);
+      float ld_ij = ldf(A, i, j, true);
       if( std::abs(ld_ij) <= threshold ) { // LD is below threshold
         if(!found_next_i) {
           next_i = j;

@@ -322,7 +322,8 @@ public:
     if(set_mu) mu_ = m;
     if(set_sigma) {
       double mu2 = m * m;
-      sigma_ = std::sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
+      // sigma_ = std::sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
+      sigma_ = std::sqrt((N1s + 4 * N2s + NAs * mu2) / n - mu2);
     }
   }
 
@@ -415,7 +416,7 @@ public:
   // for scalar product :
   // CAVEAT: stats are supposed set! 
   template<typename scalar_t = double>
-  inline scalar_t LD(const SNPvector &other) const {
+  inline scalar_t LD(const SNPvector &other, bool r_scale) const {
      
     size_t nbi = nbInds(); 
     if (nbi != other.nbInds())
@@ -436,9 +437,11 @@ public:
     gg[14] = (2. - mu_) * (1. - (other.mu_));
     gg[15] = (2. - mu_) * (2. - (other.mu_));
 
-    // PB ! what if v == 0 ?
-    // TODO return NaN directly
-    scalar_t v = sigma_ * other.sigma_;
+    scalar_t v = 2; // si on veut la covariance gamétique il faut diviser par 2 la cov génotypique
+    if(r_scale) v = sigma_ * other.sigma_;
+ 
+    // if v == 0 return NaN directly
+    if(v == 0) return std::numeric_limits<scalar_t>::quiet_NaN();
 
     auto data1 = data();
     auto data2 = other.data();
@@ -470,7 +473,7 @@ public:
       g2 >>= 2;
     }
 
-    scalar_t r = LD / (v * (nbi - 1)); // nbInds should be the same for both
+    scalar_t r = LD / (v * nbi); // nbInds should be the same for both
     return r;
   }
 

@@ -1,3 +1,6 @@
+- Dans LD ajouter "Dprime" dans les mesures
+  dans snpVector.h pour le LD on divise par nbi... compter les données complètes ?
+
 - les fonctions de lecture ddans DataStruct ne sont pas robustes
   à la présence de chaines de caractères dans une colonne numerique (eg 'NA')
   même strtof ne doit pas faire ce qu'on voudrait dans ce cas

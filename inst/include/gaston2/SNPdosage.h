@@ -263,7 +263,7 @@ public:
   }
 
   template<typename scalar_t = double>
-  inline scalar_t LD(const SNPdosage &other) const {
+  inline scalar_t LD(const SNPdosage &other, bool r_scale) const {
      throw std::logic_error("You should not call LD on a Dosage object yet !");
   }
 

@@ -22,35 +22,37 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// LD_pair
-double LD_pair(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2);
-RcppExport SEXP _gaston2_LD_pair(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
+// LD_pair_moments
+double LD_pair_moments(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, bool r_scale);
+RcppExport SEXP _gaston2_LD_pair_moments(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP r_scaleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
-    rcpp_result_gen = Rcpp::wrap(LD_pair(pM, i1, i2));
+    Rcpp::traits::input_parameter< bool >::type r_scale(r_scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_pair_moments(pM, i1, i2, r_scale));
     return rcpp_result_gen;
 END_RCPP
 }
-// LD_square
-Rcpp::NumericMatrix LD_square(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2);
-RcppExport SEXP _gaston2_LD_square(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
+// LD_square_moments
+Rcpp::NumericMatrix LD_square_moments(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, bool r_scale);
+RcppExport SEXP _gaston2_LD_square_moments(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP r_scaleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
-    rcpp_result_gen = Rcpp::wrap(LD_square(pM, i1, i2));
+    Rcpp::traits::input_parameter< bool >::type r_scale(r_scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_square_moments(pM, i1, i2, r_scale));
     return rcpp_result_gen;
 END_RCPP
 }
-// LD_chunk
-Rcpp::NumericMatrix LD_chunk(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2);
-RcppExport SEXP _gaston2_LD_chunk(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP) {
+// LD_chunk_moments
+Rcpp::NumericMatrix LD_chunk_moments(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, bool r_scale);
+RcppExport SEXP _gaston2_LD_chunk_moments(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP r_scaleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -59,39 +61,42 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
     Rcpp::traits::input_parameter< size_t >::type j2(j2SEXP);
-    rcpp_result_gen = Rcpp::wrap(LD_chunk(pM, i1, i2, j1, j2));
+    Rcpp::traits::input_parameter< bool >::type r_scale(r_scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_chunk_moments(pM, i1, i2, j1, j2, r_scale));
     return rcpp_result_gen;
 END_RCPP
 }
 // LD_pair_EM
-double LD_pair_EM(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2);
-RcppExport SEXP _gaston2_LD_pair_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
+double LD_pair_EM(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, bool r_scale);
+RcppExport SEXP _gaston2_LD_pair_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP r_scaleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
-    rcpp_result_gen = Rcpp::wrap(LD_pair_EM(pM, i1, i2));
+    Rcpp::traits::input_parameter< bool >::type r_scale(r_scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_pair_EM(pM, i1, i2, r_scale));
     return rcpp_result_gen;
 END_RCPP
 }
 // LD_square_EM
-Rcpp::NumericMatrix LD_square_EM(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2);
-RcppExport SEXP _gaston2_LD_square_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP) {
+Rcpp::NumericMatrix LD_square_EM(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, bool r_scale);
+RcppExport SEXP _gaston2_LD_square_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP r_scaleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
-    rcpp_result_gen = Rcpp::wrap(LD_square_EM(pM, i1, i2));
+    Rcpp::traits::input_parameter< bool >::type r_scale(r_scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_square_EM(pM, i1, i2, r_scale));
     return rcpp_result_gen;
 END_RCPP
 }
 // LD_chunk_EM
-Rcpp::NumericMatrix LD_chunk_EM(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2);
-RcppExport SEXP _gaston2_LD_chunk_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP) {
+Rcpp::NumericMatrix LD_chunk_EM(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, bool r_scale);
+RcppExport SEXP _gaston2_LD_chunk_EM(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP r_scaleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -100,13 +105,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
     Rcpp::traits::input_parameter< size_t >::type j2(j2SEXP);
-    rcpp_result_gen = Rcpp::wrap(LD_chunk_EM(pM, i1, i2, j1, j2));
+    Rcpp::traits::input_parameter< bool >::type r_scale(r_scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(LD_chunk_EM(pM, i1, i2, j1, j2, r_scale));
     return rcpp_result_gen;
 END_RCPP
 }
-// LD_square_mmatrix
-SEXP LD_square_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, std::string path, bool usefloat);
-RcppExport SEXP _gaston2_LD_square_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+// LD_square_moments_mmatrix
+SEXP LD_square_moments_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, std::string path, bool r_scale, bool usefloat);
+RcppExport SEXP _gaston2_LD_square_moments_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP r_scaleSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -114,14 +120,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type r_scale(r_scaleSEXP);
     Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
-    rcpp_result_gen = Rcpp::wrap(LD_square_mmatrix(pM, i1, i2, path, usefloat));
+    rcpp_result_gen = Rcpp::wrap(LD_square_moments_mmatrix(pM, i1, i2, path, r_scale, usefloat));
     return rcpp_result_gen;
 END_RCPP
 }
-// LD_chunk_mmatrix
-SEXP LD_chunk_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
-RcppExport SEXP _gaston2_LD_chunk_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+// LD_chunk_moments_mmatrix
+SEXP LD_chunk_moments_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool r_scale, bool usefloat);
+RcppExport SEXP _gaston2_LD_chunk_moments_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP r_scaleSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -131,14 +138,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
     Rcpp::traits::input_parameter< size_t >::type j2(j2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type r_scale(r_scaleSEXP);
     Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
-    rcpp_result_gen = Rcpp::wrap(LD_chunk_mmatrix(pM, i1, i2, j1, j2, path, usefloat));
+    rcpp_result_gen = Rcpp::wrap(LD_chunk_moments_mmatrix(pM, i1, i2, j1, j2, path, r_scale, usefloat));
     return rcpp_result_gen;
 END_RCPP
 }
 // LD_square_EM_mmatrix
-SEXP LD_square_EM_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, std::string path, bool usefloat);
-RcppExport SEXP _gaston2_LD_square_EM_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+SEXP LD_square_EM_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, std::string path, bool r_scale, bool usefloat);
+RcppExport SEXP _gaston2_LD_square_EM_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP pathSEXP, SEXP r_scaleSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -146,14 +154,15 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type i1(i1SEXP);
     Rcpp::traits::input_parameter< size_t >::type i2(i2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type r_scale(r_scaleSEXP);
     Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
-    rcpp_result_gen = Rcpp::wrap(LD_square_EM_mmatrix(pM, i1, i2, path, usefloat));
+    rcpp_result_gen = Rcpp::wrap(LD_square_EM_mmatrix(pM, i1, i2, path, r_scale, usefloat));
     return rcpp_result_gen;
 END_RCPP
 }
 // LD_chunk_EM_mmatrix
-SEXP LD_chunk_EM_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool usefloat);
-RcppExport SEXP _gaston2_LD_chunk_EM_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP usefloatSEXP) {
+SEXP LD_chunk_EM_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2, size_t j1, size_t j2, std::string path, bool r_scale, bool usefloat);
+RcppExport SEXP _gaston2_LD_chunk_EM_mmatrix(SEXP pMSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP j1SEXP, SEXP j2SEXP, SEXP pathSEXP, SEXP r_scaleSEXP, SEXP usefloatSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -163,8 +172,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< size_t >::type j1(j1SEXP);
     Rcpp::traits::input_parameter< size_t >::type j2(j2SEXP);
     Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    Rcpp::traits::input_parameter< bool >::type r_scale(r_scaleSEXP);
     Rcpp::traits::input_parameter< bool >::type usefloat(usefloatSEXP);
-    rcpp_result_gen = Rcpp::wrap(LD_chunk_EM_mmatrix(pM, i1, i2, j1, j2, path, usefloat));
+    rcpp_result_gen = Rcpp::wrap(LD_chunk_EM_mmatrix(pM, i1, i2, j1, j2, path, r_scale, usefloat));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1024,16 +1034,16 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_DoseMatrixToNumericMatrix", (DL_FUNC) &_gaston2_DoseMatrixToNumericMatrix, 1},
-    {"_gaston2_LD_pair", (DL_FUNC) &_gaston2_LD_pair, 3},
-    {"_gaston2_LD_square", (DL_FUNC) &_gaston2_LD_square, 3},
-    {"_gaston2_LD_chunk", (DL_FUNC) &_gaston2_LD_chunk, 5},
-    {"_gaston2_LD_pair_EM", (DL_FUNC) &_gaston2_LD_pair_EM, 3},
-    {"_gaston2_LD_square_EM", (DL_FUNC) &_gaston2_LD_square_EM, 3},
-    {"_gaston2_LD_chunk_EM", (DL_FUNC) &_gaston2_LD_chunk_EM, 5},
-    {"_gaston2_LD_square_mmatrix", (DL_FUNC) &_gaston2_LD_square_mmatrix, 5},
-    {"_gaston2_LD_chunk_mmatrix", (DL_FUNC) &_gaston2_LD_chunk_mmatrix, 7},
-    {"_gaston2_LD_square_EM_mmatrix", (DL_FUNC) &_gaston2_LD_square_EM_mmatrix, 5},
-    {"_gaston2_LD_chunk_EM_mmatrix", (DL_FUNC) &_gaston2_LD_chunk_EM_mmatrix, 7},
+    {"_gaston2_LD_pair_moments", (DL_FUNC) &_gaston2_LD_pair_moments, 4},
+    {"_gaston2_LD_square_moments", (DL_FUNC) &_gaston2_LD_square_moments, 4},
+    {"_gaston2_LD_chunk_moments", (DL_FUNC) &_gaston2_LD_chunk_moments, 6},
+    {"_gaston2_LD_pair_EM", (DL_FUNC) &_gaston2_LD_pair_EM, 4},
+    {"_gaston2_LD_square_EM", (DL_FUNC) &_gaston2_LD_square_EM, 4},
+    {"_gaston2_LD_chunk_EM", (DL_FUNC) &_gaston2_LD_chunk_EM, 6},
+    {"_gaston2_LD_square_moments_mmatrix", (DL_FUNC) &_gaston2_LD_square_moments_mmatrix, 6},
+    {"_gaston2_LD_chunk_moments_mmatrix", (DL_FUNC) &_gaston2_LD_chunk_moments_mmatrix, 8},
+    {"_gaston2_LD_square_EM_mmatrix", (DL_FUNC) &_gaston2_LD_square_EM_mmatrix, 6},
+    {"_gaston2_LD_chunk_EM_mmatrix", (DL_FUNC) &_gaston2_LD_chunk_EM_mmatrix, 8},
     {"_gaston2_LD_thin_", (DL_FUNC) &_gaston2_LD_thin_, 5},
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},

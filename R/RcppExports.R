@@ -5,44 +5,44 @@ DoseMatrixToNumericMatrix <- function(pM) {
     .Call(`_gaston2_DoseMatrixToNumericMatrix`, pM)
 }
 
-LD_pair <- function(pM, i1, i2) {
-    .Call(`_gaston2_LD_pair`, pM, i1, i2)
+LD_pair_moments <- function(pM, i1, i2, r_scale) {
+    .Call(`_gaston2_LD_pair_moments`, pM, i1, i2, r_scale)
 }
 
-LD_square <- function(pM, i1, i2) {
-    .Call(`_gaston2_LD_square`, pM, i1, i2)
+LD_square_moments <- function(pM, i1, i2, r_scale) {
+    .Call(`_gaston2_LD_square_moments`, pM, i1, i2, r_scale)
 }
 
-LD_chunk <- function(pM, i1, i2, j1, j2) {
-    .Call(`_gaston2_LD_chunk`, pM, i1, i2, j1, j2)
+LD_chunk_moments <- function(pM, i1, i2, j1, j2, r_scale) {
+    .Call(`_gaston2_LD_chunk_moments`, pM, i1, i2, j1, j2, r_scale)
 }
 
-LD_pair_EM <- function(pM, i1, i2) {
-    .Call(`_gaston2_LD_pair_EM`, pM, i1, i2)
+LD_pair_EM <- function(pM, i1, i2, r_scale) {
+    .Call(`_gaston2_LD_pair_EM`, pM, i1, i2, r_scale)
 }
 
-LD_square_EM <- function(pM, i1, i2) {
-    .Call(`_gaston2_LD_square_EM`, pM, i1, i2)
+LD_square_EM <- function(pM, i1, i2, r_scale) {
+    .Call(`_gaston2_LD_square_EM`, pM, i1, i2, r_scale)
 }
 
-LD_chunk_EM <- function(pM, i1, i2, j1, j2) {
-    .Call(`_gaston2_LD_chunk_EM`, pM, i1, i2, j1, j2)
+LD_chunk_EM <- function(pM, i1, i2, j1, j2, r_scale) {
+    .Call(`_gaston2_LD_chunk_EM`, pM, i1, i2, j1, j2, r_scale)
 }
 
-LD_square_mmatrix <- function(pM, i1, i2, path, usefloat = TRUE) {
-    .Call(`_gaston2_LD_square_mmatrix`, pM, i1, i2, path, usefloat)
+LD_square_moments_mmatrix <- function(pM, i1, i2, path, r_scale, usefloat = TRUE) {
+    .Call(`_gaston2_LD_square_moments_mmatrix`, pM, i1, i2, path, r_scale, usefloat)
 }
 
-LD_chunk_mmatrix <- function(pM, i1, i2, j1, j2, path, usefloat = TRUE) {
-    .Call(`_gaston2_LD_chunk_mmatrix`, pM, i1, i2, j1, j2, path, usefloat)
+LD_chunk_moments_mmatrix <- function(pM, i1, i2, j1, j2, path, r_scale, usefloat = TRUE) {
+    .Call(`_gaston2_LD_chunk_moments_mmatrix`, pM, i1, i2, j1, j2, path, r_scale, usefloat)
 }
 
-LD_square_EM_mmatrix <- function(pM, i1, i2, path, usefloat = TRUE) {
-    .Call(`_gaston2_LD_square_EM_mmatrix`, pM, i1, i2, path, usefloat)
+LD_square_EM_mmatrix <- function(pM, i1, i2, path, r_scale, usefloat = TRUE) {
+    .Call(`_gaston2_LD_square_EM_mmatrix`, pM, i1, i2, path, r_scale, usefloat)
 }
 
-LD_chunk_EM_mmatrix <- function(pM, i1, i2, j1, j2, path, usefloat = TRUE) {
-    .Call(`_gaston2_LD_chunk_EM_mmatrix`, pM, i1, i2, j1, j2, path, usefloat)
+LD_chunk_EM_mmatrix <- function(pM, i1, i2, j1, j2, path, r_scale, usefloat = TRUE) {
+    .Call(`_gaston2_LD_chunk_EM_mmatrix`, pM, i1, i2, j1, j2, path, r_scale, usefloat)
 }
 
 LD_thin_ <- function(pM, threshold, max_dist_bp, max_dist_cM, which_keep) {

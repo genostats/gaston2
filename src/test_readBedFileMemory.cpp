@@ -527,7 +527,7 @@ NumericMatrix test_LD_square(int SNPnb1, int SNPnb2)
         // snp2.compute_mu_sigma();
       }
 
-       double r = snp1.LD(snp2); // parce que double par défaut dans template
+       double r = snp1.LD(snp2, true); // parce que double par défaut dans template
        res(i, j) = r * r; // plus carré dans la fonction
     }
   }
