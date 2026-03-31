@@ -1,4 +1,4 @@
-- Dans LD ajouter "Dprime" dans les mesures
+- Dans LD ajouter "Dprime" dans les mesures (je refuse qu'on déprime !!)
   dans snpVector.h pour le LD on divise par nbi... compter les données complètes ?
 
 - les fonctions de lecture ddans DataStruct ne sont pas robustes
@@ -8,9 +8,37 @@
 - JU dans l'extraction de matrices, setIndStats met indStatsComputed = true
   il faudrait propager la valeur de indStatsComputed_ de la matrice originelle
   au cas où on ait seulement chargé le fam file, ou même rien chargé du tout
+  /!\ Vérifier si toujours vrai !
 
   JU question : à quoi servent les .get() dans Column.h ? à un autre moment
   on a utilisé les shared pointeurs sans mettre de get
 
+  JU question de retour : Pourquoi dans extractIndsfromDosagematrixMemory
+  on a un template <typename SNPvectorClass (...)> pour other et newMat ?
+  Dans extractIndsfromDosagematrixDisk, la f° n'est plus templatée et other
+  et newMat sont des SNPmatrix<SNPdosage> (forcée)
+
+  JU encore question de retour : Pourquoi les extracts utilisent les méthodes
+  push_back() et pas les constructeurs par copie avec des keep ?
+
 - chr_type_ dans SNPvector n'est pas utilisé dans le calcul des stats... revoir.
   [est bien utilisé pour ne calculer la GRM que sur les autosomes]
+
+POUR AVRIL : 
+
+- *** Niveau Débutant ***
+  Ajouter une interface avec houba pour la GRM, qui doit pouvoir renvoyer une mmatrix
+  Globalement adapter le code déjà existant de LD
+  Possiblement dans GRM.h déplacer usefloat en premier
+
+- *** Niveau Intermédiaire ***
+  modifier le snp.stats pour appeler le exportSNPstats plutôt.
+  Aussi y ajouter un check de si les Columns "N0s" "N1s" ... existent avec un return
+  possiblement un bool force pour recalculer quand même
+
+- *** Niveau expert / Ingénieur de recherche ***
+  Dans les SNPstats, regarder quand est-ce qu'elles sont calculées, quand est-ce qu'elles 
+  sont renvoyées (particulièrement le recompute dans getSNPstats)
+  => ajouter un getter et un setter en R
+  Adapter la classe DataStruct en R (probablement S4) pour garder un *DataStruct
+  va simplifier grandement le add de column (plus besoin d'en faire un par type)
