@@ -234,6 +234,17 @@ class SNPmatrix {
     }
   }
 
+  // compute SNP stats for snp i with i1 <= i <= i2
+  // SHOULD THIS CHANGE TO i1 <= i < i2 ?
+  void computeSNPStats(size_t i1, size_t i2) {
+    if (i1 > i2) std::swap(i1, i2);
+    if (i2 >= SNPs_.size())
+      throw std::out_of_range("Out of range [computeSNPStats]");
+    for (size_t i = i1; i <= i2; i++) {
+      SNPs_[i]->compute_stats();
+    }
+  }
+
   void exportSNPStats() {
     std::vector<int> vecN0s;
     std::vector<int> vecN1s;
@@ -255,17 +266,6 @@ class SNPmatrix {
     snpStats_.setColumn(Column(vecN1s), "N1");
     snpStats_.setColumn(Column(vecN2s), "N2");
     snpStats_.setColumn(Column(vecNAs), "NAs");
-  }
-
-  // comute SNP stats for snp i with i1 <= i <= i2
-  // SHOULD THIS CHANGE TO i1 <= i < i2 ?
-  void computeSNPStats(size_t i1, size_t i2) {
-    if (i1 > i2) std::swap(i1, i2);
-    if (i2 >= SNPs_.size())
-      throw std::out_of_range("Out of range [computeSNPStats]");
-    for (size_t i = i1; i <= i2; i++) {
-      SNPs_[i]->compute_stats();
-    }
   }
 
   void setMode(Mode mode) {

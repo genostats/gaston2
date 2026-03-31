@@ -11,3 +11,6 @@
 
   JU question : à quoi servent les .get() dans Column.h ? à un autre moment
   on a utilisé les shared pointeurs sans mettre de get
+
+- chr_type_ dans SNPvector n'est pas utilisé dans le calcul des stats... revoir.
+  [est bien utilisé pour ne calculer la GRM que sur les autosomes]
