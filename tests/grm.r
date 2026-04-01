@@ -7,7 +7,7 @@ set.mode(a, "standardized.p")
 A <- as.matrix(a)
 
 # test GRM
-g1 <- gaston2:::grm(a@ptr)
+g1 <- gaston2:::GRM(a)
 
 g2 <- tcrossprod(A) / ncol(A)
 stopifnot( max(abs(g1 - g2)) < 5e-5 ) # ces calculs sont en float !
@@ -18,18 +18,27 @@ x <- gaston::as.bed.matrix(LCT.gen, LCT.fam, LCT.bim)
 g3 <- gaston::GRM(x)*606/607
 stopifnot( max(abs(g1 - g3)) < 5e-5 ) 
 
+fn <- "grm_test"
+g4 <- gaston2::GRM(a, fn)
+g4 <- as.matrix(g4)
+stopifnot( max(abs(g4 - g3)) < 5e-5 )
+
 
 if(TRUE) {
 RcppParallel::setThreadOptions(1)
 gaston2:::set_num_thread(1)
-mb1 <- microbenchmark::microbenchmark(gaston2:::grm(a@ptr), tcrossprod(A), gaston::GRM(x))
+mb1 <- microbenchmark::microbenchmark(gaston2:::GRM(a), tcrossprod(A), gaston::GRM(x))
 
 RcppParallel::setThreadOptions(4)
 gaston2:::set_num_thread(4)
-mb4 <- microbenchmark::microbenchmark(gaston2:::grm(a@ptr), gaston::GRM(x))
+mb4 <- microbenchmark::microbenchmark(gaston2:::GRM(a), gaston::GRM(x))
 
 RcppParallel::setThreadOptions(8)
 gaston2:::set_num_thread(8)
-mb8 <- microbenchmark::microbenchmark(gaston2:::grm(a@ptr), gaston::GRM(x))
+mb8 <- microbenchmark::microbenchmark(gaston2:::GRM(a), gaston::GRM(x))
 }
 
+#Cleanup grm_test
+if (file.exists(fn)) {
+  file.remove(fn)
+}

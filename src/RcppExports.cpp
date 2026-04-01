@@ -523,6 +523,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// grm_mmatrix
+SEXP grm_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, std::string path);
+RcppExport SEXP _gaston2_grm_mmatrix(SEXP pMSEXP, SEXP pathSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< std::string >::type path(pathSEXP);
+    rcpp_result_gen = Rcpp::wrap(grm_mmatrix(pM, path));
+    return rcpp_result_gen;
+END_RCPP
+}
 // isAutosome_
 Rcpp::LogicalVector isAutosome_(Rcpp::IntegerVector chr);
 RcppExport SEXP _gaston2_isAutosome_(SEXP chrSEXP) {
@@ -1074,6 +1086,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_getSNPStats", (DL_FUNC) &_gaston2_getSNPStats, 1},
     {"_gaston2_getSNPStatsDosage", (DL_FUNC) &_gaston2_getSNPStatsDosage, 1},
     {"_gaston2_grm_", (DL_FUNC) &_gaston2_grm_, 1},
+    {"_gaston2_grm_mmatrix", (DL_FUNC) &_gaston2_grm_mmatrix, 2},
     {"_gaston2_isAutosome_", (DL_FUNC) &_gaston2_isAutosome_, 1},
     {"_gaston2_isX_", (DL_FUNC) &_gaston2_isX_, 1},
     {"_gaston2_isY_", (DL_FUNC) &_gaston2_isY_, 1},

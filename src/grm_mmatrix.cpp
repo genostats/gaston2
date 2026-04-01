@@ -5,14 +5,24 @@
 #include "chrType.h" // pour le check sur les autosomes
 #include <stdexcept>
 
+#include "houba/MMatrix.h"
+
 // [[Rcpp::export]]
-Rcpp::NumericMatrix grm_(Rcpp::XPtr<SNPmatrix<>> pM) {
+SEXP grm_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, std::string path) {
   unsigned int nbSNPs = pM->nbSNPs();
   unsigned int nbInds = pM->nbInds();
-  Rcpp::NumericMatrix R(nbInds, nbInds);
+  
+  // -------- préparation objet houba ----------
 
-  // TODO repenser à ces préliminaires,
-  // est-ce que c'est souhaitable d'en faire un membre de SNPmatrix ?
+  Rcpp::S4 GRM_MMatrix("mmatrix");
+  GRM_MMatrix.slot("file") = path;
+  GRM_MMatrix.slot("dim") = Rcpp::IntegerVector::create(nbInds, nbInds);
+  GRM_MMatrix.slot("readonly") =  false;
+
+  // cast en double au moment du calcul dans GRM.h
+  Rcpp::XPtr<houba::MMatrix<double>>  GRM_ptr(new houba::MMatrix<double>(path, nbInds, nbInds));
+  GRM_MMatrix.slot("ptr") = GRM_ptr;
+  GRM_MMatrix.slot("datatype") = "double";
 
   // -------- préparation appel GRM ----------
   //
@@ -40,7 +50,7 @@ Rcpp::NumericMatrix grm_(Rcpp::XPtr<SNPmatrix<>> pM) {
 
   // calcul effectif de la GRM
 
-  GRM(*pM, R);  
+  GRM(*pM, *GRM_ptr);  
 
-  return R;
+  return GRM_MMatrix;
 }

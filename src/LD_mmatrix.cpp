@@ -21,7 +21,7 @@ SEXP LD_square_moments_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, size_t i1, size_t i2,
   pM->computeSNPStats(i1, i2);
   Rcpp::S4 LD("mmatrix");
   LD.slot("file") = path;
-  LD.slot("dim") = Rcpp::IntegerVector::create(i2 - i1 + 1, i2 - i1 + 1);;
+  LD.slot("dim") = Rcpp::IntegerVector::create(i2 - i1 + 1, i2 - i1 + 1);
   LD.slot("readonly") =  false;
   if (usefloat) {
     Rcpp::XPtr<houba::MMatrix<float>>  LD_ptr(new houba::MMatrix<float>(path, i2 - i1 + 1, i2 - i1 + 1));

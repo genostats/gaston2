@@ -42,3 +42,6 @@ POUR AVRIL :
   => ajouter un getter et un setter en R
   Adapter la classe DataStruct en R (probablement S4) pour garder un *DataStruct
   va simplifier grandement le add de column (plus besoin d'en faire un par type)
+
+- *** Niveau maso ***
+  faire le tour des TODOs dans les fichiers et soit clean soit les reports ici

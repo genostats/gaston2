@@ -133,11 +133,11 @@ getGastonOptions_ <- function() {
     .Call(`_gaston2_getGastonOptions_`)
 }
 
-getIndStats <- function(pM, compute = TRUE) {
+getIndStats <- function(pM, compute = FALSE) {
     .Call(`_gaston2_getIndStats`, pM, compute)
 }
 
-getIndStatsDosage <- function(pM, compute = TRUE) {
+getIndStatsDosage <- function(pM, compute = FALSE) {
     .Call(`_gaston2_getIndStatsDosage`, pM, compute)
 }
 
@@ -163,6 +163,10 @@ getSNPStatsDosage <- function(pM) {
 
 grm_ <- function(pM) {
     .Call(`_gaston2_grm_`, pM)
+}
+
+grm_mmatrix <- function(pM, path) {
+    .Call(`_gaston2_grm_mmatrix`, pM, path)
 }
 
 isAutosome_ <- function(chr) {
