@@ -56,15 +56,16 @@ void extractIndsfromSNPmatrixDisk(const SNPmatrix<SNPvectorClass> &other, const 
   size_t SNPindex = 0;
 
   for (const auto &snp : otherSNPs){
-    newMat.push_back(std::make_shared<SNPvectorDisk<mio::access_mode::write>>(snp, file_ptr, SNPindex++, keep));
+    // not populating stats now
+    newMat.push_back(std::make_shared<SNPvectorDisk<mio::access_mode::write>>(snp, file_ptr, SNPindex++, keep), false);
   }
   //extract stats now and set stats_set_ to true
   DataStruct original_dt = other.getIndStats();
   newMat.setIndStats(DataStruct(original_dt, keep));
-  // keeping all SNPStats
+  // keeping all SNPStats from file
   newMat.setSnpStats(other.getSNPStats());
-
-  newMat.computeSNPStats();
+  // then computing new ones
+  newMat.exportSNPStats(true);
   newMat.setMode(other.getMode());
 }
 

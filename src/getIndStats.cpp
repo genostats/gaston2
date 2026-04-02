@@ -8,13 +8,13 @@ Rcpp::DataFrame DataStructToDataFrame(const DataStruct & DS);
 
 // [[Rcpp::export]]
 Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix<>> pM, bool compute = false) {
-  if (compute) pM->compute_indStats(compute); // to force recomputing, if never accessed before, even with no force will compute
+  pM->compute_indStats(compute); // to force recomputing, if never accessed before, even with no force will compute
   return DataStructToDataFrame( pM->getIndStats() );
 }
 
 // [[Rcpp::export]]
 Rcpp::DataFrame getIndStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, bool compute = false) {
-  if (compute) pM->compute_indStats(compute); // to force recomputing, if never accessed before, even with no force will compute
+  pM->compute_indStats(compute); // to force recomputing, if never accessed before, even with no force will compute
   return DataStructToDataFrame( pM->getIndStats() );
 }
 

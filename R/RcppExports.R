@@ -153,12 +153,12 @@ getModeDosage <- function(pM) {
     .Call(`_gaston2_getModeDosage`, pM)
 }
 
-getSNPStats <- function(pM) {
-    .Call(`_gaston2_getSNPStats`, pM)
+getSNPStats <- function(pM, compute = FALSE) {
+    .Call(`_gaston2_getSNPStats`, pM, compute)
 }
 
-getSNPStatsDosage <- function(pM) {
-    .Call(`_gaston2_getSNPStatsDosage`, pM)
+getSNPStatsDosage <- function(pM, compute = FALSE) {
+    .Call(`_gaston2_getSNPStatsDosage`, pM, compute)
 }
 
 grm_ <- function(pM) {

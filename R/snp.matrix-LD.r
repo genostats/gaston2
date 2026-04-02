@@ -52,9 +52,9 @@ LD <- function(x, lim, lim2, measure = c("r2", "r", "D"), method = c("moments", 
     # -------------- square LD matrix -------------
     if(missing(filename)) { # output R matrix
       if(method == "moments") 
-        A <- LD_square_moments(x@ptr, lim[1], lim[2], r.scale, FALSE)
+        A <- LD_square_moments(x@ptr, lim[1], lim[2], r.scale)
       else
-        A <- LD_square_EM(x@ptr, lim[1], lim[2], r.scale, FALSE)
+        A <- LD_square_EM(x@ptr, lim[1], lim[2], r.scale)
     } else { # output houba mmatrix
       if(method == "moments") 
         A <- LD_square_moments_mmatrix(x@ptr, lim[1], lim[2], filename, r.scale, float)
@@ -65,9 +65,9 @@ LD <- function(x, lim, lim2, measure = c("r2", "r", "D"), method = c("moments", 
     # ------------------ non square LD matrix -------------
     if(missing(filename)) { # ouput R matrix
       if(method == "moments") 
-        A <- LD_chunk_moments(x@ptr, lim[1], lim[2], lim2[1], lim2[2], r.scale, FALSE)
+        A <- LD_chunk_moments(x@ptr, lim[1], lim[2], lim2[1], lim2[2], r.scale)
       else
-        A <- LD_chunk_EM(x@ptr, lim[1], lim[2], lim2[1], lim2[2], r.scale, FALSE)
+        A <- LD_chunk_EM(x@ptr, lim[1], lim[2], lim2[1], lim2[2], r.scale)
     } else { # output houba mmatrix
       if(method == "moments") 
         A <- LD_chunk_moments_mmatrix(x@ptr, lim[1], lim[2], lim2[1], lim2[2], filename, r.scale, float)

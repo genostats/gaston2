@@ -54,7 +54,7 @@ void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> &other, const in
   size_t SNPindex = 0;
 
   for (const auto &snp : otherSNPs){
-    newMat.push_back(std::make_shared<SNPdosageDisk<mio::access_mode::write>>(snp, file_ptr, SNPindex++, keep));
+    newMat.push_back(std::make_shared<SNPdosageDisk<mio::access_mode::write>>(snp, file_ptr, SNPindex++, keep), false);
   }
   // keeping all SNPStats
   DataStruct og_snp_stats = other.getSNPStats();
@@ -66,7 +66,7 @@ void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> &other, const in
 
   // updating the N0, N1, N2 in the SNPs to have an accurate mu_ & sigma_,
   // and read with a coherent mode (will change nothing for "RAW")
-  newMat.computeSNPStats();
+  newMat.exportSNPStats(true); // TODO : is true necessary ? ici et aux autres extracts
   newMat.setMode(other.getMode());
 }
 

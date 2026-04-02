@@ -491,24 +491,26 @@ BEGIN_RCPP
 END_RCPP
 }
 // getSNPStats
-Rcpp::DataFrame getSNPStats(Rcpp::XPtr<SNPmatrix<>> pM);
-RcppExport SEXP _gaston2_getSNPStats(SEXP pMSEXP) {
+Rcpp::DataFrame getSNPStats(Rcpp::XPtr<SNPmatrix<>> pM, bool compute);
+RcppExport SEXP _gaston2_getSNPStats(SEXP pMSEXP, SEXP computeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
-    rcpp_result_gen = Rcpp::wrap(getSNPStats(pM));
+    Rcpp::traits::input_parameter< bool >::type compute(computeSEXP);
+    rcpp_result_gen = Rcpp::wrap(getSNPStats(pM, compute));
     return rcpp_result_gen;
 END_RCPP
 }
 // getSNPStatsDosage
-Rcpp::DataFrame getSNPStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM);
-RcppExport SEXP _gaston2_getSNPStatsDosage(SEXP pMSEXP) {
+Rcpp::DataFrame getSNPStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, bool compute);
+RcppExport SEXP _gaston2_getSNPStatsDosage(SEXP pMSEXP, SEXP computeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<SNPdosage>> >::type pM(pMSEXP);
-    rcpp_result_gen = Rcpp::wrap(getSNPStatsDosage(pM));
+    Rcpp::traits::input_parameter< bool >::type compute(computeSEXP);
+    rcpp_result_gen = Rcpp::wrap(getSNPStatsDosage(pM, compute));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1083,8 +1085,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_test_force_compute_indStats", (DL_FUNC) &_gaston2_test_force_compute_indStats, 1},
     {"_gaston2_getMode", (DL_FUNC) &_gaston2_getMode, 1},
     {"_gaston2_getModeDosage", (DL_FUNC) &_gaston2_getModeDosage, 1},
-    {"_gaston2_getSNPStats", (DL_FUNC) &_gaston2_getSNPStats, 1},
-    {"_gaston2_getSNPStatsDosage", (DL_FUNC) &_gaston2_getSNPStatsDosage, 1},
+    {"_gaston2_getSNPStats", (DL_FUNC) &_gaston2_getSNPStats, 2},
+    {"_gaston2_getSNPStatsDosage", (DL_FUNC) &_gaston2_getSNPStatsDosage, 2},
     {"_gaston2_grm_", (DL_FUNC) &_gaston2_grm_, 1},
     {"_gaston2_grm_mmatrix", (DL_FUNC) &_gaston2_grm_mmatrix, 2},
     {"_gaston2_isAutosome_", (DL_FUNC) &_gaston2_isAutosome_, 1},

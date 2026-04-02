@@ -16,7 +16,7 @@ void extractIndsfromDosagematrixMemory(const SNPmatrix<SNPvectorClass> &other, c
   const std::vector<std::shared_ptr<SNPdosage>> otherSNPs = other.getSNPs();
 
   for (const auto &snp : otherSNPs){
-    newMat.push_back(std::make_shared<SNPdosageMemory>(snp, keep));
+    newMat.push_back(std::make_shared<SNPdosageMemory>(snp, keep), false);
   }
   // extract stats now and set stats_set_ to true
   DataStruct original_dt = other.getIndStats();
@@ -24,7 +24,7 @@ void extractIndsfromDosagematrixMemory(const SNPmatrix<SNPvectorClass> &other, c
   // keeping all SNPStats
   newMat.setSnpStats(other.getSNPStats());
 
-  newMat.computeSNPStats();
+  newMat.exportSNPStats(true);
   newMat.setMode(other.getMode());
 }
 

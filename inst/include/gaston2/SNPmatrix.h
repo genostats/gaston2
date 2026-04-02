@@ -22,9 +22,9 @@ class SNPmatrix {
   /**
    * @brief function to add a shared_ptr into the vector keeping the
    * SNPs of the matrix. /!\ will check if the SNP added is matching in size
-   *
+   * Will also updates the snpStats_ of the SNPmatrix if populate_stats = true (by default)
    */
-  void push_back(std::shared_ptr<SNPvectorClass> v) {
+  void push_back(std::shared_ptr<SNPvectorClass> v, bool populate_stats = true) {
     // if at least one loaded, everySNPs must have same size
     if (nbSNPs() > 0 && nbInds() != v->nbInds()) {
       std::cerr << "Pb loading SNP" << std::endl;
@@ -33,6 +33,40 @@ class SNPmatrix {
     v->setMode(mode_);
     SNPs_.push_back(v);
     indStatsComputed_ = false;  // si on ajoute des SNP les stats individuelles doivent être recalculées
+      Column & N0col = snpStats_.getColumn("N0");
+        Column & N1col = snpStats_.getColumn("N1");
+        Column & N2col = snpStats_.getColumn("N2");    
+        Column & NAcol = snpStats_.getColumn("NAs");
+        
+        // initialize stats if needed (if populated then just return)
+        v->compute_stats();
+        auto const v_snpstats = v->getStats();
+
+        N0col.push_back(v_snpstats[0]);
+        N1col.push_back(v_snpstats[1]);   
+        N2col.push_back(v_snpstats[2]);
+        NAcol.push_back(v_snpstats[3]);
+    if (populate_stats) {
+    // checking that all Columns exists, else calling exportSNPStats
+      if (snpStats_.hasColumn("N0") && snpStats_.hasColumn("N1") && snpStats_.hasColumn("N2")
+                && snpStats_.hasColumn("NAs")) {
+        Column & N0col = snpStats_.getColumn("N0");
+        Column & N1col = snpStats_.getColumn("N1");
+        Column & N2col = snpStats_.getColumn("N2");    
+        Column & NAcol = snpStats_.getColumn("NAs");
+        
+        // initialize stats if needed (if populated then just return)
+        v->compute_stats();
+        auto const v_snpstats = v->getStats();
+
+        N0col.push_back(v_snpstats[0]);
+        N1col.push_back(v_snpstats[1]);   
+        N2col.push_back(v_snpstats[2]);
+        NAcol.push_back(v_snpstats[3]);
+      } else {
+        exportSNPStats(true); // true to potentially replace columns if one missing
+      }
+    }
   }
 
   /**
@@ -125,13 +159,10 @@ class SNPmatrix {
     indStatsComputed_ = false;
     // but the fam stay the same !
     indStats_ = first.indStats_; // there should be the same inds in first and scd !!!
+    
     // For snpStats_, don't have to touch, so only appending
-    snpStats_ = DataStruct(first.snpStats_, second.snpStats_); 
-
-    // recompute stats for everything, 
-    // maybe not the most efficient (but if already computed will just take the available value so fine),
-    // but the less error prone solution
-    this->exportSNPStats();
+    // TODO : is above statement true ?? even now with N0etc Columns ?
+    snpStats_ = DataStruct(first.snpStats_, second.snpStats_);
   }
 
   // #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
@@ -203,9 +234,6 @@ class SNPmatrix {
     return indStats_;
   }
 
-  // get the DataStruct containing snp stats
-  const DataStruct &getSNPStats() const { return snpStats_; }
-
   // TODO : see if by default possible ?
   // they need to be ordered !!!!
   void setIndStats(Column N0s, Column N1s, Column N2s, Column NAs) {
@@ -220,6 +248,10 @@ class SNPmatrix {
     indStats_ = new_stats;
     indStatsComputed_ = true;
   }
+
+  // get theDataStruct containing snp stats, possibly without N0s...
+  // checkout exportSNPStats if thats what you want
+  const DataStruct &getSNPStats() const { return snpStats_; }
 
   // for the toSNPmatrix* functions and the extractInds* f° to populate through
   // snpStats_ with at least bim content
@@ -245,7 +277,16 @@ class SNPmatrix {
     }
   }
 
-  void exportSNPStats() {
+  // Adds N0s... Columns in the snpStats_ DataStruct
+  void exportSNPStats(bool force) {
+
+    // Add a check on if Column has a N0etc already, 
+    // then abort if no force
+    if (!(force) && (snpStats_.hasColumn("N0") || snpStats_.hasColumn("N1") 
+    || snpStats_.hasColumn("N2") || snpStats_.hasColumn("NAs"))){
+      return;
+    }
+
     std::vector<int> vecN0s;
     std::vector<int> vecN1s;
     std::vector<int> vecN2s;
@@ -268,12 +309,6 @@ class SNPmatrix {
     snpStats_.setColumn(Column(vecNAs), "NAs");
   }
 
-  void setMode(Mode mode) {
-    for (auto &snp : SNPs_) {
-      snp->setMode(mode);
-    }
-    mode_ = mode;
-  }
 
   // TODO (to think) there might be a problem if SNPs are not all in the same mode...
   // possible solution : enforce mode when push_back is done ?
@@ -287,6 +322,14 @@ class SNPmatrix {
 
   Mode getMode() {
     return mode_;
+  }
+
+
+  void setMode(Mode mode) {
+    for (auto &snp : SNPs_) {
+      snp->setMode(mode);
+    }
+    mode_ = mode;
   }
 
   void readFamFile(std::string famFile) {
