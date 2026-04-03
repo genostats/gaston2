@@ -23,11 +23,19 @@ void bindIndstoDosagematrixMemory(const SNPmatrix<SNPdosage> &first, const SNPma
     newMat.push_back(std::make_shared<SNPdosageMemory>(firstSNPs[i], secondSNPs[i]));
   }
 
-  // Individuals stats are still good (N0, N1, N2, NAs also)
+  // Individuals stats are still good (N0, N1, N2, NAs also if they exist in both)
   // so I can just fuse them
   newMat.setIndStats(DataStruct(first.getIndStats(), second.getIndStats()));
+  if (first.indStatscomplete() && second.indStatscomplete()) {
+      newMat.setindStatscomplete(true);//redundant bcos done by set, but clearer
+  } else {
+      newMat.setindStatscomplete(false);// the N0etc Columns are not computed nor exported
+  }
+
   // SNP stats need to be recomputed
   newMat.setSnpStats(first.getSNPStats());
+  newMat.setsnpStatscomplete(false);
+  
   newMat.setMode(first.getMode());
 }
 

@@ -8,6 +8,8 @@
 #include "Datastruct.h"
 #include "SNPvector.h"
 
+#include "debug_flags.h"
+
 #ifndef _snpmatrix_
 #define _snpmatrix_
 
@@ -22,9 +24,8 @@ class SNPmatrix {
   /**
    * @brief function to add a shared_ptr into the vector keeping the
    * SNPs of the matrix. /!\ will check if the SNP added is matching in size
-   * Will also updates the snpStats_ of the SNPmatrix if populate_stats = true (by default)
    */
-  void push_back(std::shared_ptr<SNPvectorClass> v, bool populate_stats = true) {
+  void push_back(std::shared_ptr<SNPvectorClass> v) {
     // if at least one loaded, everySNPs must have same size
     if (nbSNPs() > 0 && nbInds() != v->nbInds()) {
       std::cerr << "Pb loading SNP" << std::endl;
@@ -33,40 +34,8 @@ class SNPmatrix {
     v->setMode(mode_);
     SNPs_.push_back(v);
     indStatsComputed_ = false;  // si on ajoute des SNP les stats individuelles doivent être recalculées
-      Column & N0col = snpStats_.getColumn("N0");
-        Column & N1col = snpStats_.getColumn("N1");
-        Column & N2col = snpStats_.getColumn("N2");    
-        Column & NAcol = snpStats_.getColumn("NAs");
-        
-        // initialize stats if needed (if populated then just return)
-        v->compute_stats();
-        auto const v_snpstats = v->getStats();
-
-        N0col.push_back(v_snpstats[0]);
-        N1col.push_back(v_snpstats[1]);   
-        N2col.push_back(v_snpstats[2]);
-        NAcol.push_back(v_snpstats[3]);
-    if (populate_stats) {
-    // checking that all Columns exists, else calling exportSNPStats
-      if (snpStats_.hasColumn("N0") && snpStats_.hasColumn("N1") && snpStats_.hasColumn("N2")
-                && snpStats_.hasColumn("NAs")) {
-        Column & N0col = snpStats_.getColumn("N0");
-        Column & N1col = snpStats_.getColumn("N1");
-        Column & N2col = snpStats_.getColumn("N2");    
-        Column & NAcol = snpStats_.getColumn("NAs");
-        
-        // initialize stats if needed (if populated then just return)
-        v->compute_stats();
-        auto const v_snpstats = v->getStats();
-
-        N0col.push_back(v_snpstats[0]);
-        N1col.push_back(v_snpstats[1]);   
-        N2col.push_back(v_snpstats[2]);
-        NAcol.push_back(v_snpstats[3]);
-      } else {
-        exportSNPStats(true); // true to potentially replace columns if one missing
-      }
-    }
+    // TODO : est ce que juste un update des snpStats si elles sont déjà exportées serait utile ? 
+    snpStatsExported_ = false;  // idem, il va leur manquer les stats de ce nv SNP
   }
 
   /**
@@ -121,6 +90,8 @@ class SNPmatrix {
     // now inheriting the SNPStats_ of the SNPs specified in keep
     DataStruct original_snpStats = other.getSNPStats();
     snpStats_ = DataStruct(original_snpStats, keep);
+    snpStatsExported_ = other.snpStatscomplete(); // true ONLY if other's have N0etc
+
     // just to get the fam stats in
     indStats_ = other.getIndStats();
     // Still not automatically computing indStats back,
@@ -135,7 +106,7 @@ class SNPmatrix {
    * @brief Constructor concatenating 2 SNPmatrix,
    * and also their stats
    * (doesn't matter if one is on Disk and the other in Memory)
-   * BUT it needs to be 
+   * BUT it needs to be (TODO finish this sentence please Juliette ???)
    * @param first
    * SNPmatrix to append to
    * @param second
@@ -155,14 +126,32 @@ class SNPmatrix {
     for (auto scd_snp : scdSNPs) {
       this->push_back(scd_snp);
     }
+
+    // TODO : there is something smarter to do here
+    // we could add the N0etc from first and second (if they both exist)
+    // And have indStatsComputed_ to true
+    // BUT maybe stats are never used, so not usefull
+
     // Because all individual stats are changed (N0, N1, N2...)
     indStatsComputed_ = false;
     // but the fam stay the same !
     indStats_ = first.indStats_; // there should be the same inds in first and scd !!!
-    
+
     // For snpStats_, don't have to touch, so only appending
-    // TODO : is above statement true ?? even now with N0etc Columns ?
     snpStats_ = DataStruct(first.snpStats_, second.snpStats_);
+    // N0etc Columns need to exist in both for them to be added by DataStruct c° 
+    if (first.snpStatscomplete() && second.snpStatscomplete()) {
+      snpStatsExported_ = true;
+      #if DEBUG_CBIND
+      std::cout << "When concat 2 matrices, both had complete snpStats\n";
+      #endif
+    }
+    else {
+      snpStatsExported_ = false; // the N0etc Columns are not computed nor exported
+      #if DEBUG_CBIND
+      std::cout << "When concat 2 matrices, snpStats were incomplete\n";
+      #endif
+    }
   }
 
   // #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
@@ -171,7 +160,9 @@ class SNPmatrix {
   // Stocking in Datastruct indStats_ the number of occurrences of 0, 1, 2, and NAs for all individuals,
   // accross all SNPs currently in the SNPmatrix (need to be recalled if another SNP is pushed back after)
   void compute_indStats(bool force = false) {
-    if (!force && indStatsComputed_) return;  // stats déjà calculées, on ne recalcule pas
+    if (!force && indStatsComputed_) { 
+      return;  // stats déjà calculées, on ne recalcule pas
+    }
 
     size_t nbSNPs = SNPs_.size();
 
@@ -249,6 +240,14 @@ class SNPmatrix {
     indStatsComputed_ = true;
   }
 
+  bool indStatscomplete() const {
+    return indStatsComputed_;
+  }
+
+  void setindStatscomplete(bool complete) {
+    indStatsComputed_ = complete;
+  }
+
   // get theDataStruct containing snp stats, possibly without N0s...
   // checkout exportSNPStats if thats what you want
   const DataStruct &getSNPStats() const { return snpStats_; }
@@ -257,6 +256,7 @@ class SNPmatrix {
   // snpStats_ with at least bim content
   void setSnpStats(DataStruct new_snps) {
     snpStats_ = new_snps;
+    snpStatsExported_ = true;
   }
 
   // compute all SNP stats
@@ -280,10 +280,9 @@ class SNPmatrix {
   // Adds N0s... Columns in the snpStats_ DataStruct
   void exportSNPStats(bool force) {
 
-    // Add a check on if Column has a N0etc already, 
-    // then abort if no force
-    if (!(force) && (snpStats_.hasColumn("N0") || snpStats_.hasColumn("N1") 
-    || snpStats_.hasColumn("N2") || snpStats_.hasColumn("NAs"))){
+    // Add a check on if snpStats were computed already, 
+    // then returns if no force
+    if (!(force) && (snpStatsExported_)){
       return;
     }
 
@@ -294,7 +293,7 @@ class SNPmatrix {
 
     for (auto &snp : SNPs_) {
       if (snp->stats_set() == 0) {
-        snp->compute_stats();
+        snp->compute_stats(); // returns if stats already up to date
       }
       const int *stats = snp->getStats();
 
@@ -307,6 +306,20 @@ class SNPmatrix {
     snpStats_.setColumn(Column(vecN1s), "N1");
     snpStats_.setColumn(Column(vecN2s), "N2");
     snpStats_.setColumn(Column(vecNAs), "NAs");
+
+    snpStatsExported_ = true;
+  }
+
+  // To know if snpStats contain N0, N1 ...
+  // or were manually set
+  bool snpStatscomplete() const {
+    return snpStatsExported_;
+  }
+
+  // used when setSnpStats called to add stats
+  // but still want the N0etc Columns for example
+  void setsnpStatscomplete(bool complete) {
+    snpStatsExported_ = complete;
   }
 
 
@@ -375,6 +388,7 @@ private:
   DataStruct snpStats_;  // will contain bim file + statistics of SNP
   std::vector<std::shared_ptr<SNPvectorClass>> SNPs_;
   bool indStatsComputed_ = false;
+  bool snpStatsExported_ = false;
   Mode mode_ = RAW_VALUES;
 };
 

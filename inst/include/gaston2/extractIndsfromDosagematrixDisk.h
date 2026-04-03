@@ -54,19 +54,18 @@ void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> &other, const in
   size_t SNPindex = 0;
 
   for (const auto &snp : otherSNPs){
-    newMat.push_back(std::make_shared<SNPdosageDisk<mio::access_mode::write>>(snp, file_ptr, SNPindex++, keep), false);
+    newMat.push_back(std::make_shared<SNPdosageDisk<mio::access_mode::write>>(snp, file_ptr, SNPindex++, keep));
   }
-  // keeping all SNPStats
-  DataStruct og_snp_stats = other.getSNPStats();
-  newMat.setSnpStats(og_snp_stats);
-  //extract stats now and set stats_set_ to true
+  //extract stats now
   DataStruct original_dt = other.getIndStats();
-  newMat.setIndStats(DataStruct(original_dt, keep)); // for now does nothing else than fam file
-  // but will when compute_IndStats will be implemented
+  newMat.setIndStats(DataStruct(original_dt, keep)); // for now does guarantee nothing else than fam file 
+  // and set them to be as "complete" as the mother matrix
+  newMat.setindStatscomplete(other.indStatscomplete());
 
-  // updating the N0, N1, N2 in the SNPs to have an accurate mu_ & sigma_,
-  // and read with a coherent mode (will change nothing for "RAW")
-  newMat.exportSNPStats(true); // TODO : is true necessary ? ici et aux autres extracts
+  // keeping all from bim, but specifying N0etc need update
+  newMat.setSnpStats(other.getSNPStats());
+  newMat.setsnpStatscomplete(false);
+
   newMat.setMode(other.getMode());
 }
 

@@ -16,15 +16,18 @@ void extractIndsfromDosagematrixMemory(const SNPmatrix<SNPvectorClass> &other, c
   const std::vector<std::shared_ptr<SNPdosage>> otherSNPs = other.getSNPs();
 
   for (const auto &snp : otherSNPs){
-    newMat.push_back(std::make_shared<SNPdosageMemory>(snp, keep), false);
+    newMat.push_back(std::make_shared<SNPdosageMemory>(snp, keep));
   }
   // extract stats now and set stats_set_ to true
   DataStruct original_dt = other.getIndStats();
   newMat.setIndStats(DataStruct(original_dt, keep));
-  // keeping all SNPStats
-  newMat.setSnpStats(other.getSNPStats());
+  // and set them to be as "complete" as the mother matrix
+  newMat.setindStatscomplete(other.indStatscomplete());
 
-  newMat.exportSNPStats(true);
+  // keeping all from bim, but specifying N0etc need an update
+  newMat.setSnpStats(other.getSNPStats());
+  newMat.setsnpStatscomplete(false);
+
   newMat.setMode(other.getMode());
 }
 

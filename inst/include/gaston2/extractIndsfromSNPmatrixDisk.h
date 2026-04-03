@@ -57,15 +57,18 @@ void extractIndsfromSNPmatrixDisk(const SNPmatrix<SNPvectorClass> &other, const 
 
   for (const auto &snp : otherSNPs){
     // not populating stats now
-    newMat.push_back(std::make_shared<SNPvectorDisk<mio::access_mode::write>>(snp, file_ptr, SNPindex++, keep), false);
+    newMat.push_back(std::make_shared<SNPvectorDisk<mio::access_mode::write>>(snp, file_ptr, SNPindex++, keep));
   }
-  //extract stats now and set stats_set_ to true
+  //extract stats now and set indStatsComputed to true
   DataStruct original_dt = other.getIndStats();
   newMat.setIndStats(DataStruct(original_dt, keep));
-  // keeping all SNPStats from file
+  // and set them to be as "complete" as the mother matrix
+  newMat.setindStatscomplete(other.indStatscomplete());
+  
+  // keeping all from bim, but specifying N0etc need update
   newMat.setSnpStats(other.getSNPStats());
-  // then computing new ones
-  newMat.exportSNPStats(true);
+  newMat.setsnpStatscomplete(false);
+
   newMat.setMode(other.getMode());
 }
 

@@ -17,16 +17,18 @@ void extractIndsfromSNPmatrixMemory(const SNPmatrix<SNPvectorClass> &other, cons
   const std::vector<std::shared_ptr<SNPvector>> otherSNPs = other.getSNPs();
 
   for (const auto &snp : otherSNPs){
-    newMat.push_back(std::make_shared<SNPvectorMemory>(snp, keep), false);
+    newMat.push_back(std::make_shared<SNPvectorMemory>(snp, keep));
   }
   //extract stats now and set stats_set_ to true
   DataStruct original_dt = other.getIndStats();
   newMat.setIndStats(DataStruct(original_dt, keep));
+  newMat.setindStatscomplete(other.indStatscomplete()); // and set them to be as "complete" as the mother matrix
 
-  // keeping all SNPStats from file, but need to update the N0...
+
+  // keeping all from bim, but specifying N0etc need update
   newMat.setSnpStats(other.getSNPStats());
+  newMat.setsnpStatscomplete(false);
 
-  newMat.exportSNPStats(true); // to force recompute and not just copy og N0...
   newMat.setMode(other.getMode());
 }
 
