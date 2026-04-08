@@ -27,19 +27,10 @@
 POUR AVRIL : 
 
 - *** Niveau Débutant ***
-  Ajouter une interface avec houba pour la GRM, qui doit pouvoir renvoyer une mmatrix
-  Globalement adapter le code déjà existant de LD
+  Interface avec houba faite, améliorer les perfs, très lente...
   Possiblement dans GRM.h déplacer usefloat en premier
-
-- *** Niveau Intermédiaire ***
-  modifier le snp.stats pour appeler le exportSNPstats plutôt.
-  Aussi y ajouter un check de si les Columns "N0s" "N1s" ... existent avec un return
-  possiblement un bool force pour recalculer quand même
-
+          
 - *** Niveau expert / Ingénieur de recherche ***
-  Dans les SNPstats, regarder quand est-ce qu'elles sont calculées, quand est-ce qu'elles 
-  sont renvoyées (particulièrement le recompute dans getSNPstats)
-  => ajouter un getter et un setter en R
   Adapter la classe DataStruct en R (probablement S4) pour garder un *DataStruct
   va simplifier grandement le add de column (plus besoin d'en faire un par type)
 

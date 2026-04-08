@@ -21,6 +21,10 @@ SEXP grm_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, std::string path) {
 
   // cast en double au moment du calcul dans GRM.h
   Rcpp::XPtr<houba::MMatrix<double>>  GRM_ptr(new houba::MMatrix<double>(path, nbInds, nbInds));
+  // make sure that the file is zeroed (if it exists before hand, its bytes are still there)
+  size_t matrix_size = nbInds * nbInds * sizeof(double);
+  std::memset(GRM_ptr->data(), 0, matrix_size);
+
   GRM_MMatrix.slot("ptr") = GRM_ptr;
   GRM_MMatrix.slot("datatype") = "double";
 
@@ -36,10 +40,10 @@ SEXP grm_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, std::string path) {
   int nbAutosomalSNPs = 0;
   for(size_t i = 0; i < nbSNPs; i++) {  
     auto SNP = pM->getSNP(i);
-    if(SNP->getChrType() == chrType::AUTOSOME) nbAutosomalSNPs++;
+    if(SNP->getChrType() == chrType::AUTOSOME && !SNP->monomorphe()) nbAutosomalSNPs++;
   }
 
-  if(nbAutosomalSNPs == 0) Rcpp::stop("No autosomal SNPs");
+  if(nbAutosomalSNPs == 0) Rcpp::stop("No autosomal (non monomorphic) SNPs");
 
   // on les met à l'échelle voulue
   for(size_t i = 0; i < nbSNPs; i++) {  
@@ -51,6 +55,8 @@ SEXP grm_mmatrix(Rcpp::XPtr<SNPmatrix<>> pM, std::string path) {
   // calcul effectif de la GRM
 
   GRM(*pM, *GRM_ptr);  
+
+  //std::cout << "Message from houba : " << GRM_ptr->getVerbosout() << "\n"; // TODO REMOVE, just to debug
 
   return GRM_MMatrix;
 }

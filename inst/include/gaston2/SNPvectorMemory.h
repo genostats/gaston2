@@ -50,6 +50,7 @@ class SNPvectorMemory : public SNPvector {
         new_2bits = 0;
       }
     }
+    chr_type_ = source->getChrType();
   }
 
 

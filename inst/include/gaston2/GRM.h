@@ -12,6 +12,7 @@
 // NOTE 
 // a priori on laissera scalar_t = float même pour remplir une matrice de double
 // car ça doit aller plus vite et c'est suffisant
+
 template<typename SNPvectorClass, typename matrixType, typename scalar_t = float>
 void GRM(SNPmatrix<SNPvectorClass> & M, matrixType & R) {
   unsigned int nbSNPs = M.nbSNPs();
@@ -20,30 +21,29 @@ void GRM(SNPmatrix<SNPvectorClass> & M, matrixType & R) {
   if(R.nrow() != nbInds || R.ncol() != nbInds)
     throw std::runtime_error("In grm, bad dimensions for R");
 
-  // les résultats bruts [matrice triangulaire, stockée dans un vecteur]
-  std::vector<scalar_t> V( (nbInds*(nbInds + 1))/2 );
+  // writing in the final matrix BUT as a flat vector
   for(size_t i = 0; i < nbSNPs; i++) {  
     auto SNP = M.getSNP(i);
     if(SNP->getChrType() == chrType::AUTOSOME) // seulement pour les autosomes
-      SNP->template tcrossprod<scalar_t>(V);
-  }
- 
-  // on copie dans R et on symétrise mais ça pourrait être intéressant de
-  // renvoyer une matrice symétrique du package Matrix...
-  size_t k = 0;
-  for(size_t i = 0; i < nbInds; i++) {
-    for(size_t j = 0; j <= i; j++) {
-      R(j,i) = (double) V[k++];
-    }
+      SNP->template tcrossprod<scalar_t>(R);
   }
 
-  // symetriser
-  k = 0;
-  for(size_t i = 0; i < nbInds; i++) {
-    for(size_t j = 0; j <= i; j++) {
-      R(i,j) = (double) V[k++]; // ou R(j,i)
+  size_t k = ((nbInds*(nbInds + 1))/2) - 1; //in base 0
+  // no need to go through last column...
+  for(long j = nbInds -1; j > 0; j--) {
+    for(long i = j; i >= 0; i--) {
+      R(i,j) = (double) R[k--]; // remplir matrice symétrique à partir de la fin 
+      //symétriser icic possiblement : R(j, i) = R(i, j)
     }
   }
+  
+  // symétriser
+  k = 0;
+  for(size_t i = 0; i < nbInds; i++) {
+    for(size_t j = i + 1; j < nbInds; j++) { // parcours le triangle supérieur
+      R(j,i) = (double) R(i,j);
+      }
+    }
 }
 
 

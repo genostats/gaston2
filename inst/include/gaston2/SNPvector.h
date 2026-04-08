@@ -323,7 +323,7 @@ public:
     if(set_sigma) {
       double mu2 = m * m;
       // sigma_ = std::sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
-      sigma_ = std::sqrt((N1s + 4 * N2s + NAs * mu2) / n - mu2);
+      sigma_ = std::sqrt((N1s + 4 * N2s) / n - mu2);
     }
   }
 
@@ -331,11 +331,13 @@ public:
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
   // /!\ only if stats are not set !
   void compute_stats(bool set_mu = true, bool set_sigma = true) {
+//std::cout << "compute_stats...\n"; 
     // if already called, do nothing
     if(stats_set_) {
       //std::cout << "Not recomputing !\n";
       return;
     }
+//std::cout << "on y va!";
 
     size_t nbc_m1 = nbChars() - 1;
 
@@ -374,6 +376,11 @@ public:
     computeMode();
   }
 
+
+  // test is SNP is monomorphic
+  bool monomorphe() {
+    return (mu_ == 0 || mu_ == 2);
+  }
 
   // ----------------------------------------------------------------
   // Incrementing 'unordered_stats',
@@ -528,7 +535,7 @@ public:
   // si on voit V comme une matrice c'est V += SNP . SNP'
   template<typename scalar_t, typename vectorType> 
   void tcrossprod(vectorType & V) {
-    if(V.size()*2 != nbInds_ * (nbInds_ + 1)) throw std::runtime_error("tcrossprod, V has not the right size");
+    if(V.size()*2 < (nbInds_ * (nbInds_ + 1))) throw std::runtime_error("tcrossprod, R is too small to write in");
     
     auto DATA = data();
     size_t nbc_m1 = nbChars() - 1;
@@ -538,6 +545,10 @@ public:
     const scalar_t v1 = (scalar_t) g_trans[2];
     const scalar_t v2 = (scalar_t) g_trans[3];
 
+    // if SNP is monomorphe, nothing to compute
+    if(monomorphe()) return;
+    
+//std::cout << v0 << ", " << v1 << ", " << v2 << "\n";
     // loop j1 to nbChar - 1
     uint8_t previous_genotype_1 = 4; // impossible value
 #pragma omp parallel for firstprivate(previous_genotype_1)
@@ -663,7 +674,7 @@ public:
   private:
     size_t currentChar;     // ii dans le code RV, correspond au byte sur lequel je suis
     size_t current2bits;    // ss dans le code RV, correspond au bit (0...3) dans le byte
-    SNPvector &iterated; // link to mother class
+    SNPvector &iterated;      // link to mother class
     const double * values;     // values according to current mode of iterated
 
   public:

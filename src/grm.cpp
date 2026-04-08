@@ -26,10 +26,10 @@ Rcpp::NumericMatrix grm_(Rcpp::XPtr<SNPmatrix<>> pM) {
   int nbAutosomalSNPs = 0;
   for(size_t i = 0; i < nbSNPs; i++) {  
     auto SNP = pM->getSNP(i);
-    if(SNP->getChrType() == chrType::AUTOSOME) nbAutosomalSNPs++;
+    if(SNP->getChrType() == chrType::AUTOSOME && !SNP->monomorphe()) nbAutosomalSNPs++;
   }
 
-  if(nbAutosomalSNPs == 0) Rcpp::stop("No autosomal SNPs");
+  if(nbAutosomalSNPs == 0) Rcpp::stop("No autosomal (non monomorphic) SNPs");
 
   // on les met à l'échelle voulue
   for(size_t i = 0; i < nbSNPs; i++) {  

@@ -39,6 +39,7 @@ class SNPdosageMemory : public SNPdosage {
       int ind_idx = keep[i];
       data_[i] = refdata[ind_idx];
     }
+    chr_type_ = source->getChrType();
   }
 
   // constructeur concatenant 2 vecteurs
