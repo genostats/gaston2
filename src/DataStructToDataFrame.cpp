@@ -1,4 +1,4 @@
-#include "Datastruct.h"
+#include "DataStruct.h"
 #include <iostream>
 #include <Rcpp.h>
 
@@ -25,4 +25,7 @@ Rcpp::DataFrame DataStructToDataFrame(const DataStruct & DS) {
   return DF;
 }
 
-
+// [[Rcpp::export]]
+Rcpp::DataFrame DataStructToDataFrame_(Rcpp::XPtr<DataStruct> pDS) {
+  return DataStructToDataFrame(*pDS);
+}

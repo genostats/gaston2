@@ -11,7 +11,7 @@
 #include <omp.h>
 #include "SNPdosageMemory.h"
 #include "readDosageFileMemory.h"
-//#include "Datastruct.h"
+//#include "DataStruct.h"
 
 using namespace Rcpp;
 

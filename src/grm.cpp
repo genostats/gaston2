@@ -2,6 +2,7 @@
 
 #include "SNPmatrix.h"
 #include "GRM.h"
+#include "RMatrix.h"
 #include "chrType.h" // pour le check sur les autosomes
 #include <stdexcept>
 
@@ -10,6 +11,7 @@ Rcpp::NumericMatrix grm_(Rcpp::XPtr<SNPmatrix<>> pM) {
   unsigned int nbSNPs = pM->nbSNPs();
   unsigned int nbInds = pM->nbInds();
   Rcpp::NumericMatrix R(nbInds, nbInds);
+  RMatrix<double> wrapper_R(R);
 
   // TODO repenser à ces préliminaires,
   // est-ce que c'est souhaitable d'en faire un membre de SNPmatrix ?
@@ -40,7 +42,7 @@ Rcpp::NumericMatrix grm_(Rcpp::XPtr<SNPmatrix<>> pM) {
 
   // calcul effectif de la GRM
 
-  GRM(*pM, R);  
+  GRM(*pM, wrapper_R);  
 
   return R;
 }

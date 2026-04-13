@@ -60,6 +60,7 @@ void bindIndstoDosagematrixDisk(const SNPmatrix<SNPdosage> &first, const SNPmatr
   // maybe could also do a constructor or a function on the SNPmatrix level ?
   for (size_t i = 0; i < firstSNPs.size(); i++) {
     newMat.push_back(std::make_shared<SNPdosageDisk<mio::access_mode::write>>(firstSNPs[i], secondSNPs[i], file_ptr, i));
+    newMat.getSNP(i)->setChrType(wanted_chrType(firstSNPs[i]->getChrType(), secondSNPs[i]->getChrType()));
   }
 
   // Individuals stats are still good (N0, N1, N2, NAs also if they exist in both)

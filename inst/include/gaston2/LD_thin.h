@@ -1,6 +1,6 @@
 #include "SNPvector.h"
 #include "SNPmatrix.h"
-#include "Datastruct.h"
+#include "DataStruct.h"
 #include "Column.h"
 #include "LD.h"
 #include <stdexcept>

@@ -65,6 +65,7 @@ void bindIndstoSNPmatrixDisk(const SNPmatrix<SNPvector> &first, const SNPmatrix<
   // maybe could also do a constructor or a function on the SNPmatrix level ?
   for (size_t i = 0; i < firstSNPs.size(); i++) {
     newMat.push_back(std::make_shared<SNPvectorDisk<mio::access_mode::write>>(firstSNPs[i], secondSNPs[i], file_ptr, i));
+    newMat.getSNP(i)->setChrType(wanted_chrType(firstSNPs[i]->getChrType(), secondSNPs[i]->getChrType()));
   }
 
   // Individuals stats are still good (N0, N1, N2, NAs also if they exist in both)
@@ -80,7 +81,6 @@ void bindIndstoSNPmatrixDisk(const SNPmatrix<SNPvector> &first, const SNPmatrix<
   newMat.setsnpStatscomplete(false);
 
   newMat.setMode(first.getMode());
-
 }
 
 SNPmatrix<SNPvectorDisk<mio::access_mode::write>> bindIndstoSNPmatrixDisk(const SNPmatrix<SNPvector> &first, const SNPmatrix<SNPvector> &second, std::string path) {

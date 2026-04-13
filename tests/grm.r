@@ -26,43 +26,38 @@ stopifnot( max(abs(g1 - g3)) < 5e-5 )
 # bg <- as.matrix(GRM(b, "test_grm"))
 
 fn <- "grm_test"
-g4 <- as.matrix(gaston2::GRM(a, fn))
+g4 <- as.matrix(gaston2::GRM(a, filename=fn))
 stopifnot( max(abs(g4 - g3)) < 5e-5 )
 
+# tests with a calcul in floats
+fn_float <- "grm_test_float"
+g5 <- gaston2::GRM(a, filename=fn_float, usefloat=TRUE)
+stopifnot( max(abs(as.matrix(g5) - g3)) < 5e-5 )
 
 if(TRUE) {
 RcppParallel::setThreadOptions(1)
 gaston2:::set_num_thread(1)
-mb1 <- microbenchmark::microbenchmark(gaston2:::GRM(a), tcrossprod(A), gaston::GRM(x))
+mb1 <- microbenchmark::microbenchmark(gaston2:::GRM(a), gaston2:::GRM(a, filename=fn), gaston2:::GRM(a, filename=fn_float, usefloat=TRUE), tcrossprod(A), gaston::GRM(x))
 
 RcppParallel::setThreadOptions(4)
 gaston2:::set_num_thread(4)
-mb4 <- microbenchmark::microbenchmark(gaston2:::GRM(a), gaston::GRM(x))
+mb4 <- microbenchmark::microbenchmark(gaston2:::GRM(a), gaston2:::GRM(a, filename=fn), gaston2:::GRM(a, filename=fn_float, usefloat=TRUE), gaston::GRM(x))
 
 RcppParallel::setThreadOptions(8)
 gaston2:::set_num_thread(8)
-mb8 <- microbenchmark::microbenchmark(gaston2:::GRM(a), gaston::GRM(x))
-
-
-RcppParallel::setThreadOptions(1)
-gaston2:::set_num_thread(1)
-mb1_file <- microbenchmark::microbenchmark(gaston2:::GRM(a, fn), tcrossprod(A), gaston::GRM(x))
-
-
-RcppParallel::setThreadOptions(4)
-gaston2:::set_num_thread(4)
-mb4_file <- microbenchmark::microbenchmark(gaston2:::GRM(a, fn), gaston::GRM(x))
-
-
-RcppParallel::setThreadOptions(8)
-gaston2:::set_num_thread(8)
-mb8_file <- microbenchmark::microbenchmark(gaston2:::GRM(a, fn), gaston::GRM(x))
-
+mb8 <- microbenchmark::microbenchmark(gaston2:::GRM(a), gaston2:::GRM(a, filename=fn), gaston2:::GRM(a, filename=fn_float, usefloat=TRUE), gaston::GRM(x))
 }
 
 #Cleanup grm_test
 if (file.exists(fn)) {
-  file.remove(fn)
+  shut_up <- file.remove(fn)
 }
+
+#Cleanup grm_test_float
+if (file.exists(fn_float)) {
+  shut_up <- file.remove(fn_float)
+}
+
+
 
 

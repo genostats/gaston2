@@ -1,12 +1,12 @@
-#include <string>
 #include <stdexcept>
+#include <string>
+
 #include "isAutosome.h"
 
 #ifndef _gaston_chrType_
 #define _gaston_chrType_
 
-enum chrType
-{
+enum chrType {
   AUTOSOME,
   X,
   Y,
@@ -16,7 +16,7 @@ enum chrType
 };
 
 inline std::string chrTypeToString(chrType mo) {
-  switch(mo) {
+  switch (mo) {
     case AUTOSOME:
       return std::string("AUTOSOME");
     case X:
@@ -35,21 +35,39 @@ inline std::string chrTypeToString(chrType mo) {
 }
 
 inline chrType stringTochrType(std::string str) {
-  if(str == "AUTOSOME")  return chrType::AUTOSOME; 
-  if(str == "X")         return chrType::X; 
-  if(str == "Y")         return chrType::Y; 
-  if(str == "MT")        return chrType::MT; 
-  if(str == "HAPLOTYPE") return chrType::HAPLOTYPE; 
-  if(str == "UNKNOWN")   return chrType::UNKNOWN; 
+  if (str == "AUTOSOME") return chrType::AUTOSOME;
+  if (str == "X") return chrType::X;
+  if (str == "Y") return chrType::Y;
+  if (str == "MT") return chrType::MT;
+  if (str == "HAPLOTYPE") return chrType::HAPLOTYPE;
+  if (str == "UNKNOWN") return chrType::UNKNOWN;
   throw std::runtime_error("something went horribly wrong (undefined chrType)");
 }
 
 inline chrType intToChrType(int chr) {
-  if(isAutosome(chr))  return chrType::AUTOSOME;
-  if(isX(chr))         return chrType::X;
-  if(isY(chr))         return chrType::Y;
-  if(isMt(chr))        return chrType::MT;
+  if (isAutosome(chr)) return chrType::AUTOSOME;
+  if (isX(chr)) return chrType::X;
+  if (isY(chr)) return chrType::Y;
+  if (isMt(chr)) return chrType::MT;
   return chrType::UNKNOWN;
+}
+
+// helper function to propagate the "right" chrType and
+// also do a quick validity check
+// called by the bindInds family
+inline chrType wanted_chrType(chrType first, chrType second) {
+  if (first != second) {
+    if (first != chrType::UNKNOWN) {
+      if (second != chrType::UNKNOWN) {
+        throw std::logic_error("Error : chrTypes were incompatible");  // both are known butnot matching !
+      }
+      return first; // is defined and second is UNKNOWN
+    } else {
+      return second; // is defined but first isn't
+    }
+  } else { // both match
+    return first;
+  }
 }
 
 #endif

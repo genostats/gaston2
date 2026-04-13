@@ -5,7 +5,7 @@
 #include <stdexcept>  // for out of range exceptions
 #include <vector>     // for omp reduction
 
-#include "Datastruct.h"
+#include "DataStruct.h"
 #include "SNPvector.h"
 
 #include "debug_flags.h"
@@ -152,12 +152,13 @@ class SNPmatrix {
       std::cout << "When concat 2 matrices, snpStats were incomplete\n";
       #endif
     }
+    // pas besoin de propag le chr_type vu que stocké ds chaque snp
   }
 
   // #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
     initializer(omp_priv = decltype(omp_orig)(omp_orig.size(), 0))
 
-  // Stocking in Datastruct indStats_ the number of occurrences of 0, 1, 2, and NAs for all individuals,
+  // Stocking in DataStruct indStats_ the number of occurrences of 0, 1, 2, and NAs for all individuals,
   // accross all SNPs currently in the SNPmatrix (need to be recalled if another SNP is pushed back after)
   void compute_indStats(bool force = false) {
     if (!force && indStatsComputed_) { 

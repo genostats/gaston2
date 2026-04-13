@@ -21,6 +21,7 @@ void bindIndstoDosagematrixMemory(const SNPmatrix<SNPdosage> &first, const SNPma
   // maybe could also do a constructor or a function on the SNPmatrix level ?
   for (size_t i = 0; i < firstSNPs.size(); i++) {
     newMat.push_back(std::make_shared<SNPdosageMemory>(firstSNPs[i], secondSNPs[i]));
+    newMat.getSNP(i)->setChrType(wanted_chrType(firstSNPs[i]->getChrType(), secondSNPs[i]->getChrType()));
   }
 
   // Individuals stats are still good (N0, N1, N2, NAs also if they exist in both)

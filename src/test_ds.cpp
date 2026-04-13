@@ -1,4 +1,4 @@
-#include "Datastruct.h"
+#include "DataStruct.h"
 #include <iostream>
 #include <fstream>
 #include <Rcpp.h>

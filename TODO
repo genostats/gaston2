@@ -25,13 +25,9 @@
   [est bien utilisé pour ne calculer la GRM que sur les autosomes]
 
 POUR AVRIL : 
-
-- *** Niveau Débutant ***
-  Interface avec houba faite, améliorer les perfs, très lente...
-  Possiblement dans GRM.h déplacer usefloat en premier
           
 - *** Niveau expert / Ingénieur de recherche ***
-  Adapter la classe DataStruct en R (probablement S4) pour garder un *DataStruct
+  Continuer à Adapter la classe DataStruct en R (probablement S4) pour garder un *DataStruct
   va simplifier grandement le add de column (plus besoin d'en faire un par type)
 
 - *** Niveau maso ***
