@@ -70,7 +70,7 @@ Here is a simple example of data manipulation with `gaston2`.
 
 ```{r}
 require(gaston2)
-filename <- system.file("extdata", "LCT.bed", package="gaston2")
+filename <- system.file("extdata", "LCT.bed", package = "gaston2")
 
 # reading in memory
 x1 <- read.snp.matrix(filename)

@@ -1,7 +1,7 @@
 library(gaston2)
 
-
-a <- read.snp.matrix("inst/extdata/LCT.bed")
+filename <- system.file("extdata", "LCT.bed", package = "gaston2")
+a <- read.snp.matrix(filename)
 
 set.mode(a, "standardized.p")
 A <- as.matrix(a)
@@ -25,12 +25,12 @@ stopifnot( max(abs(g1 - g3)) < 5e-5 )
 # g3 <- gaston::GRM(x[1:5,1:5])*606/607
 # bg <- as.matrix(GRM(b, "test_grm"))
 
-fn <- "grm_test"
-g4 <- as.matrix(gaston2::GRM(a, filename=fn))
+fn <- tempfile()
+g4 <- as.matrix(gaston2::GRM(a, filename = fn))
 stopifnot( max(abs(g4 - g3)) < 5e-5 )
 
 # tests with a calcul in floats
-fn_float <- "grm_test_float"
+fn_float <- tmpfile()
 g5 <- gaston2::GRM(a, filename=fn_float, usefloat=TRUE)
 stopifnot( max(abs(as.matrix(g5) - g3)) < 5e-5 )
 
