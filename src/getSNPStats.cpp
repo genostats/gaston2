@@ -19,9 +19,10 @@ Rcpp::DataFrame getSNPStats(Rcpp::XPtr<SNPmatrix<>> pM, bool compute = false) {
 // [[Rcpp::export]]
 Rcpp::S4 getSNPStats_DataStruct(Rcpp::XPtr<SNPmatrix<>> pM, bool compute = false) {
   pM->exportSNPStats(compute);
-  Rcpp::XPtr<DataStruct> ptr(new DataStruct(pM->getSNPStats()));
+  Rcpp::XPtr<DataStruct> ptr(&(pM->getSNPStats()));
   Rcpp::S4 ds("data.struct");
   ds.slot("ptr") = ptr;
+  ds.slot("matrixptr") = pM;
   return ds;
 }
 
@@ -33,11 +34,12 @@ Rcpp::DataFrame getSNPStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, bool comp
 }
 
 // [[Rcpp::export]]
-Rcpp::DataFrame getSNPStatsDosage_DataStruct(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, bool compute = false) {
+Rcpp::S4 getSNPStatsDosage_DataStruct(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, bool compute = false) {
   // If never exported before will create N0s, N1s... AND compute all SNPStats
   pM->exportSNPStats(compute);
-  Rcpp::XPtr<DataStruct> ptr(new DataStruct(pM->getSNPStats()));
+  Rcpp::XPtr<DataStruct> ptr(&(pM->getSNPStats()));
   Rcpp::S4 ds("data.struct");
   ds.slot("ptr") = ptr;
+  ds.slot("matrixptr") = pM;
   return ds;
 }

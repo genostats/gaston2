@@ -7,7 +7,7 @@
 #ifndef _datatype_
 #define _datatype_
 
-enum datatype { NONE, INT, DOUBLE, FLOAT, STRING };
+enum datatype { NONE, INT, DOUBLE, FLOAT, STRING, BOOL };
 
 /***********************************************************/
 
@@ -23,6 +23,8 @@ inline std::string typeToString(datatype ty) {
       return std::string("FLOAT");
     case STRING:
       return std::string("STRING");
+    case BOOL:
+      return std::string("BOOL");
     default:
       throw std::runtime_error("unknown type");
   }
@@ -51,6 +53,11 @@ inline datatype whichType<float>() {
 template<>
 inline datatype whichType<std::string>() {
   return STRING;
+}
+
+template<>
+inline datatype whichType<bool>() {
+  return BOOL;
 }
 
 #endif

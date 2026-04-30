@@ -17,8 +17,13 @@ inline int strtoi(const char * x, char ** end) {
   } else if(*p == '+') {
     p++;
   }
-
-  while(isdigit(*p)) {
+  
+  /* from cppreferences isdigit() :
+  "To use these functions safely with plain chars (or signed chars), 
+  the argument should first be converted to unsigned char.
+  so TODO : maybe cast p into static_cast<unsigned char>(*p)
+  */
+  while(isdigit(*p)) { // isdigit('\0') == false, so no need to check for NUL
     val *= 10;
     val += (*p - '0');
     p++;

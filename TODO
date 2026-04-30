@@ -29,6 +29,20 @@ POUR AVRIL :
 - *** Niveau expert / Ingénieur de recherche ***
   Continuer à Adapter la classe DataStruct en R (probablement S4) pour garder un *DataStruct
   va simplifier grandement le add de column (plus besoin d'en faire un par type)
+  X fixer le show
+          X ugly mem leak in A2
+  => fixer le add column 
+          X prise de vecteur 
+          => partage d'objet entre C++ et R
+          => lui donner des brackets ???
+          => si un nom donné en même temps que dataframe, chopper le nom
+  => ajouter un getColumn avec un $ d'interface et []
+  => faire un meilleur test qui fait le tour de datastruct
+
+  => ajouter un type bool dans Column et data.struct
+
+  => corriger les tests de LD !!!
+
 
 - *** Niveau maso ***
   faire le tour des TODOs dans les fichiers et soit clean soit les reports ici

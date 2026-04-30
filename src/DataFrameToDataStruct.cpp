@@ -2,7 +2,7 @@
 #include <iostream>
 #include <Rcpp.h>
 
-
+//TO THINK : potentiellemnt lui faire return un DataStruct *
 DataStruct DataFrameToDataStruct(Rcpp::DataFrame DF) {
   DataStruct DS;
   SEXP sxpnames = DF.names();
@@ -44,6 +44,13 @@ DataStruct DataFrameToDataStruct(Rcpp::DataFrame DF) {
           DS.push_back(v, names[i]);
           break;
         }
+      case LGLSXP: {
+          Rcpp::LogicalVector sexv(sxp);
+          std::vector<bool> v;
+          for(auto x:sexv) v.push_back((bool) x );
+          DS.push_back(v, names[i]);
+          break;
+        }
       default:
         Rcpp::stop("Unsupported column type");
     }
@@ -52,3 +59,9 @@ DataStruct DataFrameToDataStruct(Rcpp::DataFrame DF) {
   return DS;
 }
 
+
+// [[Rcpp::export]]
+Rcpp::XPtr<DataStruct> DataFrameToDataStructR_(Rcpp::DataFrame DF) {
+  Rcpp::XPtr<DataStruct> pDS(new DataStruct(DataFrameToDataStruct(DF)));
+  return pDS; 
+}

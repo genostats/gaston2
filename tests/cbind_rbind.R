@@ -1,8 +1,9 @@
 require(gaston2)
 
+filename <- system.file("extdata", "LCT.bed", package="gaston2")
 
 # -------- testing the cbind (append of snps)
-a <- read.snp.matrix("inst/extdata/LCT.bed")
+a <- read.snp.matrix(filename)
 a1 <- a[,1]
 a2 <- a[,2]
 a_test <- cbind(a1, a2)
@@ -78,7 +79,7 @@ all(as.matrix(d_ref) == as.matrix(disk_test))
 
 # -------- testing a bit of both
 
-e <- read.snp.matrix("inst/extdata/LCT.bed")
+e <- read.snp.matrix(filename)
 e1 <- e[2:4,1:8]
   
 data("LCT", package = "gaston")

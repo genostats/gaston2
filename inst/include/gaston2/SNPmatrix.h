@@ -226,6 +226,11 @@ class SNPmatrix {
     return indStats_;
   }
 
+
+  // get the DataStruct containing individual stats
+  // non const version to send to manipulate in R
+  DataStruct &getIndStats() {  return indStats_;  }
+
   // TODO : see if by default possible ?
   // they need to be ordered !!!!
   void setIndStats(Column N0s, Column N1s, Column N2s, Column NAs) {
@@ -252,6 +257,10 @@ class SNPmatrix {
   // get theDataStruct containing snp stats, possibly without N0s...
   // checkout exportSNPStats if thats what you want
   const DataStruct &getSNPStats() const { return snpStats_; }
+
+
+  // non const version to send to manipulate in R
+  DataStruct &getSNPStats() { return snpStats_; }
 
   // for the toSNPmatrix* functions and the extractInds* f° to populate through
   // snpStats_ with at least bim content

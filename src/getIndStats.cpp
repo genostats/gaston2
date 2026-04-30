@@ -16,9 +16,10 @@ Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix<>> pM, bool compute = false) {
 // [[Rcpp::export]]
 Rcpp::S4 getIndStats_DataStruct(Rcpp::XPtr<SNPmatrix<>> pM, bool compute = false) {
     pM->compute_indStats(compute);
-    Rcpp::XPtr<DataStruct> ptr(new DataStruct(pM->getIndStats()));
+    Rcpp::XPtr<DataStruct> ptr(&(pM->getIndStats()));
     Rcpp::S4 ds("data.struct");
     ds.slot("ptr") = ptr;
+    ds.slot("matrixptr") = pM;
     return ds;
 }
 
@@ -32,9 +33,10 @@ Rcpp::DataFrame getIndStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, bool comp
 // [[Rcpp::export]]
 Rcpp::S4 getIndStatsDosage_DataStruct(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, bool compute = false) {
     pM->compute_indStats(compute);
-    Rcpp::XPtr<DataStruct> ptr(new DataStruct(pM->getIndStats()));
+    Rcpp::XPtr<DataStruct> ptr(&(pM->getIndStats()));
     Rcpp::S4 ds("data.struct");
     ds.slot("ptr") = ptr;
+    ds.slot("matrixptr") = pM;
     return ds;
 }
 

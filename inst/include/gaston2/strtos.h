@@ -11,7 +11,9 @@ inline std::string strtos(const char * x, char ** end) {
   // skip white spaces
   while(isspace(*p)) p++;
 
-  while(!isspace(*p)) {
+  // TODO : voir si std::isgraph ne serait pas plus approprié ? 
+  //https://en.cppreference.com/cpp/string/byte/isgraph 
+  while(*p && !isspace(*p)) { // isspace de \0 renvoit false !
     val += *p;
     p++;
   }
