@@ -26,13 +26,13 @@ Rcpp::DataFrame DataStructToDataFrame(const DataStruct& DS) {
   size_t nb_col = DS.size();
   // First need to run a check of if all column have same size
   size_t ref_size = DS.at(0).size();
-  unsigned int i = 0;
-  while (i < nb_col) {
-    if (DS.at(i).size() != ref_size) break;
-    i++;
+  unsigned int count = 0;
+  while (count < nb_col) {
+    if (DS.at(count).size() != ref_size) break;
+    count++;
   }
 
-  if (i == nb_col - 1) {
+  if (count == nb_col) {
     // all same size, DF possible
     Rcpp::DataFrame DF;
     for (unsigned int i = 0; i < nb_col; i++) {
@@ -41,10 +41,9 @@ Rcpp::DataFrame DataStructToDataFrame(const DataStruct& DS) {
     return DF;
   } else {
     // downgrade to listo remove 
-    // TODO :to rm debug
-    std::cout << "using OUR list \n";
     Rcpp::List L;
     for (unsigned int i = 0; i < nb_col; i++) {
+      // TODO check how does this throw a warning 
       L.push_back(ColumnToSEXP(DS.at(i)), DS.colName(i));
     }
     return L;

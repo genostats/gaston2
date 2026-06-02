@@ -49,7 +49,7 @@ std::string showcolDataStruct(Rcpp::XPtr<DataStruct> pDS, std::string colname, i
     }
 
     // choosing to always diplay the first value
-    // + 1 why ?
+    // + 1 for the space
     if (i != 0 && (vals.size() + newval.size() + 1) > size_left) {
       vals += "...";
       return vals;
@@ -59,9 +59,5 @@ std::string showcolDataStruct(Rcpp::XPtr<DataStruct> pDS, std::string colname, i
     }
 
   }
-  #if DEBUG_COL
-  vals += "Use count:";
-  vals += col.handler_use_count();
-  #endif
   return vals;
 }
