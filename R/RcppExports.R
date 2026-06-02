@@ -5,8 +5,8 @@ DataFrameToDataStructR_ <- function(DF) {
     .Call(`_gaston2_DataFrameToDataStructR_`, DF)
 }
 
-DataStructToDataFrame_ <- function(pDS) {
-    .Call(`_gaston2_DataStructToDataFrame_`, pDS)
+DataStructToSEXP <- function(pDS) {
+    .Call(`_gaston2_DataStructToSEXP`, pDS)
 }
 
 DoseMatrixToNumericMatrix <- function(pM) {
@@ -147,10 +147,6 @@ extractSNPsfromDosagematrix_ <- function(other, keep) {
 
 extractSNPsfromSNPmatrix_ <- function(other, keep) {
     .Call(`_gaston2_extractSNPsfromSNPmatrix_`, other, keep)
-}
-
-extractcolDataStruct_ <- function(ogDS, colnames) {
-    .Call(`_gaston2_extractcolDataStruct_`, ogDS, colnames)
 }
 
 getGastonOptions_ <- function() {
@@ -383,18 +379,6 @@ set_num_thread <- function(num) {
 
 testsuite <- function(verbose = TRUE) {
     invisible(.Call(`_gaston2_testsuite`, verbose))
-}
-
-test_stob <- function(input) {
-    .Call(`_gaston2_test_stob`, input)
-}
-
-test_strtob <- function(input) {
-    .Call(`_gaston2_test_strtob`, input)
-}
-
-test_strtob_line <- function(input) {
-    invisible(.Call(`_gaston2_test_strtob_line`, input))
 }
 
 ToDosagematrixDisk_ <- function(pM, newfile_name) {

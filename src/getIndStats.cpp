@@ -1,11 +1,9 @@
 #include "SNPmatrix.h"
 #include "SNPdosage.h"
 #include "DataStruct.h"
+#include "DataStructToSEXP.h"
 #include <iostream>
 #include <Rcpp.h>
-
-
-Rcpp::DataFrame DataStructToDataFrame(const DataStruct & DS);
 
 // [[Rcpp::export]]
 Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix<>> pM, bool compute = false) {
@@ -15,12 +13,12 @@ Rcpp::DataFrame getIndStats(Rcpp::XPtr<SNPmatrix<>> pM, bool compute = false) {
 
 // [[Rcpp::export]]
 Rcpp::S4 getIndStats_DataStruct(Rcpp::XPtr<SNPmatrix<>> pM, bool compute = false) {
-    pM->compute_indStats(compute);
-    Rcpp::XPtr<DataStruct> ptr(&(pM->getIndStats()));
-    Rcpp::S4 ds("data.struct");
-    ds.slot("ptr") = ptr;
-    ds.slot("matrixptr") = pM;
-    return ds;
+  pM->compute_indStats(compute);
+  Rcpp::XPtr<DataStruct> ptr(&(pM->getIndStats()));
+  Rcpp::S4 ds("data.struct");
+  ds.slot("ptr") = ptr;
+  ds.slot("matrixptr") = pM;
+  return ds;
 }
 
 // [[Rcpp::export]]

@@ -1,12 +1,9 @@
 #include <Rcpp.h>
-
 #include <iostream>
-
 #include "DataStruct.h"
+#include "DataStructToSEXP.h"
 #include "SNPdosage.h"
 #include "SNPmatrix.h"
-
-Rcpp::DataFrame DataStructToDataFrame(const DataStruct& DS);
 
 // [[Rcpp::export]]
 Rcpp::DataFrame getSNPStats(Rcpp::XPtr<SNPmatrix<>> pM, bool compute = false) {

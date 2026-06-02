@@ -4,7 +4,7 @@
 #'
 #' @exportS3Method as.data.frame data.struct
 as.data.frame.data.struct <- function(x, ...) {
-  DataStructToDataFrame_(x@ptr)
+  DataStructToSEXP(x@ptr)
 }
 
 #' @family data.struct

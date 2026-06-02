@@ -26,7 +26,7 @@ void addcolDataStruct(Rcpp::XPtr<DataStruct> pDS, std::string colname, SEXP valu
     case LGLSXP: {
       return pDS->setColumn(Column(Rcpp::as<std::vector<bool>>(values)), colname);
     }
-    default: { // so for single	SINGLESXP and list VECSXP???
+    default: { 
       throw std::runtime_error("Added column can only be of type INT, DOUBLE/FLOAT, STRONG or BOOL");
     }
   }

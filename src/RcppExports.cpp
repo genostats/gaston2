@@ -22,14 +22,14 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// DataStructToDataFrame_
-Rcpp::DataFrame DataStructToDataFrame_(Rcpp::XPtr<DataStruct> pDS);
-RcppExport SEXP _gaston2_DataStructToDataFrame_(SEXP pDSSEXP) {
+// DataStructToSEXP
+SEXP DataStructToSEXP(Rcpp::XPtr<DataStruct> pDS);
+RcppExport SEXP _gaston2_DataStructToSEXP(SEXP pDSSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<DataStruct> >::type pDS(pDSSEXP);
-    rcpp_result_gen = Rcpp::wrap(DataStructToDataFrame_(pDS));
+    rcpp_result_gen = Rcpp::wrap(DataStructToSEXP(pDS));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -478,18 +478,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type other(otherSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type keep(keepSEXP);
     rcpp_result_gen = Rcpp::wrap(extractSNPsfromSNPmatrix_(other, keep));
-    return rcpp_result_gen;
-END_RCPP
-}
-// extractcolDataStruct_
-Rcpp::XPtr<DataStruct> extractcolDataStruct_(Rcpp::XPtr<DataStruct> ogDS, std::vector<std::string> colnames);
-RcppExport SEXP _gaston2_extractcolDataStruct_(SEXP ogDSSEXP, SEXP colnamesSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DataStruct> >::type ogDS(ogDSSEXP);
-    Rcpp::traits::input_parameter< std::vector<std::string> >::type colnames(colnamesSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractcolDataStruct_(ogDS, colnames));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1153,38 +1141,6 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// test_stob
-bool test_stob(const std::string& input);
-RcppExport SEXP _gaston2_test_stob(SEXP inputSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type input(inputSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_stob(input));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_strtob
-bool test_strtob(const std::string& input);
-RcppExport SEXP _gaston2_test_strtob(SEXP inputSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type input(inputSEXP);
-    rcpp_result_gen = Rcpp::wrap(test_strtob(input));
-    return rcpp_result_gen;
-END_RCPP
-}
-// test_strtob_line
-void test_strtob_line(const std::string& input);
-RcppExport SEXP _gaston2_test_strtob_line(SEXP inputSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type input(inputSEXP);
-    test_strtob_line(input);
-    return R_NilValue;
-END_RCPP
-}
 // ToDosagematrixDisk_
 Rcpp::XPtr<SNPmatrix<SNPdosageDisk<mio::access_mode::write>>> ToDosagematrixDisk_(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, std::string newfile_name);
 RcppExport SEXP _gaston2_ToDosagematrixDisk_(SEXP pMSEXP, SEXP newfile_nameSEXP) {
@@ -1234,7 +1190,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_DataFrameToDataStructR_", (DL_FUNC) &_gaston2_DataFrameToDataStructR_, 1},
-    {"_gaston2_DataStructToDataFrame_", (DL_FUNC) &_gaston2_DataStructToDataFrame_, 1},
+    {"_gaston2_DataStructToSEXP", (DL_FUNC) &_gaston2_DataStructToSEXP, 1},
     {"_gaston2_DoseMatrixToNumericMatrix", (DL_FUNC) &_gaston2_DoseMatrixToNumericMatrix, 1},
     {"_gaston2_LD_pair_moments", (DL_FUNC) &_gaston2_LD_pair_moments, 4},
     {"_gaston2_LD_square_moments", (DL_FUNC) &_gaston2_LD_square_moments, 4},
@@ -1270,7 +1226,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_extractSEXPDataStruct", (DL_FUNC) &_gaston2_extractSEXPDataStruct, 2},
     {"_gaston2_extractSNPsfromDosagematrix_", (DL_FUNC) &_gaston2_extractSNPsfromDosagematrix_, 2},
     {"_gaston2_extractSNPsfromSNPmatrix_", (DL_FUNC) &_gaston2_extractSNPsfromSNPmatrix_, 2},
-    {"_gaston2_extractcolDataStruct_", (DL_FUNC) &_gaston2_extractcolDataStruct_, 2},
     {"_gaston2_getGastonOptions_", (DL_FUNC) &_gaston2_getGastonOptions_, 0},
     {"_gaston2_getIndStats", (DL_FUNC) &_gaston2_getIndStats, 2},
     {"_gaston2_getIndStats_DataStruct", (DL_FUNC) &_gaston2_getIndStats_DataStruct, 2},
@@ -1329,9 +1284,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_test_first_scnd_ind", (DL_FUNC) &_gaston2_test_first_scnd_ind, 0},
     {"_gaston2_set_num_thread", (DL_FUNC) &_gaston2_set_num_thread, 1},
     {"_gaston2_testsuite", (DL_FUNC) &_gaston2_testsuite, 1},
-    {"_gaston2_test_stob", (DL_FUNC) &_gaston2_test_stob, 1},
-    {"_gaston2_test_strtob", (DL_FUNC) &_gaston2_test_strtob, 1},
-    {"_gaston2_test_strtob_line", (DL_FUNC) &_gaston2_test_strtob_line, 1},
     {"_gaston2_ToDosagematrixDisk_", (DL_FUNC) &_gaston2_ToDosagematrixDisk_, 2},
     {"_gaston2_ToDosagematrixMemory_", (DL_FUNC) &_gaston2_ToDosagematrixMemory_, 1},
     {"_gaston2_ToSNPmatrixDisk_", (DL_FUNC) &_gaston2_ToSNPmatrixDisk_, 2},
