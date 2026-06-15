@@ -15,7 +15,7 @@ setMethod("addcolumn", "data.struct",
       i <- 1
       # j'itère sur les colonnes
       while (i <= length(dataframe)) {
-      addcolDataStruct(x@ptr, names(dataframe)[i], dataframe[[i]])
+      addColDataStruct(x@ptr, names(dataframe)[i], dataframe[[i]])
       i <- i + 1
       }
     } else {
@@ -24,7 +24,7 @@ setMethod("addcolumn", "data.struct",
 
     if (length(colname_idx) == 0) stop("Please name your new column")
     if (is.null(vec)) stop("Please give values to link to your column (using vec=...)")
-    addcolDataStruct(x@ptr, args[[colname_idx[1]]], vec)
+    addColDataStruct(x@ptr, args[[colname_idx[1]]], vec)
     }
   }
 )

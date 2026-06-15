@@ -1,10 +1,13 @@
 #include <Rcpp.h>
 #include <iostream>
 #include "DataStruct.h"
+#include "getDataStructPtr.h"
 #include "DataStructToSEXP.h"
 
+// sends a DataFrame or a List
 // [[Rcpp::export]]
-SEXP DataStructToSEXP(Rcpp::XPtr<DataStruct> pDS) {
+SEXP DataStructToSEXP(Rcpp::S4 x) {
+  DataStruct * pDS = getDataStructPtr(x);
   size_t nb_col = pDS->size();
   // First need to run a check of if all column have same size
   size_t ref_size = pDS->at(0).size();

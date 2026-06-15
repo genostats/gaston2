@@ -23,13 +23,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // DataStructToSEXP
-SEXP DataStructToSEXP(Rcpp::XPtr<DataStruct> pDS);
-RcppExport SEXP _gaston2_DataStructToSEXP(SEXP pDSSEXP) {
+SEXP DataStructToSEXP(Rcpp::S4 x);
+RcppExport SEXP _gaston2_DataStructToSEXP(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DataStruct> >::type pDS(pDSSEXP);
-    rcpp_result_gen = Rcpp::wrap(DataStructToSEXP(pDS));
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(DataStructToSEXP(x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -236,15 +236,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// addcolDataStruct
-void addcolDataStruct(Rcpp::XPtr<DataStruct> pDS, std::string colname, SEXP values);
-RcppExport SEXP _gaston2_addcolDataStruct(SEXP pDSSEXP, SEXP colnameSEXP, SEXP valuesSEXP) {
+// addColDataStruct
+void addColDataStruct(Rcpp::S4 x, std::string colname, SEXP values);
+RcppExport SEXP _gaston2_addColDataStruct(SEXP xSEXP, SEXP colnameSEXP, SEXP valuesSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DataStruct> >::type pDS(pDSSEXP);
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
     Rcpp::traits::input_parameter< std::string >::type colname(colnameSEXP);
     Rcpp::traits::input_parameter< SEXP >::type values(valuesSEXP);
-    addcolDataStruct(pDS, colname, values);
+    addColDataStruct(x, colname, values);
     return R_NilValue;
 END_RCPP
 }
@@ -323,13 +323,25 @@ BEGIN_RCPP
 END_RCPP
 }
 // colNamesDataStruct
-std::vector<std::string> colNamesDataStruct(Rcpp::XPtr<DataStruct> pDS);
-RcppExport SEXP _gaston2_colNamesDataStruct(SEXP pDSSEXP) {
+std::vector<std::string> colNamesDataStruct(Rcpp::S4 x);
+RcppExport SEXP _gaston2_colNamesDataStruct(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DataStruct> >::type pDS(pDSSEXP);
-    rcpp_result_gen = Rcpp::wrap(colNamesDataStruct(pDS));
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(colNamesDataStruct(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// colTypeDataStruct
+std::string colTypeDataStruct(Rcpp::S4 x, std::string colName);
+RcppExport SEXP _gaston2_colTypeDataStruct(SEXP xSEXP, SEXP colNameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::string >::type colName(colNameSEXP);
+    rcpp_result_gen = Rcpp::wrap(colTypeDataStruct(x, colName));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -395,6 +407,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// extractColDataStruct_
+Rcpp::XPtr<DataStruct> extractColDataStruct_(Rcpp::S4 x, std::vector<std::string> colnames);
+RcppExport SEXP _gaston2_extractColDataStruct_(SEXP xSEXP, SEXP colnamesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::vector<std::string> >::type colnames(colnamesSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractColDataStruct_(x, colnames));
+    return rcpp_result_gen;
+END_RCPP
+}
 // extractIndsfromDosagematrixDisk_
 Rcpp::XPtr<SNPmatrix<SNPdosage>> extractIndsfromDosagematrixDisk_(Rcpp::XPtr<SNPmatrix<SNPdosage>> other, Rcpp::IntegerVector keep, std::string path_str);
 RcppExport SEXP _gaston2_extractIndsfromDosagematrixDisk_(SEXP otherSEXP, SEXP keepSEXP, SEXP path_strSEXP) {
@@ -446,14 +470,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // extractSEXPDataStruct
-SEXP extractSEXPDataStruct(Rcpp::XPtr<DataStruct> pDS, std::string colname);
-RcppExport SEXP _gaston2_extractSEXPDataStruct(SEXP pDSSEXP, SEXP colnameSEXP) {
+SEXP extractSEXPDataStruct(Rcpp::S4 x, std::string colname);
+RcppExport SEXP _gaston2_extractSEXPDataStruct(SEXP xSEXP, SEXP colnameSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DataStruct> >::type pDS(pDSSEXP);
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
     Rcpp::traits::input_parameter< std::string >::type colname(colnameSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractSEXPDataStruct(pDS, colname));
+    rcpp_result_gen = Rcpp::wrap(extractSEXPDataStruct(x, colname));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -619,18 +643,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// getcolTypeDataStruct
-std::string getcolTypeDataStruct(Rcpp::XPtr<DataStruct> pDS, std::string colName);
-RcppExport SEXP _gaston2_getcolTypeDataStruct(SEXP pDSSEXP, SEXP colNameSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DataStruct> >::type pDS(pDSSEXP);
-    Rcpp::traits::input_parameter< std::string >::type colName(colNameSEXP);
-    rcpp_result_gen = Rcpp::wrap(getcolTypeDataStruct(pDS, colName));
-    return rcpp_result_gen;
-END_RCPP
-}
 // grm_
 Rcpp::NumericMatrix grm_(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_grm_(SEXP pMSEXP) {
@@ -711,13 +723,13 @@ BEGIN_RCPP
 END_RCPP
 }
 // ncolDataStruct
-size_t ncolDataStruct(Rcpp::XPtr<DataStruct> pDS);
-RcppExport SEXP _gaston2_ncolDataStruct(SEXP pDSSEXP) {
+size_t ncolDataStruct(Rcpp::S4 x);
+RcppExport SEXP _gaston2_ncolDataStruct(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DataStruct> >::type pDS(pDSSEXP);
-    rcpp_result_gen = Rcpp::wrap(ncolDataStruct(pDS));
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(ncolDataStruct(x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -837,16 +849,16 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
-// showcolDataStruct
-std::string showcolDataStruct(Rcpp::XPtr<DataStruct> pDS, std::string colname, int size_left);
-RcppExport SEXP _gaston2_showcolDataStruct(SEXP pDSSEXP, SEXP colnameSEXP, SEXP size_leftSEXP) {
+// showColDataStruct
+std::string showColDataStruct(Rcpp::S4 x, std::string colname, int size_left);
+RcppExport SEXP _gaston2_showColDataStruct(SEXP xSEXP, SEXP colnameSEXP, SEXP size_leftSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::XPtr<DataStruct> >::type pDS(pDSSEXP);
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
     Rcpp::traits::input_parameter< std::string >::type colname(colnameSEXP);
     Rcpp::traits::input_parameter< int >::type size_left(size_leftSEXP);
-    rcpp_result_gen = Rcpp::wrap(showcolDataStruct(pDS, colname, size_left));
+    rcpp_result_gen = Rcpp::wrap(showColDataStruct(x, colname, size_left));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1205,7 +1217,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_LD_thin_", (DL_FUNC) &_gaston2_LD_thin_, 5},
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
-    {"_gaston2_addcolDataStruct", (DL_FUNC) &_gaston2_addcolDataStruct, 3},
+    {"_gaston2_addColDataStruct", (DL_FUNC) &_gaston2_addColDataStruct, 3},
     {"_gaston2_bindIndstoDosagematrixDisk_", (DL_FUNC) &_gaston2_bindIndstoDosagematrixDisk_, 3},
     {"_gaston2_bindIndstoDosagematrixMemory_", (DL_FUNC) &_gaston2_bindIndstoDosagematrixMemory_, 2},
     {"_gaston2_bindIndstoSNPmatrixDisk_", (DL_FUNC) &_gaston2_bindIndstoSNPmatrixDisk_, 3},
@@ -1213,12 +1225,14 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_cbind_SNPmatrix", (DL_FUNC) &_gaston2_cbind_SNPmatrix, 2},
     {"_gaston2_cbind_Dosagematrix", (DL_FUNC) &_gaston2_cbind_Dosagematrix, 2},
     {"_gaston2_colNamesDataStruct", (DL_FUNC) &_gaston2_colNamesDataStruct, 1},
+    {"_gaston2_colTypeDataStruct", (DL_FUNC) &_gaston2_colTypeDataStruct, 2},
     {"_gaston2_computeSNPStats", (DL_FUNC) &_gaston2_computeSNPStats, 1},
     {"_gaston2_computeSNPStatsDosage", (DL_FUNC) &_gaston2_computeSNPStatsDosage, 1},
     {"_gaston2_exportSNPStats", (DL_FUNC) &_gaston2_exportSNPStats, 1},
     {"_gaston2_exportSNPStatsDosage", (DL_FUNC) &_gaston2_exportSNPStatsDosage, 1},
     {"_gaston2_dimDosematrix", (DL_FUNC) &_gaston2_dimDosematrix, 1},
     {"_gaston2_dimSNPmatrix", (DL_FUNC) &_gaston2_dimSNPmatrix, 1},
+    {"_gaston2_extractColDataStruct_", (DL_FUNC) &_gaston2_extractColDataStruct_, 2},
     {"_gaston2_extractIndsfromDosagematrixDisk_", (DL_FUNC) &_gaston2_extractIndsfromDosagematrixDisk_, 3},
     {"_gaston2_extractIndsfromDosagematrixMemory_", (DL_FUNC) &_gaston2_extractIndsfromDosagematrixMemory_, 2},
     {"_gaston2_extractIndsfromSNPmatrixDisk_", (DL_FUNC) &_gaston2_extractIndsfromSNPmatrixDisk_, 3},
@@ -1238,7 +1252,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_getSNPStats_DataStruct", (DL_FUNC) &_gaston2_getSNPStats_DataStruct, 2},
     {"_gaston2_getSNPStatsDosage", (DL_FUNC) &_gaston2_getSNPStatsDosage, 2},
     {"_gaston2_getSNPStatsDosage_DataStruct", (DL_FUNC) &_gaston2_getSNPStatsDosage_DataStruct, 2},
-    {"_gaston2_getcolTypeDataStruct", (DL_FUNC) &_gaston2_getcolTypeDataStruct, 2},
     {"_gaston2_grm_", (DL_FUNC) &_gaston2_grm_, 1},
     {"_gaston2_grm_mmatrix", (DL_FUNC) &_gaston2_grm_mmatrix, 3},
     {"_gaston2_isAutosome_", (DL_FUNC) &_gaston2_isAutosome_, 1},
@@ -1257,7 +1270,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_setGastonOptions", (DL_FUNC) &_gaston2_setGastonOptions, 1},
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},
     {"_gaston2_setModeDosage", (DL_FUNC) &_gaston2_setModeDosage, 2},
-    {"_gaston2_showcolDataStruct", (DL_FUNC) &_gaston2_showcolDataStruct, 3},
+    {"_gaston2_showColDataStruct", (DL_FUNC) &_gaston2_showColDataStruct, 3},
     {"_gaston2_test_ds", (DL_FUNC) &_gaston2_test_ds, 2},
     {"_gaston2_test_ds2", (DL_FUNC) &_gaston2_test_ds2, 0},
     {"_gaston2_test_readBedFileMemory", (DL_FUNC) &_gaston2_test_readBedFileMemory, 4},

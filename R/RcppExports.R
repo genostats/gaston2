@@ -5,8 +5,8 @@ DataFrameToDataStructR_ <- function(DF) {
     .Call(`_gaston2_DataFrameToDataStructR_`, DF)
 }
 
-DataStructToSEXP <- function(pDS) {
-    .Call(`_gaston2_DataStructToSEXP`, pDS)
+DataStructToSEXP <- function(x) {
+    .Call(`_gaston2_DataStructToSEXP`, x)
 }
 
 DoseMatrixToNumericMatrix <- function(pM) {
@@ -65,8 +65,8 @@ SNPMatrixToNumericMatrix <- function(pM) {
     .Call(`_gaston2_SNPMatrixToNumericMatrix`, pM)
 }
 
-addcolDataStruct <- function(pDS, colname, values) {
-    invisible(.Call(`_gaston2_addcolDataStruct`, pDS, colname, values))
+addColDataStruct <- function(x, colname, values) {
+    invisible(.Call(`_gaston2_addColDataStruct`, x, colname, values))
 }
 
 bindIndstoDosagematrixDisk_ <- function(first, second, path) {
@@ -93,8 +93,12 @@ cbind_Dosagematrix <- function(first_matrix, scd_matrix) {
     .Call(`_gaston2_cbind_Dosagematrix`, first_matrix, scd_matrix)
 }
 
-colNamesDataStruct <- function(pDS) {
-    .Call(`_gaston2_colNamesDataStruct`, pDS)
+colNamesDataStruct <- function(x) {
+    .Call(`_gaston2_colNamesDataStruct`, x)
+}
+
+colTypeDataStruct <- function(x, colName) {
+    .Call(`_gaston2_colTypeDataStruct`, x, colName)
 }
 
 computeSNPStats <- function(pM) {
@@ -121,6 +125,10 @@ dimSNPmatrix <- function(pM) {
     .Call(`_gaston2_dimSNPmatrix`, pM)
 }
 
+extractColDataStruct_ <- function(x, colnames) {
+    .Call(`_gaston2_extractColDataStruct_`, x, colnames)
+}
+
 extractIndsfromDosagematrixDisk_ <- function(other, keep, path_str) {
     .Call(`_gaston2_extractIndsfromDosagematrixDisk_`, other, keep, path_str)
 }
@@ -137,8 +145,8 @@ extractIndsfromSNPmatrixMemory_ <- function(other, keep) {
     .Call(`_gaston2_extractIndsfromSNPmatrixMemory_`, other, keep)
 }
 
-extractSEXPDataStruct <- function(pDS, colname) {
-    .Call(`_gaston2_extractSEXPDataStruct`, pDS, colname)
+extractSEXPDataStruct <- function(x, colname) {
+    .Call(`_gaston2_extractSEXPDataStruct`, x, colname)
 }
 
 extractSNPsfromDosagematrix_ <- function(other, keep) {
@@ -197,10 +205,6 @@ getSNPStatsDosage_DataStruct <- function(pM, compute = FALSE) {
     .Call(`_gaston2_getSNPStatsDosage_DataStruct`, pM, compute)
 }
 
-getcolTypeDataStruct <- function(pDS, colName) {
-    .Call(`_gaston2_getcolTypeDataStruct`, pDS, colName)
-}
-
 grm_ <- function(pM) {
     .Call(`_gaston2_grm_`, pM)
 }
@@ -229,8 +233,8 @@ isnullptr <- function(pointer) {
     .Call(`_gaston2_isnullptr`, pointer)
 }
 
-ncolDataStruct <- function(pDS) {
-    .Call(`_gaston2_ncolDataStruct`, pDS)
+ncolDataStruct <- function(x) {
+    .Call(`_gaston2_ncolDataStruct`, x)
 }
 
 readBedFileDisk_ <- function(bedfile, bimfile, famfile) {
@@ -273,8 +277,8 @@ setModeDosage <- function(pM, mode) {
     invisible(.Call(`_gaston2_setModeDosage`, pM, mode))
 }
 
-showcolDataStruct <- function(pDS, colname, size_left) {
-    .Call(`_gaston2_showcolDataStruct`, pDS, colname, size_left)
+showColDataStruct <- function(x, colname, size_left) {
+    .Call(`_gaston2_showColDataStruct`, x, colname, size_left)
 }
 
 test_ds <- function(DF, In) {

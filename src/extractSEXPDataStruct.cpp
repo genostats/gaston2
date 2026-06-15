@@ -1,15 +1,14 @@
 #include <Rcpp.h>
-
 #include <iostream>
-
 #include "Column.h"
 #include "DataStruct.h"
+#include "getDataStructPtr.h"
 #include "datatype.h"
 #include <stdexcept> // for runtime_error
 
 // [[Rcpp::export]]
-SEXP extractSEXPDataStruct(Rcpp::XPtr<DataStruct> pDS, std::string colname) {
-  if (!pDS) throw std::runtime_error("data.struct has a broken external pointer !");
+SEXP extractSEXPDataStruct(Rcpp::S4 x, std::string colname) {
+  DataStruct * pDS = getDataStructPtr(x);
   Column & col = pDS->getColumn(colname);
   datatype dt = col.type();
   if(dt == INT) 

@@ -4,11 +4,12 @@
 
 #include "Column.h"
 #include "DataStruct.h"
+#include "getDataStructPtr.h"
 #include "datatype.h"
 
 // [[Rcpp::export]]
-void addcolDataStruct(Rcpp::XPtr<DataStruct> pDS, std::string colname, SEXP values) {
-  if (!pDS) throw std::runtime_error("data.struct has a broken external pointer !");
+void addColDataStruct(Rcpp::S4 x, std::string colname, SEXP values) {
+  DataStruct * pDS = getDataStructPtr(x);
 
   // must create a Column object
   // then Call pDS->setColumn(const Column & col, std::string name) {}

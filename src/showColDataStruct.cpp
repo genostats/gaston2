@@ -4,6 +4,7 @@
 #include <stdexcept> // for runtime error
 
 #include "DataStruct.h"
+#include "getDataStructPtr.h"
 #include "Column.h"
 #include "datatype.h"
 
@@ -13,8 +14,9 @@ Takes the number of characters left on the console line (I want it to fit into a
 */
 
 // [[Rcpp::export]]
-std::string showcolDataStruct(Rcpp::XPtr<DataStruct> pDS, std::string colname, int size_left) {
-  if (!pDS) throw std::runtime_error("Broken pointer for DataStruct");
+std::string showColDataStruct(Rcpp::S4 x, std::string colname, int size_left) {
+  DataStruct * pDS = getDataStructPtr(x);
+  if (!pDS) Rcpp::stop("Broken pointer for DataStruct");
   Column & col = pDS->getColumn(colname);
 
   std::string vals;

@@ -12,7 +12,7 @@ setMethod("$", "data.struct",
             stop("column ", name, " does not exist")
         # do I want to stop ou send back a NULL comme data.frame ? 
         else
-            new("data.struct", ptr = extractcolDataStruct_(x@ptr, name), matrixptr = x@matrixptr)
+            new("data.struct", ptr = extractColsDataStruct_(x@ptr, name), matrixptr = x@matrixptr)
     }
 )
 
@@ -31,7 +31,7 @@ setMethod("[", "data.struct",
         if (!(name %in% ds_names))
             stop("column ", name, " does not exist")
         }
-        new("data.struct", ptr = extractcolDataStruct_(x@ptr, i), matrixptr = x@matrixptr)
+        new("data.struct", ptr = extractColsDataStruct_(x@ptr, i), matrixptr = x@matrixptr)
     }
 )
 
