@@ -60,8 +60,9 @@ DataStruct DataFrameToDataStruct(Rcpp::DataFrame DF) {
 }
 
 
+// le std::move doit éviter la copie
 // [[Rcpp::export]]
 Rcpp::XPtr<DataStruct> DataFrameToDataStructR_(Rcpp::DataFrame DF) {
-  Rcpp::XPtr<DataStruct> pDS(new DataStruct(DataFrameToDataStruct(DF)));
+  Rcpp::XPtr<DataStruct> pDS(new DataStruct(std::move(DataFrameToDataStruct(DF))));
   return pDS; 
 }

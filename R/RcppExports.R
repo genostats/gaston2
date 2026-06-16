@@ -117,6 +117,10 @@ exportSNPStatsDosage <- function(pM) {
     invisible(.Call(`_gaston2_exportSNPStatsDosage`, pM))
 }
 
+dimDataStruct <- function(x) {
+    .Call(`_gaston2_dimDataStruct`, x)
+}
+
 dimDosematrix <- function(pM) {
     .Call(`_gaston2_dimDosematrix`, pM)
 }
@@ -127,6 +131,10 @@ dimSNPmatrix <- function(pM) {
 
 extractColDataStruct_ <- function(x, colnames) {
     .Call(`_gaston2_extractColDataStruct_`, x, colnames)
+}
+
+extractDataStruct <- function(x, lines, columns) {
+    .Call(`_gaston2_extractDataStruct`, x, lines, columns)
 }
 
 extractIndsfromDosagematrixDisk_ <- function(other, keep, path_str) {
@@ -145,16 +153,16 @@ extractIndsfromSNPmatrixMemory_ <- function(other, keep) {
     .Call(`_gaston2_extractIndsfromSNPmatrixMemory_`, other, keep)
 }
 
-extractSEXPDataStruct <- function(x, colname) {
-    .Call(`_gaston2_extractSEXPDataStruct`, x, colname)
-}
-
 extractSNPsfromDosagematrix_ <- function(other, keep) {
     .Call(`_gaston2_extractSNPsfromDosagematrix_`, other, keep)
 }
 
 extractSNPsfromSNPmatrix_ <- function(other, keep) {
     .Call(`_gaston2_extractSNPsfromSNPmatrix_`, other, keep)
+}
+
+getColAsSEXPDataStruct <- function(x, colname) {
+    .Call(`_gaston2_getColAsSEXPDataStruct`, x, colname)
 }
 
 getGastonOptions_ <- function() {

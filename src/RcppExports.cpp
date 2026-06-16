@@ -385,6 +385,17 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// dimDataStruct
+Rcpp::IntegerVector dimDataStruct(Rcpp::S4 x);
+RcppExport SEXP _gaston2_dimDataStruct(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(dimDataStruct(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dimDosematrix
 Rcpp::IntegerVector dimDosematrix(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_dimDosematrix(SEXP pMSEXP) {
@@ -416,6 +427,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
     Rcpp::traits::input_parameter< std::vector<std::string> >::type colnames(colnamesSEXP);
     rcpp_result_gen = Rcpp::wrap(extractColDataStruct_(x, colnames));
+    return rcpp_result_gen;
+END_RCPP
+}
+// extractDataStruct
+Rcpp::XPtr<DataStruct> extractDataStruct(Rcpp::S4 x, Rcpp::IntegerVector lines, Rcpp::IntegerVector columns);
+RcppExport SEXP _gaston2_extractDataStruct(SEXP xSEXP, SEXP linesSEXP, SEXP columnsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type lines(linesSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type columns(columnsSEXP);
+    rcpp_result_gen = Rcpp::wrap(extractDataStruct(x, lines, columns));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -469,18 +493,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// extractSEXPDataStruct
-SEXP extractSEXPDataStruct(Rcpp::S4 x, std::string colname);
-RcppExport SEXP _gaston2_extractSEXPDataStruct(SEXP xSEXP, SEXP colnameSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
-    Rcpp::traits::input_parameter< std::string >::type colname(colnameSEXP);
-    rcpp_result_gen = Rcpp::wrap(extractSEXPDataStruct(x, colname));
-    return rcpp_result_gen;
-END_RCPP
-}
 // extractSNPsfromDosagematrix_
 Rcpp::XPtr<SNPmatrix<SNPdosage>> extractSNPsfromDosagematrix_(Rcpp::XPtr<SNPmatrix<SNPdosage>> other, Rcpp::IntegerVector keep);
 RcppExport SEXP _gaston2_extractSNPsfromDosagematrix_(SEXP otherSEXP, SEXP keepSEXP) {
@@ -502,6 +514,18 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type other(otherSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type keep(keepSEXP);
     rcpp_result_gen = Rcpp::wrap(extractSNPsfromSNPmatrix_(other, keep));
+    return rcpp_result_gen;
+END_RCPP
+}
+// getColAsSEXPDataStruct
+SEXP getColAsSEXPDataStruct(Rcpp::S4 x, std::string colname);
+RcppExport SEXP _gaston2_getColAsSEXPDataStruct(SEXP xSEXP, SEXP colnameSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    Rcpp::traits::input_parameter< std::string >::type colname(colnameSEXP);
+    rcpp_result_gen = Rcpp::wrap(getColAsSEXPDataStruct(x, colname));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1230,16 +1254,18 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_computeSNPStatsDosage", (DL_FUNC) &_gaston2_computeSNPStatsDosage, 1},
     {"_gaston2_exportSNPStats", (DL_FUNC) &_gaston2_exportSNPStats, 1},
     {"_gaston2_exportSNPStatsDosage", (DL_FUNC) &_gaston2_exportSNPStatsDosage, 1},
+    {"_gaston2_dimDataStruct", (DL_FUNC) &_gaston2_dimDataStruct, 1},
     {"_gaston2_dimDosematrix", (DL_FUNC) &_gaston2_dimDosematrix, 1},
     {"_gaston2_dimSNPmatrix", (DL_FUNC) &_gaston2_dimSNPmatrix, 1},
     {"_gaston2_extractColDataStruct_", (DL_FUNC) &_gaston2_extractColDataStruct_, 2},
+    {"_gaston2_extractDataStruct", (DL_FUNC) &_gaston2_extractDataStruct, 3},
     {"_gaston2_extractIndsfromDosagematrixDisk_", (DL_FUNC) &_gaston2_extractIndsfromDosagematrixDisk_, 3},
     {"_gaston2_extractIndsfromDosagematrixMemory_", (DL_FUNC) &_gaston2_extractIndsfromDosagematrixMemory_, 2},
     {"_gaston2_extractIndsfromSNPmatrixDisk_", (DL_FUNC) &_gaston2_extractIndsfromSNPmatrixDisk_, 3},
     {"_gaston2_extractIndsfromSNPmatrixMemory_", (DL_FUNC) &_gaston2_extractIndsfromSNPmatrixMemory_, 2},
-    {"_gaston2_extractSEXPDataStruct", (DL_FUNC) &_gaston2_extractSEXPDataStruct, 2},
     {"_gaston2_extractSNPsfromDosagematrix_", (DL_FUNC) &_gaston2_extractSNPsfromDosagematrix_, 2},
     {"_gaston2_extractSNPsfromSNPmatrix_", (DL_FUNC) &_gaston2_extractSNPsfromSNPmatrix_, 2},
+    {"_gaston2_getColAsSEXPDataStruct", (DL_FUNC) &_gaston2_getColAsSEXPDataStruct, 2},
     {"_gaston2_getGastonOptions_", (DL_FUNC) &_gaston2_getGastonOptions_, 0},
     {"_gaston2_getIndStats", (DL_FUNC) &_gaston2_getIndStats, 2},
     {"_gaston2_getIndStats_DataStruct", (DL_FUNC) &_gaston2_getIndStats_DataStruct, 2},

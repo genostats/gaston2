@@ -7,7 +7,7 @@
 #include <stdexcept> // for runtime_error
 
 // [[Rcpp::export]]
-SEXP extractSEXPDataStruct(Rcpp::S4 x, std::string colname) {
+SEXP getColAsSEXPDataStruct(Rcpp::S4 x, std::string colname) {
   DataStruct * pDS = getDataStructPtr(x);
   Column & col = pDS->getColumn(colname);
   datatype dt = col.type();

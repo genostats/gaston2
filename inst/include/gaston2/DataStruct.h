@@ -146,9 +146,19 @@ class DataStruct {
 
     // constructeur qui fait une extraction de lignes
     template<typename intVec>
-    DataStruct(DataStruct & DS, intVec & keep) {
+    DataStruct(DataStruct & DS, intVec & lines) {
       for(size_t i = 0; i < DS.size(); i++) {
-        push_back(Column(DS.at(i), keep), DS.colNames[i]);
+        push_back(Column(DS.at(i), lines), DS.colNames[i]);
+      }
+    }
+
+    // constructeur qui fait une extraction de lignes et de colonnes
+    template<typename intVec>
+    DataStruct(DataStruct & DS, intVec & lines, intVec & cols) {
+      size_t ncol = DS.size();
+      for(size_t i : cols) {
+        if(i >= ncol) throw std::runtime_error("Column index out of range");
+        push_back(Column(DS.at(i), lines), DS.colNames[i]);
       }
     }
 
@@ -165,7 +175,7 @@ class DataStruct {
 #endif
     }
 
-    // I am stupid and this is not usefull for now but could be later on
+    // this is not usefull for now but could be later on
     // // fonction qui enlève les colonnes (ainsi que leurs noms)
     // // spécifiés dans to_remove
     // void remove(DataStruct & D, std::vector<std::string> & to_remove) {

@@ -163,9 +163,8 @@ struct Column {
   Column ColumnExtract(const Column col, const intVec& keep) {
     const std::vector<T>* vec = col.get<T>();
     std::vector<T> filtered;
-    // TODO : think if reserve is of appropriate size
     filtered.reserve(keep.size());
-    for (size_t i : keep)
+    for (size_t i : keep) 
       filtered.push_back(vec->at(i));
     return Column(filtered);
   }
@@ -174,11 +173,10 @@ struct Column {
   // un constructeur qui retourne une copie
   // d'un append de col2 dans col
   Column(const Column col1, const Column col2) {
-    // je pars du principe que les Columns doivent être du même type
-    // à voir si possible pour chr ?
+    // les Columns doivent être du même type
     type_ = col1.type();
     if (type_ != col2.type()) {
-      throw std::runtime_error("Failing to append columns beacause of mismatched types");
+      throw std::runtime_error("Failing to append columns (types mismatch)");
     }
 
     switch (type_) {
