@@ -1,26 +1,11 @@
 #include <Rcpp.h>
 #include <iostream>
-#include "Column.h"
-#include "DataStruct.h"
-#include "getDataStructPtr.h"
-#include "datatype.h"
-#include <stdexcept> // for runtime_error
+#include "RcppDataStruct.h"
 
 // [[Rcpp::export]]
 SEXP getColAsSEXPDataStruct(Rcpp::S4 x, std::string colname) {
   DataStruct * pDS = getDataStructPtr(x);
   Column & col = pDS->getColumn(colname);
-  datatype dt = col.type();
-  if(dt == INT) 
-    return Rcpp::wrap(*col.get<int>());
-   else if(dt == DOUBLE)
-    return Rcpp::wrap(*col.get<double>());
-  else if(dt == FLOAT)
-    return Rcpp::wrap(*col.get<float>());
-  else if(dt == STRING)
-    return Rcpp::wrap(*col.get<std::string>());
-  else if(dt == BOOL)
-    return Rcpp::wrap(*col.get<bool>());
-  else
-    Rcpp::stop("Unknown column type");
+  return ColumnToSEXP(col);
 }
+

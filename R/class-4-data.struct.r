@@ -16,7 +16,8 @@ setMethod("show", "data.struct",
     if(isnullptr(object@ptr)) {
       cat("A data.struct with a broken external ptr\n")
     } else {
-      cat("A data.struct with", ncolDataStruct(object), "columns\n")
+      dd <- dimDataStruct(object)
+      cat("A", dd[1], "x", dd[2], "data.struct\n")
       # list all Columns present
       vecNames <- colNamesDataStruct(object)
       for (name in vecNames) {  # for every col

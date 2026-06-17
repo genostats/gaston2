@@ -247,6 +247,13 @@ struct Column {
     return ((std::vector<T>*)handler.get())->at(i);
   }
 
+  // une fonction set (pour changer une valeur)
+  template <typename T>
+  void set(int i, T value) {
+    checkType<T>();
+    ((std::vector<T>*)handler.get())->at(i) = value;
+  }
+
   // une fonction push_back qui va convertir une chaine de caractères
   // dans le type cible
   void push_back_convert(const std::string& x) {

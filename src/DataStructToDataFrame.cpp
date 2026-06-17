@@ -1,7 +1,6 @@
 #include <Rcpp.h>
 #include <iostream>
-#include "DataStruct.h"
-#include "DataStructToSEXP.h"
+#include "RcppDataStruct.h"
 
 Rcpp::DataFrame DataStructToDataFrame(const DataStruct & DS) {
   Rcpp::DataFrame DF;

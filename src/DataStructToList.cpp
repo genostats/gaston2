@@ -1,7 +1,5 @@
 #include <Rcpp.h>
-#include <iostream>
-#include "DataStruct.h"
-#include "DataStructToSEXP.h"
+#include "RcppDataStruct.h"
 
 Rcpp::List DataStructToList(const DataStruct & DS) {
   Rcpp::List L;

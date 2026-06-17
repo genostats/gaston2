@@ -1,8 +1,6 @@
 #include <Rcpp.h>
 #include <iostream>
-#include "DataStruct.h"
-#include "getDataStructPtr.h"
-#include "DataStructToSEXP.h"
+#include "RcppDataStruct.h"
 
 // sends a DataFrame or a List
 // [[Rcpp::export]]

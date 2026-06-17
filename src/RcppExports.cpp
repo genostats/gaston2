@@ -757,6 +757,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// nrowDataStruct
+int nrowDataStruct(Rcpp::S4 x);
+RcppExport SEXP _gaston2_nrowDataStruct(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(nrowDataStruct(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // readBedFileDisk_
 Rcpp::XPtr<SNPmatrix<>> readBedFileDisk_(std::string bedfile, std::string bimfile, std::string famfile);
 RcppExport SEXP _gaston2_readBedFileDisk_(SEXP bedfileSEXP, SEXP bimfileSEXP, SEXP famfileSEXP) {
@@ -828,6 +839,32 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
     Rcpp::traits::input_parameter< std::string >::type famFile(famFileSEXP);
     readFamFile(pM, famFile);
+    return R_NilValue;
+END_RCPP
+}
+// setCellDataStruct
+void setCellDataStruct(Rcpp::S4 x, int i, int j, SEXP value);
+RcppExport SEXP _gaston2_setCellDataStruct(SEXP xSEXP, SEXP iSEXP, SEXP jSEXP, SEXP valueSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type i(iSEXP);
+    Rcpp::traits::input_parameter< int >::type j(jSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type value(valueSEXP);
+    setCellDataStruct(x, i, j, value);
+    return R_NilValue;
+END_RCPP
+}
+// setCellsDataStruct
+void setCellsDataStruct(Rcpp::S4 x, Rcpp::IntegerVector I, int j, SEXP value);
+RcppExport SEXP _gaston2_setCellsDataStruct(SEXP xSEXP, SEXP ISEXP, SEXP jSEXP, SEXP valueSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::S4 >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type I(ISEXP);
+    Rcpp::traits::input_parameter< int >::type j(jSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type value(valueSEXP);
+    setCellsDataStruct(x, I, j, value);
     return R_NilValue;
 END_RCPP
 }
@@ -1286,12 +1323,15 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_isMt_", (DL_FUNC) &_gaston2_isMt_, 1},
     {"_gaston2_isnullptr", (DL_FUNC) &_gaston2_isnullptr, 1},
     {"_gaston2_ncolDataStruct", (DL_FUNC) &_gaston2_ncolDataStruct, 1},
+    {"_gaston2_nrowDataStruct", (DL_FUNC) &_gaston2_nrowDataStruct, 1},
     {"_gaston2_readBedFileDisk_", (DL_FUNC) &_gaston2_readBedFileDisk_, 3},
     {"_gaston2_readBedFileMemory_", (DL_FUNC) &_gaston2_readBedFileMemory_, 3},
     {"_gaston2_readBimFile", (DL_FUNC) &_gaston2_readBimFile, 2},
     {"_gaston2_readDosageFileMemory_", (DL_FUNC) &_gaston2_readDosageFileMemory_, 3},
     {"_gaston2_readDosageFileDisk_", (DL_FUNC) &_gaston2_readDosageFileDisk_, 3},
     {"_gaston2_readFamFile", (DL_FUNC) &_gaston2_readFamFile, 2},
+    {"_gaston2_setCellDataStruct", (DL_FUNC) &_gaston2_setCellDataStruct, 4},
+    {"_gaston2_setCellsDataStruct", (DL_FUNC) &_gaston2_setCellsDataStruct, 4},
     {"_gaston2_setChrType", (DL_FUNC) &_gaston2_setChrType, 1},
     {"_gaston2_setGastonOptions", (DL_FUNC) &_gaston2_setGastonOptions, 1},
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},

@@ -245,6 +245,10 @@ ncolDataStruct <- function(x) {
     .Call(`_gaston2_ncolDataStruct`, x)
 }
 
+nrowDataStruct <- function(x) {
+    .Call(`_gaston2_nrowDataStruct`, x)
+}
+
 readBedFileDisk_ <- function(bedfile, bimfile, famfile) {
     .Call(`_gaston2_readBedFileDisk_`, bedfile, bimfile, famfile)
 }
@@ -267,6 +271,14 @@ readDosageFileDisk_ <- function(bedfile, bimfile, famfile) {
 
 readFamFile <- function(pM, famFile) {
     invisible(.Call(`_gaston2_readFamFile`, pM, famFile))
+}
+
+setCellDataStruct <- function(x, i, j, value) {
+    invisible(.Call(`_gaston2_setCellDataStruct`, x, i, j, value))
+}
+
+setCellsDataStruct <- function(x, I, j, value) {
+    invisible(.Call(`_gaston2_setCellsDataStruct`, x, I, j, value))
 }
 
 setChrType <- function(pM) {

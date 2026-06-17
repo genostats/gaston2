@@ -3,7 +3,6 @@
 #include "DataStruct.h"
 #include "getDataStructPtr.h"
 
-// sends a DataFrame or a List
 // [[Rcpp::export]]
 Rcpp::IntegerVector dimDataStruct(Rcpp::S4 x) {
   DataStruct * pDS = getDataStructPtr(x);

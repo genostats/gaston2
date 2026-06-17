@@ -1,7 +1,12 @@
 #include <Rcpp.h>
+#include "Column.h"
+#include "DataStruct.h"
+#include "getDataStructPtr.h"
+#include "datatype.h"
 
-#ifndef _datastructosexp_
-#define _datastructosexp_
+#ifndef _rcppdatastruct_
+#define _rcppdatastruct_
+
 Rcpp::DataFrame DataStructToDataFrame(const DataStruct & DS);
 Rcpp::List DataStructToList(const DataStruct & DS);
 
