@@ -169,48 +169,12 @@ getGastonOptions_ <- function() {
     .Call(`_gaston2_getGastonOptions_`)
 }
 
-getIndStats <- function(pM, compute = FALSE) {
-    .Call(`_gaston2_getIndStats`, pM, compute)
-}
-
-getIndStats_DataStruct <- function(pM, compute = FALSE) {
-    .Call(`_gaston2_getIndStats_DataStruct`, pM, compute)
-}
-
-getIndStatsDosage <- function(pM, compute = FALSE) {
-    .Call(`_gaston2_getIndStatsDosage`, pM, compute)
-}
-
-getIndStatsDosage_DataStruct <- function(pM, compute = FALSE) {
-    .Call(`_gaston2_getIndStatsDosage_DataStruct`, pM, compute)
-}
-
-test_force_compute_indStats <- function(pM) {
-    invisible(.Call(`_gaston2_test_force_compute_indStats`, pM))
-}
-
 getMode <- function(pM) {
     .Call(`_gaston2_getMode`, pM)
 }
 
 getModeDosage <- function(pM) {
     .Call(`_gaston2_getModeDosage`, pM)
-}
-
-getSNPStats <- function(pM, compute = FALSE) {
-    .Call(`_gaston2_getSNPStats`, pM, compute)
-}
-
-getSNPStats_DataStruct <- function(pM, compute = FALSE) {
-    .Call(`_gaston2_getSNPStats_DataStruct`, pM, compute)
-}
-
-getSNPStatsDosage <- function(pM, compute = FALSE) {
-    .Call(`_gaston2_getSNPStatsDosage`, pM, compute)
-}
-
-getSNPStatsDosage_DataStruct <- function(pM, compute = FALSE) {
-    .Call(`_gaston2_getSNPStatsDosage_DataStruct`, pM, compute)
 }
 
 grm_ <- function(pM) {
