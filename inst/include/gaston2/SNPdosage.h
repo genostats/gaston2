@@ -244,7 +244,7 @@ public:
   // the gen value for every ind for this SNP 
   // this vector has to be seen as a 'flatten' matrix with 4 rows (N0 N1 N2 NAs)
   // and nbInds columns
-  void compute_indStats(std::vector<int> &unordered_stats) {  
+  void compute_indStats(std::vector<unsigned int> &unordered_stats) {  
     //#pragma omp parallel for //num_threads(4)      
     for (size_t ind = 0; ind < nbInds_; ind++) {
       float val = data()[ind];

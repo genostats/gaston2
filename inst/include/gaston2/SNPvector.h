@@ -388,15 +388,15 @@ public:
   // the gen value for every ind for this SNP 
   // this vector has to be seen as a 'flatten' matrix with 4 rows (N0 N1 N2 NAs)
   // and nbInds columns
-  void compute_indStats(std::vector<int> &unordered_stats) {
+  void compute_indStats(std::vector<unsigned int> &unordered_stats) {
     
     //hardcoded to read in PLINK
     const unsigned int g[4] = {0, 3, 1, 2};
 
     size_t nbc_m1 = nbChars() - 1;
 
-    // parcourt le SNP byte by byte
-#pragma omp parallel for
+    // parcourt le SNP byte by byte 
+    // #pragma omp parallel for
     for (size_t byte = 0; byte < nbc_m1; byte++) {
       uint8_t d = data()[byte];
       size_t byteoffset = byte * 4;

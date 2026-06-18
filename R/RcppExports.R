@@ -5,8 +5,8 @@ DataFrameToDataStructR_ <- function(DF) {
     .Call(`_gaston2_DataFrameToDataStructR_`, DF)
 }
 
-DataStructToSEXP <- function(x) {
-    .Call(`_gaston2_DataStructToSEXP`, x)
+DataStructToSEXP <- function(x, I) {
+    .Call(`_gaston2_DataStructToSEXP`, x, I)
 }
 
 DoseMatrixToNumericMatrix <- function(pM) {
@@ -101,6 +101,14 @@ colTypeDataStruct <- function(x, colName) {
     .Call(`_gaston2_colTypeDataStruct`, x, colName)
 }
 
+computeIndStats <- function(pM, force = FALSE) {
+    invisible(.Call(`_gaston2_computeIndStats`, pM, force))
+}
+
+computeIndStatsDosage <- function(pM, force = FALSE) {
+    .Call(`_gaston2_computeIndStatsDosage`, pM, force)
+}
+
 computeSNPStats <- function(pM) {
     invisible(.Call(`_gaston2_computeSNPStats`, pM))
 }
@@ -109,12 +117,12 @@ computeSNPStatsDosage <- function(pM) {
     invisible(.Call(`_gaston2_computeSNPStatsDosage`, pM))
 }
 
-exportSNPStats <- function(pM) {
-    invisible(.Call(`_gaston2_exportSNPStats`, pM))
+exportSNPStats <- function(pM, force = FALSE) {
+    invisible(.Call(`_gaston2_exportSNPStats`, pM, force))
 }
 
-exportSNPStatsDosage <- function(pM) {
-    invisible(.Call(`_gaston2_exportSNPStatsDosage`, pM))
+exportSNPStatsDosage <- function(pM, force = FALSE) {
+    invisible(.Call(`_gaston2_exportSNPStatsDosage`, pM, force))
 }
 
 dimDataStruct <- function(x) {
@@ -263,14 +271,6 @@ setModeDosage <- function(pM, mode) {
 
 showColDataStruct <- function(x, colname, size_left) {
     .Call(`_gaston2_showColDataStruct`, x, colname, size_left)
-}
-
-test_ds <- function(DF, In) {
-    .Call(`_gaston2_test_ds`, DF, In)
-}
-
-test_ds2 <- function() {
-    .Call(`_gaston2_test_ds2`)
 }
 
 test_readBedFileMemory <- function(filename, n_ind, n_snp, verbose = TRUE) {

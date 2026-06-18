@@ -14,17 +14,17 @@ inline bool isAutosome(int chr) {
 
 inline bool isX(int chr) {
   static gastonOptions & opt = getGastonOptions();  
-  return opt.autosomes.find(chr) != opt.x.end();
+  return opt.x.find(chr) != opt.x.end();
 }
 
 inline bool isY(int chr) {
   static gastonOptions & opt = getGastonOptions();  
-  return opt.autosomes.find(chr) != opt.y.end();
+  return opt.y.find(chr) != opt.y.end();
 }
 
 inline bool isMt(int chr) {
   static gastonOptions & opt = getGastonOptions();  
-  return opt.autosomes.find(chr) != opt.mt.end();
+  return opt.mt.find(chr) != opt.mt.end();
 }
 
 // ------------ vectorised functions -------------------

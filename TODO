@@ -1,3 +1,6 @@
+- Chasser les const std::shared_ptr<> source pour les remplacer par const std::shared_ptr<> & source
+  -> fait dans SNPvectorMemory, gain de temps : x5 dans l'extraction de matrice
+
 - Dans LD ajouter "Dprime" dans les mesures
   dans snpVector.h pour le LD on divise par nbi... compter les données complètes ?
 
@@ -5,8 +8,10 @@
 - les fonctions de lecture ddans DataStruct ne sont pas robustes
   à la présence de chaines de caractères dans une colonne numerique (eg 'NA')
   même strtof ne doit pas faire ce qu'on voudrait dans ce cas
-- getIndStats.cpp et getSNPStats.cpp doivent pouvoir dégager
+- ajouter des type "unsigned" ?
 
+NOTE : pour avoir des fonctions géneriques avec le meme nom dans gaston / gaston2
+il vaut mieux les enregistrer comme des méthodes S4 que S3 (avec setGeneric).
 
 - JU dans l'extraction de matrices, setIndStats met indStatsComputed = true
   il faudrait propager la valeur de indStatsComputed_ de la matrice originelle

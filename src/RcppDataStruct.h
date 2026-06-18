@@ -7,8 +7,8 @@
 #ifndef _rcppdatastruct_
 #define _rcppdatastruct_
 
-Rcpp::DataFrame DataStructToDataFrame(const DataStruct & DS);
-Rcpp::List DataStructToList(const DataStruct & DS);
+Rcpp::DataFrame DataStructToDataFrame(const DataStruct & DS, Rcpp::IntegerVector I);
+Rcpp::List DataStructToList(const DataStruct & DS, Rcpp::IntegerVector I);
 
 inline SEXP ColumnToSEXP(const Column& col) {
   datatype dt = col.type();

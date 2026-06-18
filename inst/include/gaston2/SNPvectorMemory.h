@@ -22,13 +22,13 @@ class SNPvectorMemory : public SNPvector {
   SNPvectorMemory(size_t nbInds) : SNPvector(nbInds), data_(nbInds / 4 + ((nbInds % 4 == 0u) ? 0 : 1)) {}
 
   // constructeur par copie
-  SNPvectorMemory(const std::shared_ptr<SNPvector> source) : SNPvector(source->nbInds()),
+  SNPvectorMemory(const std::shared_ptr<SNPvector> & source) : SNPvector(source->nbInds()),
                                                              data_(source->data(), source->data() + source->nbChars()) {}
 
   // constructeur par copie avec une sélection des individus,
   // par un vecteur d'index 
   template <typename intVec>
-  SNPvectorMemory(const std::shared_ptr<SNPvector> source, intVec &keep) : SNPvector(keep.size()) {
+  SNPvectorMemory(const std::shared_ptr<SNPvector> & source, intVec &keep) : SNPvector(keep.size()) {
     const uint8_t *refdata = source->data();
     // check the keep (no idx to far or impossible)
     data_.assign((nbInds_ / 4 + ((nbInds_ % 4 == 0u) ? 0 : 1)), 0); // creating with nbChars of 0
@@ -55,7 +55,7 @@ class SNPvectorMemory : public SNPvector {
 
 
   // constructeur concatenant 2 vecteurs 
-  SNPvectorMemory(const std::shared_ptr<SNPvector> first, const std::shared_ptr<SNPvector> second) : SNPvector(first->nbInds() + second->nbInds()) {
+  SNPvectorMemory(const std::shared_ptr<SNPvector> & first, const std::shared_ptr<SNPvector> & second) : SNPvector(first->nbInds() + second->nbInds()) {
 
     // Initializing properly with the right size and zeros everywhere
     data_.assign((nbInds_ / 4 + ((nbInds_ % 4 == 0u) ? 0 : 1)), 0); // creating with nbChars of 0

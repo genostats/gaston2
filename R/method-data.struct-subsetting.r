@@ -1,11 +1,11 @@
 
 #' @export
 setMethod("[", "data.struct",
-  function(x, i, j, ..., drop = TRUE) { 
+  function(x, i, j, ..., drop = TRUE) { browser();
     if(missing(i)) i <- seq_len(nrow(x))
     if(missing(j)) j <- seq_len(ncol(x))
     if(is.character(j)) {
-      ds_names = colNamesDataStruct(x)
+      ds_names <- colNamesDataStruct(x)
       j <- match(j, ds_names)
     }
     if(any(i <= 0L)) i <- seq_len(nrow(x))[i]

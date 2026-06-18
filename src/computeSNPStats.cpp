@@ -13,13 +13,11 @@ void computeSNPStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM) {
 }
 
 // [[Rcpp::export]]
-void exportSNPStats(Rcpp::XPtr<SNPmatrix<SNPvector>> pM) {
-  //forces recomputing even if accessed before, 
-  // not used for now but possibly usefull
-  pM->exportSNPStats(true);
+void exportSNPStats(Rcpp::XPtr<SNPmatrix<SNPvector>> pM, bool force = false) {
+  pM->exportSNPStats(force);
 }
 
 // [[Rcpp::export]]
-void exportSNPStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM) {
-  pM->exportSNPStats(true);
+void exportSNPStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, bool force = false) {
+  pM->exportSNPStats(force);
 }

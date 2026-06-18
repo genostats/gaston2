@@ -4,7 +4,7 @@
 \alias{as.data.frame.data.struct}
 \title{Converting custom datastruct to R data.frame}
 \usage{
-\method{as.data.frame}{data.struct}(x, ...)
+\method{as.data.frame}{data.struct}(x, row.names = NULL, optional = FALSE, ..., cols)
 }
 \description{
 Converting custom datastruct to R data.frame

@@ -160,26 +160,21 @@ class SNPmatrix {
     initializer(omp_priv = decltype(omp_orig)(omp_orig.size(), 0))
   */
 
-  // Stocking in DataStruct indStats_ the number of occurrences of 0, 1, 2, and NAs for all individuals,
-  // accross all SNPs currently in the SNPmatrix (need to be recalled if another SNP is pushed back after)
-  void compute_indStats(bool force = false) {
-    if (!force && indStatsComputed_) { 
-      return;  // stats déjà calculées, on ne recalcule pas
-    }
-
+ private:
+  // helper for the next function
+  template<typename scalar_t = float>
+  void compute_indStats_chrType(chrType ct, std::string suffix) {
+    size_t nbInds = SNPs_[0]->nbInds();
     size_t nbSNPs = SNPs_.size();
 
-    if (nbSNPs == 0)
-      throw std::out_of_range("No SNPs loaded into the SNPMatrix !");
-
-    size_t nbInds = SNPs_[0]->nbInds();
+    scalar_t nb_snps_of_type = (scalar_t) nbSnpType[ (size_t) ct ];
     // a vector keeping for every inds NOs, N1s, N2s and NAs
     // filled with 0 by default
-    std::vector<int> unordered_stats(nbInds * 4, 0);  // DO NOT USE nbCHars ! rounded up !
+    std::vector<unsigned int> unordered_stats(nbInds * 4, 0); 
 
-    // #pragma omp parallel for reduction(vec_int_plus : unordered_stats)
+    // # pragma omp parallel for reduction(vec_int_plus : unordered_stats)
     for (size_t i = 0; i < nbSNPs; i++) {  // parcourt tous les SNPs
-      SNPs_[i]->compute_indStats(unordered_stats);
+      if(SNPs_[i]->getChrType() == ct) SNPs_[i]->compute_indStats(unordered_stats);
     }
 
     // isolate columns from unordered_stats
@@ -187,21 +182,51 @@ class SNPmatrix {
     std::vector<int> vecN1s;
     std::vector<int> vecN2s;
     std::vector<int> vecNAs;
+    // + compute callrate and heterozigosity
+    std::vector<scalar_t> callrate;
+    std::vector<scalar_t> hz;
 
     for (size_t ind = 0; ind < nbInds; ind++) {
       auto idxnzeros = ind * 4;
-      vecN0s.push_back(unordered_stats[idxnzeros]);
-      vecN1s.push_back(unordered_stats[idxnzeros + 1]);
-      vecN2s.push_back(unordered_stats[idxnzeros + 2]);
-      vecNAs.push_back(unordered_stats[idxnzeros + 3]);
+      unsigned int n0 = unordered_stats[idxnzeros];
+      unsigned int n1 = unordered_stats[idxnzeros + 1];
+      unsigned int n2 = unordered_stats[idxnzeros + 2];
+      unsigned int na = unordered_stats[idxnzeros + 3];
+      vecN0s.push_back(n0);
+      vecN1s.push_back(n1);
+      vecN2s.push_back(n2);
+      vecNAs.push_back(na);
+      callrate.push_back( 1.0 - (scalar_t) na / nb_snps_of_type );
+      hz.push_back( (scalar_t) n1 / (nb_snps_of_type - (scalar_t) na) );
     }
 
     // using setColumn will check if the Column exists 
     // and replace it, else it will push_back
-    indStats_.setColumn(Column(vecN0s), "N0");
-    indStats_.setColumn(Column(vecN1s), "N1");
-    indStats_.setColumn(Column(vecN2s), "N2");
-    indStats_.setColumn(Column(vecNAs), "NAs");
+    indStats_.setColumn(Column(vecN0s), "N0" + suffix);
+    indStats_.setColumn(Column(vecN1s), "N1" + suffix);
+    indStats_.setColumn(Column(vecN2s), "N2" + suffix);
+    indStats_.setColumn(Column(vecNAs), "NAs" + suffix);
+    indStats_.setColumn(Column(callrate), "callrate" + suffix);
+    indStats_.setColumn(Column(hz), "hz" + suffix);
+  }
+ 
+ public:
+ 
+  // populating indStats 
+  template<typename scalar_t = float>
+  void compute_indStats(bool force = false) {
+    if (!force && indStatsComputed_) { 
+      return;  // stats déjà calculées, on ne recalcule pas
+    }
+
+    size_t nbSNPs = SNPs_.size();
+    if (nbSNPs == 0)
+      throw std::out_of_range("No SNPs loaded into the SNPMatrix !");
+
+    if(nbSnpType[(size_t) chrType::AUTOSOME ] > 0) compute_indStats_chrType<scalar_t>(chrType::AUTOSOME, "");
+    if(nbSnpType[(size_t) chrType::X ] > 0) compute_indStats_chrType<scalar_t>(chrType::X, ".x");
+    if(nbSnpType[(size_t) chrType::Y ] > 0) compute_indStats_chrType<scalar_t>(chrType::Y, ".y");
+    if(nbSnpType[(size_t) chrType::MT ] > 0) compute_indStats_chrType<scalar_t>(chrType::MT, ".mt");
 
     indStatsComputed_ = true;
   }
@@ -377,20 +402,27 @@ class SNPmatrix {
     snpStats_.readFile(in);
   }
 
-  // to call once bim file is loaded, to set chromosome type in SNPs
+  // to call once bim file and SNPs are loaded, to set chromosome type in SNPs
   // nothing done yet for loading haploptypes...
   void setChrType() {
+    // get 'chr' column
     if(!snpStats_.hasColumn("chr")) 
-      throw std::runtime_error("No column 'chr' in snp stats (was bim file loaded?)");
-
+      throw std::runtime_error("No column 'chr' in snp stats. Load bim file before calling setChrType.");
     std::vector<int> & chr = *snpStats_.getColumn("chr").get<int>();
     size_t n = nbSNPs();
     if(n != chr.size())
       throw std::runtime_error("chr data size doesn't match SNPmatrix size");
 
-#pragma omp parallel for
+    // wipe nbSnpType
+    for(unsigned int & i : nbSnpType) i = 0;
+
+    // constexpr size_t nbt = (size_t) chrType::UNKNOWN + 1:
+
+#pragma omp parallel for reduction(+:nbSnpType[:std::size(nbSnpType)])
     for(size_t i = 0; i < n; i++) {
-      SNPs_[i]->setChrType( intToChrType(chr[i]) );
+      chrType ct = intToChrType(chr[i]);
+      SNPs_[i]->setChrType(ct);
+      nbSnpType[ (size_t) ct ]++;
     }
   }
 
@@ -402,6 +434,9 @@ private:
   bool indStatsComputed_ = false;
   bool snpStatsExported_ = false;
   Mode mode_ = RAW_VALUES;
+
+  // number of SNP by types
+  unsigned int nbSnpType[ (size_t) chrType::UNKNOWN + 1 ] = {0};
 };
 
 #endif

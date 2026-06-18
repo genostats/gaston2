@@ -6,28 +6,29 @@
 #ifndef _gaston_chrType_
 #define _gaston_chrType_
 
-enum chrType {
+enum class chrType {
   AUTOSOME,
   X,
   Y,
   MT,
   HAPLOTYPE,
-  UNKNOWN
+  UNKNOWN     // if future evolutions, keep UNKNOWN as last element
+              // it used in other places to know the number of values
 };
 
 inline std::string chrTypeToString(chrType mo) {
   switch (mo) {
-    case AUTOSOME:
+    case chrType::AUTOSOME:
       return std::string("AUTOSOME");
-    case X:
+    case chrType::X:
       return std::string("X");
-    case Y:
+    case chrType::Y:
       return std::string("Y");
-    case MT:
+    case chrType::MT:
       return std::string("MT");
-    case HAPLOTYPE:
+    case chrType::HAPLOTYPE:
       return std::string("HAPLOTYPE");
-    case UNKNOWN:
+    case chrType::UNKNOWN:
       return std::string("UNKNOWN");
     default:
       throw std::runtime_error("something went horribly wrong (undefined chrType)");
@@ -52,6 +53,9 @@ inline chrType intToChrType(int chr) {
   return chrType::UNKNOWN;
 }
 
+
+// TODO vérifier l'utilité de cette fonction créée par Ju
+//
 // helper function to propagate the "right" chrType and
 // also do a quick validity check
 // called by the bindInds family
