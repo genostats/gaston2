@@ -1,7 +1,6 @@
 - Chasser les const std::shared_ptr<> source pour les remplacer par const std::shared_ptr<> & source
   -> fait dans SNPvectorMemory, gain de temps : x5 dans l'extraction de matrice
-  -> pas faisable avec les shared_ptr vers un objet mio puisqu'on veut les copier de toutes façons
-     (peut-on trouver un mécanisme alternatif ?!)
+  -> pas possible d'éviter totalement les copies des shared_ptr vers un objet mio
 
 - Dans LD ajouter "Dprime" dans les mesures
   dans snpVector.h pour le LD on divise par nbi... compter les données complètes ?

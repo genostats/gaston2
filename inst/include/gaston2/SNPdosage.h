@@ -238,6 +238,12 @@ public:
     compute_mu_sigma(set_mu, set_sigma);
   }
 
+  // TODO
+  template<typename tvec>
+  void compute_stats_mask(int * counts, const tvec & mask, unsigned int nb_masked_values) {
+    return;
+  }
+
 
   // Adding in unordered_stats 
   // (a vector with an index for N0, N1, N2, NA for every ind in the SNP)

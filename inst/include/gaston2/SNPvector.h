@@ -15,6 +15,7 @@
 #ifndef _SNPvector_
 #define _SNPvector_
 
+// nb de paires de bits à 00 dans aabbccdd
 static uint8_t N0[256] = {
     4, 3, 3, 3, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2,
     3, 2, 2, 2, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1,
@@ -33,6 +34,7 @@ static uint8_t N0[256] = {
     2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0,
     2, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
 
+// idem pour 01
 static uint8_t N1[256] = {
     0, 1, 0, 0, 1, 2, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0,
     1, 2, 1, 1, 2, 3, 2, 2, 1, 2, 1, 1, 1, 2, 1, 1,
@@ -341,20 +343,22 @@ public:
 
     /* FIRST : filling up stats_ with N0s, N1s, N2s, and NAs with RAW_VALUES translation*/
     stats_[0] = stats_[1] = stats_[2] = stats_[3] = 0;
+    
+    const uint8_t * DAT = data();
 
     // all bytes excepted last byte
     for (size_t i = 0; i < nbc_m1; i++) {
-      uint8_t d = data()[i];
-      stats_[0] += N0[d];
-      stats_[2] += N0[255 - d]; // raw = 3
-      stats_[3] += N1[d];       // raw = 1
-      stats_[1] += N1[255 - d]; // raw = 2
+      uint8_t d = DAT[i];
+      stats_[0] += N0[d];             // raw = 0 : genotype 0
+      stats_[1] += N1[(uint8_t) ~d];  // raw = 2 : genotype 1 (plink convention)
+      stats_[2] += N0[(uint8_t) ~d];  // raw = 3 : genotype 2 (plink convention) 
+      stats_[3] += N1[d];             // raw = 1 : genotype NA 
     }
 
     // last byte treated separately,
     // stopping mid-byte if necessary:
     unsigned int g[4] = {0, 3, 1, 2};
-    uint8_t d = data()[nbc_m1];
+    uint8_t d = DAT[nbc_m1];
     unsigned int BitsInLastByte = (nbInds() & 3)?(nbInds() & 3):4;
     while(BitsInLastByte > 0) {
       unsigned int val_plink = g[d&3];
@@ -374,8 +378,48 @@ public:
     computeMode();
   }
 
+  // computes stats for some individuals only (typically women)
+  // for the moment this will have to be called by the user when needed.
+  // depending on developments on the X/Y chromosomes methods, 'mask' and 'counts'
+  // could become members of the class...
+  //
+  // counts est un tableau de longueur 4
+  // mask est vecteur de uint8_t qui ont des 11 pour les individus à masquer
+  // on fait un | : cela crée des valeur à 11 (ie raw value 3 : geno 2)
+  // on termine en soustrayant à counts[2] le nb de valeurs masquees
+  template<typename tvec>
+  void compute_stats_mask(int * counts, const tvec & mask, unsigned int nb_masked_values) {
+    size_t nbc_m1 = nbChars() - 1;
 
-  // test is SNP is monomorphic
+    counts[0] = counts[1] = counts[2] = counts[3] = 0;
+
+    const uint8_t * DAT = data();
+
+    // all bytes excepted last byte
+    for (size_t i = 0; i < nbc_m1; i++) {
+      uint8_t d = DAT[i] | mask[i];
+      counts[0] += N0[d];              // raw = 0 : genotype 0
+      counts[1] += N1[(uint8_t) ~d];   // raw = 2 : genotype 1 (plink convention)
+      counts[2] += N0[(uint8_t) ~d];   // raw = 3 : genotype 2 (plink convention) 
+      counts[3] += N1[d];              // raw = 1 : genotype NA 
+    }
+
+    // last byte treated separately,
+    // stopping mid-byte if necessary:
+    unsigned int g[4] = {0, 3, 1, 2};
+    uint8_t d = DAT[nbc_m1] | mask[nbc_m1];
+    unsigned int BitsInLastByte = (nbInds() & 3)?(nbInds() & 3):4;
+    while(BitsInLastByte > 0) {
+      unsigned int val_plink = g[d&3];
+      counts[val_plink]++;
+      BitsInLastByte--;
+      d >>= 2; // 1 shift par loop
+    }
+    // remove excess values in counts[2] (raw 3 : masked values)
+    counts[2] -= nb_masked_values;
+  }
+
+  // test if SNP is monomorphic
   bool monomorphe() {
     return (mu_ == 0 || mu_ == 2);
   }
@@ -392,11 +436,12 @@ public:
     const unsigned int g[4] = {0, 3, 1, 2};
 
     size_t nbc_m1 = nbChars() - 1;
+    const uint8_t * DAT = data();
 
     // parcourt le SNP byte by byte 
     // #pragma omp parallel for
     for (size_t byte = 0; byte < nbc_m1; byte++) {
-      uint8_t d = data()[byte];
+      uint8_t d = DAT[byte];
       size_t byteoffset = byte * 4;
 
       for (int ind = 0; ind < 4; ind++) {
@@ -407,7 +452,7 @@ public:
     }
     // last byte read separately
     unsigned int BitsInLastByte = (nbInds() & 3)?(nbInds() & 3):4;
-    uint8_t d = data()[nbc_m1];
+    uint8_t d = DAT[nbc_m1];
     size_t byteoffset = nbc_m1 * 4;
 
     for (int ind = 0; ind <  BitsInLastByte; ind++) {
@@ -448,8 +493,8 @@ public:
     // if v == 0 return NaN directly
     if(v == 0) return std::numeric_limits<scalar_t>::quiet_NaN();
 
-    auto data1 = data();
-    auto data2 = other.data();
+    const uint8_t * data1 = data();
+    const uint8_t * data2 = other.data();
     size_t nbc_m1 = nbChars() - 1;
 
     for (size_t i = 0; i < nbc_m1; i++) {
@@ -491,8 +536,10 @@ public:
     // the "raw" contigency table, 4x4 seen as a long 16 elts array
     unsigned int table[16] = {0}; // initialisée à 0
     size_t nbc_m1 = nbChars() - 1;
-    auto data1 = data();
-    auto data2 = other.data();
+
+    const uint8_t * data1 = data();
+    const uint8_t * data2 = other.data();
+    
     for (size_t i = 0; i < nbc_m1; i++) {
       uint8_t g1 = data1[i]; 
       uint8_t g2 = data2[i];
@@ -535,7 +582,7 @@ public:
   void tcrossprod(vectorType & V) {
     if(V.size()*2 < (nbInds_ * (nbInds_ + 1))) throw std::runtime_error("tcrossprod, R is too small to write in");
     
-    auto DATA = data();
+    const uint8_t * DATA = data();
     size_t nbc_m1 = nbChars() - 1;
    
     // value of transformed *genotypes* 0, 1, 2, skipping NA (always 0)

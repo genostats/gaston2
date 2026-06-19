@@ -233,10 +233,10 @@ class SNPmatrix {
     if (nbSNPs == 0)
       throw std::out_of_range("No SNPs loaded into the SNPMatrix !");
 
-    if(nbSnpType[(size_t) chrType::AUTOSOME ] > 0) compute_indStats_chrType<scalar_t>(chrType::AUTOSOME, "");
-    if(nbSnpType[(size_t) chrType::X ] > 0) compute_indStats_chrType<scalar_t>(chrType::X, ".x");
-    if(nbSnpType[(size_t) chrType::Y ] > 0) compute_indStats_chrType<scalar_t>(chrType::Y, ".y");
-    if(nbSnpType[(size_t) chrType::MT ] > 0) compute_indStats_chrType<scalar_t>(chrType::MT, ".mt");
+    if(nbSnpType[ (size_t) chrType::AUTOSOME ] > 0) compute_indStats_chrType<scalar_t>(chrType::AUTOSOME, "");
+    if(nbSnpType[ (size_t) chrType::X ] > 0) compute_indStats_chrType<scalar_t>(chrType::X, ".x");
+    if(nbSnpType[ (size_t) chrType::Y ] > 0) compute_indStats_chrType<scalar_t>(chrType::Y, ".y");
+    if(nbSnpType[ (size_t) chrType::MT ] > 0) compute_indStats_chrType<scalar_t>(chrType::MT, ".mt");
 
     indStatsComputed_ = true;
   }
@@ -300,7 +300,7 @@ class SNPmatrix {
 
   // compute all SNP stats
   void computeSNPStats() {
-    for (auto &snp : SNPs_) {
+    for (auto & snp : SNPs_) {
       snp->compute_stats();
     }
   }
@@ -318,6 +318,8 @@ class SNPmatrix {
 
   // Adds N0s... Columns in the snpStats_ DataStruct
   void exportSNPStats(bool force) {
+    // for values not computed (women only stats for X/Y chr)
+    constexpr int na_value = -2147483648; // I can't find of a better solution for the moment
 
     // Add a check on if snpStats were computed already, 
     // then returns if no force
@@ -325,16 +327,17 @@ class SNPmatrix {
       return;
     }
 
+    // for all SNPs get N0 N1 N2 on all individuals
     std::vector<int> vecN0s;
     std::vector<int> vecN1s;
     std::vector<int> vecN2s;
     std::vector<int> vecNAs;
 
-    for (auto &snp : SNPs_) {
+    for (auto & snp : SNPs_) {
       if (snp->stats_set() == 0) {
         snp->compute_stats(); // returns if stats already up to date
       }
-      const int *stats = snp->getStats();
+      const int * stats = snp->getStats();
 
       vecN0s.push_back(stats[0]);
       vecN1s.push_back(stats[1]);
@@ -345,6 +348,59 @@ class SNPmatrix {
     snpStats_.setColumn(Column(vecN1s), "N1");
     snpStats_.setColumn(Column(vecN2s), "N2");
     snpStats_.setColumn(Column(vecNAs), "NAs");
+
+    // extra computation for X/Y chr (if any)
+    if(nbSnpType[ (size_t) chrType::X ] > 0 || nbSnpType[ (size_t) chrType::Y ] > 0) {
+      // vector of sex
+      const std::vector<int> & sex = *indStats_.getColumn("sex").get<int>();
+      if(sex.size() != nbInds()) throw std::runtime_error("Sex vector size doesn't match the number of individuals");
+      // create mask to remove men
+      size_t nbc = SNPs_[0]->nbChars();
+      std::vector<uint8_t> mask(nbc);
+      size_t jj = 0;
+      unsigned int nb_mask = 0;
+      for(size_t j = 0; j < nbc - 1; j++) {
+        // men are 1
+        if(sex[jj++] == 1) { nb_mask++; mask[j] |= 3;   } // jj = 4*j
+        if(sex[jj++] == 1) { nb_mask++; mask[j] |= 12;  } // jj = 4*j + 1
+        if(sex[jj++] == 1) { nb_mask++; mask[j] |= 48;  } // jj = 4*j + 2
+        if(sex[jj++] == 1) { nb_mask++; mask[j] |= 192; } // jj = 4*j + 3
+      }
+      // last byte
+      if(jj < sex.size() && sex[jj++] == 1) { nb_mask++; mask[nbc - 1] |= 3;   }
+      if(jj < sex.size() && sex[jj++] == 1) { nb_mask++; mask[nbc - 1] |= 12;  }
+      if(jj < sex.size() && sex[jj++] == 1) { nb_mask++; mask[nbc - 1] |= 48;  }
+      if(jj < sex.size() && sex[jj++] == 1) { nb_mask++; mask[nbc - 1] |= 192; }
+      
+      // wipe vectors
+      vecN0s.clear();
+      vecN1s.clear();
+      vecN2s.clear();
+      vecNAs.clear();
+
+      // run throuh SNPs and compute women only stats only for X/Y chr
+      for (auto & snp : SNPs_) {
+        int count[4] = {0, 0, 0, 0};
+        if(snp->getChrType() == chrType::X || snp->getChrType() == chrType::Y) {
+          snp->compute_stats_mask(count, mask, nb_mask);
+          vecN0s.push_back(count[0]);
+          vecN1s.push_back(count[1]);
+          vecN2s.push_back(count[2]);
+          vecNAs.push_back(count[3]);
+        } else {
+          vecN0s.push_back(na_value);
+          vecN1s.push_back(na_value);
+          vecN2s.push_back(na_value);
+          vecNAs.push_back(na_value);
+        }
+      }
+
+      // set values
+      snpStats_.setColumn(Column(vecN0s), "N0.f");
+      snpStats_.setColumn(Column(vecN1s), "N1.f");
+      snpStats_.setColumn(Column(vecN2s), "N2.f");
+      snpStats_.setColumn(Column(vecNAs), "NAs.f");
+    } // ----- fin calcul chr X/Y
 
     snpStatsExported_ = true;
   }

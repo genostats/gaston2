@@ -6,4 +6,3 @@ setMethod("ind.stats", "snp.matrix", function(x) {
   computeIndStats(x@ptr)
   new("data.struct", ptr = x@ptr, type = 1L)
 })
-

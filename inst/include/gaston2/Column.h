@@ -225,7 +225,7 @@ struct Column {
 
   // renvoie un pointer vers le std::vector...
   template <typename T>
-  std::vector<T>* get() const {
+  std::vector<T> * get() const {
     // a priori si handler = null alors type_ = NONE : géré par checkType
     checkType<T>();
     return static_cast<std::vector<T>*>(handler.get());
