@@ -32,9 +32,8 @@ class SNPmatrix {
       throw std::out_of_range("Attempting to load a SNP with a different nb of individuals");
     }
     v->setMode(mode_);
-    SNPs_.push_back(v);
+    SNPs_.push_back(std::move(v));
     indStatsComputed_ = false;  // si on ajoute des SNP les stats individuelles doivent être recalculées
-    // TODO : est ce que juste un update des snpStats si elles sont déjà exportées serait utile ? 
     snpStatsExported_ = false;  // idem, il va leur manquer les stats de ce nv SNP
   }
 
@@ -65,6 +64,15 @@ class SNPmatrix {
     SNPs_.pop_back();
   }
 
+  const std::vector<std::shared_ptr<SNPvectorClass>> & getSNPs() const {
+    return SNPs_;
+  }
+
+  const std::shared_ptr<SNPvectorClass> & getSNP(size_t i) const {
+    return SNPs_[i];
+  }
+
+
   SNPmatrix() {}  // default constructor to have a specialized one just after
 
   /**
@@ -82,7 +90,7 @@ class SNPmatrix {
    */
   template <typename intVec>
   SNPmatrix(const SNPmatrix<SNPvectorClass> &other, intVec keep) {
-    const std::vector<std::shared_ptr<SNPvectorClass>> otherSNPs = other.getSNPs();
+    const std::vector<std::shared_ptr<SNPvectorClass>> & otherSNPs = other.getSNPs();
     for (auto keep_idx : keep) {
       this->push_back(otherSNPs.at(keep_idx));  // at is supposed to do bound checking
     }
@@ -117,11 +125,11 @@ class SNPmatrix {
     // I prefer to throw an error here, but push_back would also do it (to think...)
     if (first.nbInds() != second.nbInds())
       throw std::logic_error("You should not be concatenating 2 SNPmatrix with a different number of individuals !");
-    const std::vector<std::shared_ptr<SNPvectorClass>> firstSNPs = first.getSNPs();
+    const std::vector<std::shared_ptr<SNPvectorClass>> & firstSNPs = first.getSNPs();
     for (auto first_snp : firstSNPs) {
       this->push_back(first_snp);
     }
-    const std::vector<std::shared_ptr<SNPvectorClass>> scdSNPs = second.getSNPs();
+    const std::vector<std::shared_ptr<SNPvectorClass>> & scdSNPs = second.getSNPs();
 
     for (auto scd_snp : scdSNPs) {
       this->push_back(scd_snp);
@@ -155,6 +163,8 @@ class SNPmatrix {
     // pas besoin de propag le chr_type vu que stocké ds chaque snp
   }
 
+  /******************** IND STATS ***********************/
+  
   /*
     #pragma omp declare reduction(vec_int_plus : std::vector<int> : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<int>())) \
     initializer(omp_priv = decltype(omp_orig)(omp_orig.size(), 0))
@@ -231,14 +241,6 @@ class SNPmatrix {
     indStatsComputed_ = true;
   }
 
-  const std::vector<std::shared_ptr<SNPvectorClass>> &getSNPs() const {
-    return SNPs_;
-  }
-
-  const std::shared_ptr<SNPvectorClass> &getSNP(size_t i) const {
-    return SNPs_[i];
-  }
-
   // get the DataStruct containing individual stats
   const DataStruct &getIndStats() const {
     // TO DEBUG : will print the type of what the SNPmat has
@@ -252,7 +254,6 @@ class SNPmatrix {
     //<< "\n";   }
     return indStats_;
   }
-
 
   // get the DataStruct containing individual stats
   // non const version to send to manipulate in R
@@ -281,10 +282,11 @@ class SNPmatrix {
     indStatsComputed_ = complete;
   }
 
+  /******************* SNP STATS ***********************/
+
   // get theDataStruct containing snp stats, possibly without N0s...
   // checkout exportSNPStats if thats what you want
   const DataStruct &getSNPStats() const { return snpStats_; }
-
 
   // non const version to send to manipulate in R
   DataStruct &getSNPStats() { return snpStats_; }
@@ -355,10 +357,11 @@ class SNPmatrix {
 
   // used when setSnpStats called to add stats
   // but still want the N0etc Columns for example
-  void setsnpStatscomplete(bool complete) {
+  void setSnpStatsComplete(bool complete) {
     snpStatsExported_ = complete;
   }
 
+  /****************************************************************/
 
   // TODO (to think) there might be a problem if SNPs are not all in the same mode...
   // possible solution : enforce mode when push_back is done ?

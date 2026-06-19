@@ -33,7 +33,7 @@ class SNPdosageDisk : public SNPdosage {
   //  
 
   // on donne à ce constructeur un shared ptr vers fichier ouvert par mio + le nb d'individus, et le SNP index à pointer
-  SNPdosageDisk(size_t nbInds, std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref, size_t SNP_index) : 
+  SNPdosageDisk(size_t nbInds, const std::shared_ptr<mio::basic_mmap<accessMode, char>> & file_ref, size_t SNP_index) : 
     SNPdosage(nbInds),
     // no need for sizeof float because the cast is global !
     data_( ((float *) file_ref->data()) + nbInds * SNP_index), 
@@ -46,8 +46,8 @@ class SNPdosageDisk : public SNPdosage {
   // le but est d'écrire dans un fichier .bed *qu'on a créé nous-même* et qui est encore vide (à part les 3 magic bytes)
   // (ou pas forcément vide, ça va la modifier en place)
   // toujours créé en mode RAW_VALUES
-  SNPdosageDisk(const std::shared_ptr<SNPdosage> source, 
-                std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> file_ref, 
+  SNPdosageDisk(const std::shared_ptr<SNPdosage> & source, 
+                const std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> & file_ref, 
                 size_t SNP_index) : 
       SNPdosage(source->nbInds()), 
       data_( ((float *) file_ref->data()) + nbInds_ * SNP_index), 
@@ -62,8 +62,8 @@ class SNPdosageDisk : public SNPdosage {
   // constructeur par sélection des individus spécifiés : 
   // to_keep contient les indices des individus à conserver dans le SNP
   template <typename intVec>
-  SNPdosageDisk(const std::shared_ptr<SNPdosage> source, \
-    std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> newfile, size_t SNP_index, intVec &keep) : 
+  SNPdosageDisk(const std::shared_ptr<SNPdosage> & source, \
+    const std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> & newfile, size_t SNP_index, intVec &keep) : 
     SNPdosage(keep.size()), file_ref_(newfile) {
     
     data_ = ((float *) newfile->data()) + nbInds_* SNP_index ; // bcos mio sends back a char *
@@ -78,7 +78,8 @@ class SNPdosageDisk : public SNPdosage {
 
 
   // constructeur concatenant 2 vecteurs, et les écrivant dans le nouveau fichier 
-  SNPdosageDisk(const std::shared_ptr<SNPdosage> first, const std::shared_ptr<SNPdosage> second, std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> newfile, size_t SNP_index ) 
+  SNPdosageDisk(const std::shared_ptr<SNPdosage> & first, const std::shared_ptr<SNPdosage> & second, 
+      const std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> & newfile, size_t SNP_index ) 
   : SNPdosage(first->nbInds() + second->nbInds()), file_ref_(newfile) {
 
     // pointing to the right place for this SNP in the file

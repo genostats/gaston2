@@ -331,13 +331,11 @@ public:
   // Method filling up stats[] w/ the nb of ind = 00 (...03) in the SNP.
   // /!\ only if stats are not set !
   void compute_stats(bool set_mu = true, bool set_sigma = true) {
-//std::cout << "compute_stats...\n"; 
     // if already called, do nothing
     if(stats_set_) {
       //std::cout << "Not recomputing !\n";
       return;
     }
-//std::cout << "on y va!";
 
     size_t nbc_m1 = nbChars() - 1;
 

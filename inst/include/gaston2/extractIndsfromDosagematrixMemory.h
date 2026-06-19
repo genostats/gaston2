@@ -13,7 +13,7 @@
 template <typename SNPvectorClass, typename intVec>
 void extractIndsfromDosagematrixMemory(const SNPmatrix<SNPvectorClass> &other, const intVec &keep, SNPmatrix<SNPvectorClass> & newMat) {
 
-  const std::vector<std::shared_ptr<SNPdosage>> otherSNPs = other.getSNPs();
+  const std::vector<std::shared_ptr<SNPdosage>> & otherSNPs = other.getSNPs();
 
   for (const auto &snp : otherSNPs){
     newMat.push_back(std::make_shared<SNPdosageMemory>(snp, keep));
@@ -24,9 +24,9 @@ void extractIndsfromDosagematrixMemory(const SNPmatrix<SNPvectorClass> &other, c
   // and set them to be as "complete" as the mother matrix
   newMat.setindStatscomplete(other.indStatscomplete());
 
-  // keeping all from bim, but specifying N0etc need an update
+  // keeping all from bim, but specifying N0 etc need an update
   newMat.setSnpStats(other.getSNPStats());
-  newMat.setsnpStatscomplete(false);
+  newMat.setSnpStatsComplete(false);
 
   newMat.setMode(other.getMode());
 }

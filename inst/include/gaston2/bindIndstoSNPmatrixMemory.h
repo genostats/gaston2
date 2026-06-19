@@ -12,12 +12,12 @@
 #define _BINDINDMATRIX_MEM_
 
 // filling up a new SNPmatrix with every individuals from the first and second matrix
-void bindIndstoSNPmatrixMemory(const SNPmatrix<SNPvector>& first, const SNPmatrix<SNPvector>& second, SNPmatrix<SNPvectorMemory>& newMat) {
+void bindIndstoSNPmatrixMemory(const SNPmatrix<SNPvector> & first, const SNPmatrix<SNPvector> & second, SNPmatrix<SNPvectorMemory> & newMat) {
   if (first.size() != second.size())
     throw std::logic_error("You cannot merge 2 SNPmatrix with mismatched number of SNPs (maybe later could add NAs)");
 
-  const std::vector<std::shared_ptr<SNPvector>> firstSNPs = first.getSNPs();
-  const std::vector<std::shared_ptr<SNPvector>> secondSNPs = second.getSNPs();
+  const std::vector<std::shared_ptr<SNPvector>> & firstSNPs = first.getSNPs();
+  const std::vector<std::shared_ptr<SNPvector>> & secondSNPs = second.getSNPs();
 
   // maybe could also do a constructor or a function on the SNPmatrix level ?
   for (size_t i = 0; i < firstSNPs.size(); i++) {
@@ -28,16 +28,16 @@ void bindIndstoSNPmatrixMemory(const SNPmatrix<SNPvector>& first, const SNPmatri
 
   // Individuals stats are still good (N0, N1, N2, NAs also if they exist in both)
   // so I can just fuse them
-  newMat.setIndStats(DataStruct(first.getIndStats(), second.getIndStats()));
   if (first.indStatscomplete() && second.indStatscomplete()) {
+    newMat.setIndStats(DataStruct(first.getIndStats(), second.getIndStats()));
     newMat.setindStatscomplete(true);  // redundant bcos done by set, but clearer
   } else {
     newMat.setindStatscomplete(false);  // the N0etc Columns are not computed nor exported
   }
 
-  // SNP stats need to be recomputed
+  // SNP stats need to be recomputed, but we copy them anyway to get the bim part
   newMat.setSnpStats(first.getSNPStats());
-  newMat.setsnpStatscomplete(false);
+  newMat.setSnpStatsComplete(false);
 
   newMat.setMode(first.getMode());
 

@@ -10,7 +10,8 @@
 
 
 // filling up a new SNPmatrix on disk (in the file specified by path_str) with every individuals from the first and second matrix
-void bindIndstoSNPmatrixDisk(const SNPmatrix<SNPvector> &first, const SNPmatrix<SNPvector> &second, std::string path_str, SNPmatrix<SNPvectorDisk<mio::access_mode::write>> &newMat) {
+void bindIndstoSNPmatrixDisk(const SNPmatrix<SNPvector> & first, const SNPmatrix<SNPvector> & second, std::string path_str, 
+    SNPmatrix<SNPvectorDisk<mio::access_mode::write>> & newMat) {
 
   std::error_code error;
 
@@ -38,16 +39,15 @@ void bindIndstoSNPmatrixDisk(const SNPmatrix<SNPvector> &first, const SNPmatrix<
   fputc(1, f);
 
 
-  const std::vector<std::shared_ptr<SNPvector>> firstSNPs = first.getSNPs();
-  const std::vector<std::shared_ptr<SNPvector>> secondSNPs = second.getSNPs();
+  const std::vector<std::shared_ptr<SNPvector>> & firstSNPs = first.getSNPs();
+  const std::vector<std::shared_ptr<SNPvector>> & secondSNPs = second.getSNPs();
 
   const int total_nb_inds = first.nbInds() + second.nbInds();
   int total_nb_char = total_nb_inds / 4 + ((total_nb_inds % 4 == 0)? 0 : 1);
 
   // (+ 3 for the 3 magic bytes)
   int to_add = total_nb_char * first.size() + 3 ;
-  if (fseek(f, to_add - 1, SEEK_SET) != 0)
-  {
+  if (fseek(f, to_add - 1, SEEK_SET) != 0) {
     fclose(f);
     throw std::runtime_error("Error when resizing file");
   }
@@ -56,8 +56,7 @@ void bindIndstoSNPmatrixDisk(const SNPmatrix<SNPvector> &first, const SNPmatrix<
 
   /* NOW : mapping the created file with mio, */
   std::shared_ptr<mio::mmap_sink> file_ptr = std::make_shared<mio::mmap_sink>(mio::make_mmap_sink(path_str, 0, mio::map_entire_file, error));
-  if (error)
-  {
+  if (error) {
     std::string errMsg = "Error code " + std::to_string(error.value()) + ", Failed to map the file : " + error.message();
     throw std::runtime_error(errMsg);
   }
@@ -70,15 +69,16 @@ void bindIndstoSNPmatrixDisk(const SNPmatrix<SNPvector> &first, const SNPmatrix<
 
   // Individuals stats are still good (N0, N1, N2, NAs also if they exist in both)
   // so I can just fuse them
-  newMat.setIndStats(DataStruct(first.getIndStats(), second.getIndStats()));
   if (first.indStatscomplete() && second.indStatscomplete()) {
+      newMat.setIndStats(DataStruct(first.getIndStats(), second.getIndStats()));
       newMat.setindStatscomplete(true);//redundant bcos done by set, but clearer
   } else {
       newMat.setindStatscomplete(false);// the N0etc Columns are not computed nor exported
   }
-  // SNP stats need to be recomputed
+
+  // SNP stats need to be recomputed, but we copy them anyway to get the bim part
   newMat.setSnpStats(first.getSNPStats());
-  newMat.setsnpStatscomplete(false);
+  newMat.setSnpStatsComplete(false);
 
   newMat.setMode(first.getMode());
 }

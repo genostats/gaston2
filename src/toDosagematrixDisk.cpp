@@ -10,7 +10,7 @@ and fills back an instance of SNPmatrix<SNPdosageDisk> specifically
 with all the data and metadata from the original matrix.
 Also creating a corresponding file. /!\ This matrix HAS to be with SNPdosageDisk<mio::access_mode::write>
 */
-void ToDosagematrixDisk(const SNPmatrix<SNPdosage> &other, std::string newfile_name, SNPmatrix<SNPdosageDisk<mio::access_mode::write>> &newMat) {
+void ToDosagematrixDisk(const SNPmatrix<SNPdosage> & other, std::string newfile_name, SNPmatrix<SNPdosageDisk<mio::access_mode::write>> & newMat) {
   std::error_code error;
 
   /* FIRST : check if file exists, if it does, abort to not overwrite */
@@ -28,7 +28,7 @@ void ToDosagematrixDisk(const SNPmatrix<SNPdosage> &other, std::string newfile_n
     throw std::runtime_error("Failed to open file for writing");
   }
 
-  const std::vector<std::shared_ptr<SNPdosage>> otherSNPs = other.getSNPs();
+  const std::vector<std::shared_ptr<SNPdosage>> & otherSNPs = other.getSNPs();
   
   int to_add = (other.nbInds() * sizeof(float)) * otherSNPs.size();
   if (fseek(f, to_add - 1, SEEK_SET) != 0)

@@ -26,11 +26,11 @@ class SNPvectorMemory : public SNPvector {
                                                              data_(source->data(), source->data() + source->nbChars()) {}
 
   // constructeur par copie avec une sélection des individus,
-  // par un vecteur d'index 
+  // par un vecteur d'index 'keep' 
   template <typename intVec>
   SNPvectorMemory(const std::shared_ptr<SNPvector> & source, intVec &keep) : SNPvector(keep.size()) {
     const uint8_t *refdata = source->data();
-    // check the keep (no idx to far or impossible)
+
     data_.assign((nbInds_ / 4 + ((nbInds_ % 4 == 0u) ? 0 : 1)), 0); // creating with nbChars of 0
 
     size_t new_byte = 0;
@@ -44,7 +44,7 @@ class SNPvectorMemory : public SNPvector {
       ind_gen <<= (new_2bits); // shifter pour le mettre au bon endroit dans le nv byte
 
       new_2bits += 2;
-      data_[new_byte] |= ind_gen; // le || pour ne pas toucher au bits déjà set
+      data_[new_byte] |= ind_gen; // le | pour ne pas toucher au bits déjà set
       if (new_2bits == 8){
         new_byte++;
         new_2bits = 0;

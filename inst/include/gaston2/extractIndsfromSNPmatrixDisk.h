@@ -9,7 +9,7 @@
 #define _EXTRACTINDMATRIX_DISK_
 
 template <typename SNPvectorClass, typename intVec>
-void extractIndsfromSNPmatrixDisk(const SNPmatrix<SNPvectorClass> &other, const intVec &keep, std::string path_str, 
+void extractIndsfromSNPmatrixDisk(const SNPmatrix<SNPvectorClass> & other, const intVec & keep, std::string path_str, 
                                   SNPmatrix<SNPvectorClass> & newMat) {
 
   std::error_code error;
@@ -33,7 +33,7 @@ void extractIndsfromSNPmatrixDisk(const SNPmatrix<SNPvectorClass> &other, const 
   fputc(27, f);
   fputc(1, f);
 
-  const std::vector<std::shared_ptr<SNPvector>> otherSNPs = other.getSNPs();
+  const std::vector<std::shared_ptr<SNPvector>> & otherSNPs = other.getSNPs();
 
   // (+ 3 for the 3 magic bytes)
   int to_add = (keep.size() / 4 + ((keep.size() % 4 == 0u) ? 0 : 1)) * otherSNPs.size() + 3 ;
@@ -67,7 +67,7 @@ void extractIndsfromSNPmatrixDisk(const SNPmatrix<SNPvectorClass> &other, const 
   
   // keeping all from bim, but specifying N0etc need update
   newMat.setSnpStats(other.getSNPStats());
-  newMat.setsnpStatscomplete(false);
+  newMat.setSnpStatsComplete(false);
 
   newMat.setMode(other.getMode());
 }

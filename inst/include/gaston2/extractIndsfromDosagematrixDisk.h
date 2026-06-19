@@ -13,8 +13,8 @@
 // I removed the template of the SNPmatrix (previously SNPmatrix<SNPvectorClass>)
 
 template <typename intVec>
-void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> &other, const intVec &keep, std::string path_str,
-                                  SNPmatrix<SNPdosage> &newMat) {
+void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> & other, const intVec & keep, std::string path_str,
+                                  SNPmatrix<SNPdosage> & newMat) {
   std::error_code error;
 
   /* FIRST : check if file exists, if it does, abort to not overwrite */
@@ -32,11 +32,10 @@ void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> &other, const in
     throw std::runtime_error("Failed to open file for writing");
   }
 
-  const std::vector<std::shared_ptr<SNPdosage>> otherSNPs = other.getSNPs();
+  const std::vector<std::shared_ptr<SNPdosage>> & otherSNPs = other.getSNPs();
   
   int to_add = (keep.size() * sizeof(float)) * otherSNPs.size();
-  if (fseek(f, to_add - 1, SEEK_SET) != 0)
-  {
+  if (fseek(f, to_add - 1, SEEK_SET) != 0) {
     fclose(f);
     throw std::runtime_error("Error when resizing file");
   }
@@ -45,8 +44,7 @@ void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> &other, const in
 
   /* NOW : mapping the created file with mio, */
   std::shared_ptr<mio::mmap_sink> file_ptr = std::make_shared<mio::mmap_sink>(mio::make_mmap_sink(path_str, 0, mio::map_entire_file, error));
-  if (error)
-  {
+  if (error) {
     std::string errMsg = "Error code " + std::to_string(error.value()) + ", Failed to map the file : " + error.message();
     throw std::runtime_error(errMsg);
   }
@@ -62,9 +60,9 @@ void extractIndsfromDosagematrixDisk(const SNPmatrix<SNPdosage> &other, const in
   // and set them to be as "complete" as the mother matrix
   newMat.setindStatscomplete(other.indStatscomplete());
 
-  // keeping all from bim, but specifying N0etc need update
+  // keeping all from bim, but specifying N0 etc need update
   newMat.setSnpStats(other.getSNPStats());
-  newMat.setsnpStatscomplete(false);
+  newMat.setSnpStatsComplete(false);
 
   newMat.setMode(other.getMode());
 }

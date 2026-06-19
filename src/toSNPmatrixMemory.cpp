@@ -8,9 +8,9 @@ and copies it back it to SNPmatrix<SNPvectorMemory> specifically
 with all the data and metadata from the original matrix.
 If the original Matrix was on disk, this means putting all data in memory !
 */
-void ToSNPmatrixMemory(const SNPmatrix<SNPvector> &other, SNPmatrix<SNPvectorMemory> &newMat) {
+void ToSNPmatrixMemory(const SNPmatrix<SNPvector> & other, SNPmatrix<SNPvectorMemory> & newMat) {
 
-  const std::vector<std::shared_ptr<SNPvector>> otherSNPs = other.getSNPs();
+  const std::vector<std::shared_ptr<SNPvector>> & otherSNPs = other.getSNPs();
   for (const auto &snp : otherSNPs) {
     newMat.push_back(std::make_shared<SNPvectorMemory>(snp));
   }

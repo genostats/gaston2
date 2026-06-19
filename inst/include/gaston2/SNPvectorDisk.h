@@ -30,20 +30,19 @@ class SNPvectorDisk : public SNPvector {
 
   public:
   // on donne à ce constructeur un shared ptr vers fichier ouvert par mio + le nb d'individus, et le SNP index à pointer
-  SNPvectorDisk(size_t nbInds, std::shared_ptr<mio::basic_mmap<accessMode, char>> file_ref, size_t SNP_index) : 
+  SNPvectorDisk(size_t nbInds, const std::shared_ptr<mio::basic_mmap<accessMode, char>> & file_ref, size_t SNP_index) : 
     SNPvector(nbInds),
     data_((uint8_t *) (file_ref->data() + 3 /* offset from the 3 first magic bytes) */ + (nbInds/4 + ((nbInds%4 == 0u)?0:1)) * SNP_index) ), 
     file_ref_(file_ref) {}
  
 
-  // TODO !! : check what happens with empty SNP ?
   // constructeur par copie d'un SNPVector quelconque
   // il va échouer si on n'a pas accessMode == mio::access_mode::write
   // le but est d'écrire dans un fichier .bed *qu'on a créé nous-même* et qui est encore vide (à part les 3 magic bytes)
   // (ou pas forcément vide, ça va la modifier en place)
   // toujours créé en mode RAW_VALUES
-  SNPvectorDisk(const std::shared_ptr<SNPvector> source, 
-                std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> file_ref, 
+  SNPvectorDisk(const std::shared_ptr<SNPvector> & source, 
+                const std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> & file_ref, 
                 size_t SNP_index) : 
       SNPvector(source->nbInds()), 
       data_((uint8_t *) (file_ref->data() + 3 + (source->nbInds()/4 + ((source->nbInds()%4 == 0u)?0:1)) * SNP_index)), 
@@ -59,8 +58,8 @@ class SNPvectorDisk : public SNPvector {
   // constructeur par sélection des individus spécifiés : 
   // to_keep contient les indices des individus à conserver dans le SNP
   template <typename intVec>
-  SNPvectorDisk(const std::shared_ptr<SNPvector> source, \
-    std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> newfile, size_t SNP_index, intVec &keep) : 
+  SNPvectorDisk(const std::shared_ptr<SNPvector> & source, \
+    const std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> & newfile, size_t SNP_index, intVec &keep) : 
     SNPvector(keep.size()), file_ref_(newfile) {
     
     data_ = (uint8_t *) newfile->data() + (3 + (nbInds_/4 + ((nbInds_%4 == 0u)?0:1)) * SNP_index); // bcos mio sends back a char *
@@ -92,7 +91,9 @@ class SNPvectorDisk : public SNPvector {
 
 
   // constructeur concatenant 2 vecteurs 
-  SNPvectorDisk(const std::shared_ptr<SNPvector> first, const std::shared_ptr<SNPvector> second, std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> newfile, size_t SNP_index ) : SNPvector(first->nbInds() + second->nbInds()), file_ref_(newfile) {
+  SNPvectorDisk(const std::shared_ptr<SNPvector> & first, const std::shared_ptr<SNPvector> & second, 
+      const std::shared_ptr<mio::basic_mmap<mio::access_mode::write, char>> & newfile, size_t SNP_index ) : 
+    SNPvector(first->nbInds() + second->nbInds()), file_ref_(newfile) {
 
     // Initializing properly with the right size and zeros everywhere
     data_ = (uint8_t*)(newfile->data() + 3 + (nbInds_/4 + ((nbInds_%4 == 0u)?0:1)) * SNP_index);
@@ -106,7 +107,7 @@ class SNPvectorDisk : public SNPvector {
     if (BitsOnlastByte_first == 0u)  {
       // this should copy everything
       std::copy(second->data(), second->data() + second->nbChars(), data_ + first->nbChars());
-    } else {  // FRANKENSTEINING THE SNP :  
+    } else {  
       // I cannot simply do that simply because in case of padding I will have holes 
       // so I need to shift everything if that is the case
 

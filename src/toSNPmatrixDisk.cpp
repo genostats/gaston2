@@ -10,7 +10,7 @@ and fills back an instance of SNPmatrix<SNPvectorDisk> specifically
 with all the data and metadata from the original matrix.
 Also creating a corresponding file. /!\ This matrix HAS to be with SNPvectorDisk<mio::access_mode::write>
 */
-void ToSNPmatrixDisk(const SNPmatrix<SNPvector> &other, std::string newfile_name, SNPmatrix<SNPvectorDisk<mio::access_mode::write>> &newMat) {
+void ToSNPmatrixDisk(const SNPmatrix<SNPvector> & other, std::string newfile_name, SNPmatrix<SNPvectorDisk<mio::access_mode::write>> & newMat) {
   std::error_code error;
 
   /* FIRST : check if file exists, if it does, abort to not overwrite */
