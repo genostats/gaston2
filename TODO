@@ -1,15 +1,17 @@
-- Chasser les const std::shared_ptr<> source pour les remplacer par const std::shared_ptr<> & source
-  -> fait dans SNPvectorMemory, gain de temps : x5 dans l'extraction de matrice
-  -> pas possible d'éviter totalement les copies des shared_ptr vers un objet mio
+- Chasser les passages par copie quand une référence suffirait
+  (fait pour les const std::shared_ptr<> source...)
 
 - Dans LD ajouter "Dprime" dans les mesures
   dans snpVector.h pour le LD on divise par nbi... compter les données complètes ?
 
 [DATA STRUCT]
-- les fonctions de lecture ddans DataStruct ne sont pas robustes
+- les fonctions de lecture dans DataStruct ne sont pas robustes
   à la présence de chaines de caractères dans une colonne numerique (eg 'NA')
-  même strtof ne doit pas faire ce qu'on voudrait dans ce cas
-- ajouter des type "unsigned" ?
+  même strtof ne doit pas faire ce qu'on voudrait dans ce cas.
+  Pas gênant pour les .bim .fam
+- ajouter des type "unsigned" ? autres ?
+- ajouter méthodes subset, transform
+- protéger certaines colonnes [valeurs / types]
 
 NOTE : pour avoir des fonctions géneriques avec le meme nom dans gaston / gaston2
 il vaut mieux les enregistrer comme des méthodes S4 que S3 (avec setGeneric).

@@ -9,7 +9,7 @@
 #ifndef _LD_matrix_
 #define _LD_matrix_
 
-enum LDalgorithm { moments, EM };
+enum class LDalgorithm { moments, EM };
 
 // NOTE this class is created as a workaround for the impossibility 
 // of partial specialization of templated functions
@@ -22,7 +22,7 @@ class LD_pair_f;
 template<typename scalar_t, typename SNPvectorClass>
 class LD_pair_f<LDalgorithm::moments, scalar_t, SNPvectorClass>{
   public:
-  inline scalar_t operator()(SNPmatrix<SNPvectorClass> & M, size_t i1, size_t i2, bool r_scale) {
+  inline scalar_t operator()(SNPmatrix<SNPvectorClass> & M, size_t i1, size_t i2, bool r_scale) const {
     SNPvector & snp1 = *(M.getSNP(i1));
     SNPvector & snp2 = *(M.getSNP(i2));
     return snp1.LD<scalar_t>(snp2, r_scale);
@@ -33,7 +33,7 @@ class LD_pair_f<LDalgorithm::moments, scalar_t, SNPvectorClass>{
 template<typename scalar_t, typename SNPvectorClass>
 class LD_pair_f<LDalgorithm::EM, scalar_t, SNPvectorClass> {
   public:
-  inline scalar_t operator()(SNPmatrix<SNPvectorClass> & M, size_t i1, size_t i2, bool r_scale) {
+  inline scalar_t operator()(SNPmatrix<SNPvectorClass> & M, size_t i1, size_t i2, bool r_scale) const {
     richArray<9, unsigned int> table;
     SNPvector & snp1 = *(M.getSNP(i1));
     SNPvector & snp2 = *(M.getSNP(i2));

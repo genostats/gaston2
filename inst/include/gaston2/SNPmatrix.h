@@ -1,4 +1,5 @@
 #include <omp.h>
+#include <csignal>
 
 #include <fstream>    // for ifstream
 #include <memory>     // for shared_ptr
@@ -9,6 +10,7 @@
 #include "SNPvector.h"
 
 #include "debug_flags.h"
+#include "debug.h"
 
 #ifndef _snpmatrix_
 #define _snpmatrix_
@@ -188,10 +190,10 @@ class SNPmatrix {
     }
 
     // isolate columns from unordered_stats
-    std::vector<int> vecN0s;
-    std::vector<int> vecN1s;
-    std::vector<int> vecN2s;
-    std::vector<int> vecNAs;
+    std::vector<int> N0s;
+    std::vector<int> N1s;
+    std::vector<int> N2s;
+    std::vector<int> NAs;
     // + compute callrate and heterozigosity
     std::vector<scalar_t> callrate;
     std::vector<scalar_t> hz;
@@ -202,20 +204,20 @@ class SNPmatrix {
       unsigned int n1 = unordered_stats[idxnzeros + 1];
       unsigned int n2 = unordered_stats[idxnzeros + 2];
       unsigned int na = unordered_stats[idxnzeros + 3];
-      vecN0s.push_back(n0);
-      vecN1s.push_back(n1);
-      vecN2s.push_back(n2);
-      vecNAs.push_back(na);
+      N0s.push_back(n0);
+      N1s.push_back(n1);
+      N2s.push_back(n2);
+      NAs.push_back(na);
       callrate.push_back( 1.0 - (scalar_t) na / nb_snps_of_type );
       hz.push_back( (scalar_t) n1 / (nb_snps_of_type - (scalar_t) na) );
     }
 
     // using setColumn will check if the Column exists 
     // and replace it, else it will push_back
-    indStats_.setColumn(Column(vecN0s), "N0" + suffix);
-    indStats_.setColumn(Column(vecN1s), "N1" + suffix);
-    indStats_.setColumn(Column(vecN2s), "N2" + suffix);
-    indStats_.setColumn(Column(vecNAs), "NAs" + suffix);
+    indStats_.setColumn(Column(N0s), "N0" + suffix);
+    indStats_.setColumn(Column(N1s), "N1" + suffix);
+    indStats_.setColumn(Column(N2s), "N2" + suffix);
+    indStats_.setColumn(Column(NAs), "NAs" + suffix);
     indStats_.setColumn(Column(callrate), "callrate" + suffix);
     indStats_.setColumn(Column(hz), "hz" + suffix);
   }
@@ -257,7 +259,7 @@ class SNPmatrix {
 
   // get the DataStruct containing individual stats
   // non const version to send to manipulate in R
-  DataStruct &getIndStats() {  return indStats_;  }
+  DataStruct & getIndStats() { return indStats_; }
 
   // TODO : see if by default possible ?
   // they need to be ordered !!!!
@@ -286,10 +288,10 @@ class SNPmatrix {
 
   // get theDataStruct containing snp stats, possibly without N0s...
   // checkout exportSNPStats if thats what you want
-  const DataStruct &getSNPStats() const { return snpStats_; }
+  const DataStruct & getSNPStats() const { return snpStats_; }
 
   // non const version to send to manipulate in R
-  DataStruct &getSNPStats() { return snpStats_; }
+  DataStruct & getSNPStats() { return snpStats_; }
 
   // for the toSNPmatrix* functions and the extractInds* f° to populate through
   // snpStats_ with at least bim content
@@ -317,9 +319,12 @@ class SNPmatrix {
   }
 
   // Adds N0s... Columns in the snpStats_ DataStruct
+  template<typename scalar_t = float>
   void exportSNPStats(bool force) {
     // for values not computed (women only stats for X/Y chr)
     constexpr int na_value = -2147483648; // I can't find of a better solution for the moment
+
+    size_t nb_inds = nbInds();
 
     // Add a check on if snpStats were computed already, 
     // then returns if no force
@@ -328,10 +333,10 @@ class SNPmatrix {
     }
 
     // for all SNPs get N0 N1 N2 on all individuals
-    std::vector<int> vecN0s;
-    std::vector<int> vecN1s;
-    std::vector<int> vecN2s;
-    std::vector<int> vecNAs;
+    std::vector<int> N0s;
+    std::vector<int> N1s;
+    std::vector<int> N2s;
+    std::vector<int> NAs;
 
     for (auto & snp : SNPs_) {
       if (snp->stats_set() == 0) {
@@ -339,68 +344,115 @@ class SNPmatrix {
       }
       const int * stats = snp->getStats();
 
-      vecN0s.push_back(stats[0]);
-      vecN1s.push_back(stats[1]);
-      vecN2s.push_back(stats[2]);
-      vecNAs.push_back(stats[3]);
+      N0s.push_back(stats[0]);
+      N1s.push_back(stats[1]);
+      N2s.push_back(stats[2]);
+      NAs.push_back(stats[3]);
     }
-    snpStats_.setColumn(Column(vecN0s), "N0");
-    snpStats_.setColumn(Column(vecN1s), "N1");
-    snpStats_.setColumn(Column(vecN2s), "N2");
-    snpStats_.setColumn(Column(vecNAs), "NAs");
+    snpStats_.setColumn(Column(N0s), "N0");
+    snpStats_.setColumn(Column(N1s), "N1");
+    snpStats_.setColumn(Column(N2s), "N2");
+    snpStats_.setColumn(Column(NAs), "NAs");
 
     // extra computation for X/Y chr (if any)
+    unsigned int nb_male = 0;
+
+    std::vector<int> N0f;
+    std::vector<int> N1f;
+    std::vector<int> N2f;
+    std::vector<int> NAf;
+
     if(nbSnpType[ (size_t) chrType::X ] > 0 || nbSnpType[ (size_t) chrType::Y ] > 0) {
       // vector of sex
       const std::vector<int> & sex = *indStats_.getColumn("sex").get<int>();
-      if(sex.size() != nbInds()) throw std::runtime_error("Sex vector size doesn't match the number of individuals");
+      if(sex.size() != nb_inds) throw std::runtime_error("Sex vector size doesn't match the number of individuals");
       // create mask to remove men
       size_t nbc = SNPs_[0]->nbChars();
       std::vector<uint8_t> mask(nbc);
       size_t jj = 0;
-      unsigned int nb_mask = 0;
       for(size_t j = 0; j < nbc - 1; j++) {
         // men are 1
-        if(sex[jj++] == 1) { nb_mask++; mask[j] |= 3;   } // jj = 4*j
-        if(sex[jj++] == 1) { nb_mask++; mask[j] |= 12;  } // jj = 4*j + 1
-        if(sex[jj++] == 1) { nb_mask++; mask[j] |= 48;  } // jj = 4*j + 2
-        if(sex[jj++] == 1) { nb_mask++; mask[j] |= 192; } // jj = 4*j + 3
+        if(sex[jj++] == 1) { nb_male++; mask[j] |= 3;   } // jj = 4*j
+        if(sex[jj++] == 1) { nb_male++; mask[j] |= 12;  } // jj = 4*j + 1
+        if(sex[jj++] == 1) { nb_male++; mask[j] |= 48;  } // jj = 4*j + 2
+        if(sex[jj++] == 1) { nb_male++; mask[j] |= 192; } // jj = 4*j + 3
       }
       // last byte
-      if(jj < sex.size() && sex[jj++] == 1) { nb_mask++; mask[nbc - 1] |= 3;   }
-      if(jj < sex.size() && sex[jj++] == 1) { nb_mask++; mask[nbc - 1] |= 12;  }
-      if(jj < sex.size() && sex[jj++] == 1) { nb_mask++; mask[nbc - 1] |= 48;  }
-      if(jj < sex.size() && sex[jj++] == 1) { nb_mask++; mask[nbc - 1] |= 192; }
+      if(jj < sex.size() && sex[jj++] == 1) { nb_male++; mask[nbc - 1] |= 3;   }
+      if(jj < sex.size() && sex[jj++] == 1) { nb_male++; mask[nbc - 1] |= 12;  }
+      if(jj < sex.size() && sex[jj++] == 1) { nb_male++; mask[nbc - 1] |= 48;  }
+      if(jj < sex.size() && sex[jj++] == 1) { nb_male++; mask[nbc - 1] |= 192; }
       
-      // wipe vectors
-      vecN0s.clear();
-      vecN1s.clear();
-      vecN2s.clear();
-      vecNAs.clear();
-
       // run throuh SNPs and compute women only stats only for X/Y chr
       for (auto & snp : SNPs_) {
         int count[4] = {0, 0, 0, 0};
         if(snp->getChrType() == chrType::X || snp->getChrType() == chrType::Y) {
-          snp->compute_stats_mask(count, mask, nb_mask);
-          vecN0s.push_back(count[0]);
-          vecN1s.push_back(count[1]);
-          vecN2s.push_back(count[2]);
-          vecNAs.push_back(count[3]);
+          snp->compute_stats_mask(count, mask, nb_male);
+          N0f.push_back(count[0]);
+          N1f.push_back(count[1]);
+          N2f.push_back(count[2]);
+          NAf.push_back(count[3]);
         } else {
-          vecN0s.push_back(na_value);
-          vecN1s.push_back(na_value);
-          vecN2s.push_back(na_value);
-          vecNAs.push_back(na_value);
+          N0f.push_back(na_value);
+          N1f.push_back(na_value);
+          N2f.push_back(na_value);
+          NAf.push_back(na_value);
         }
       }
 
       // set values
-      snpStats_.setColumn(Column(vecN0s), "N0.f");
-      snpStats_.setColumn(Column(vecN1s), "N1.f");
-      snpStats_.setColumn(Column(vecN2s), "N2.f");
-      snpStats_.setColumn(Column(vecNAs), "NAs.f");
-    } // ----- fin calcul chr X/Y
+      snpStats_.setColumn(Column(N0f), "N0.f");
+      snpStats_.setColumn(Column(N1f), "N1.f");
+      snpStats_.setColumn(Column(N2f), "N2.f");
+      snpStats_.setColumn(Column(NAf), "NAs.f");
+    } // ------------------------------------------ fin calcul chr X/Y
+    unsigned int nb_female = nb_inds - nb_male; // we assume no other sex than 1/2 in the data.
+
+    // now compute callrate, p, maf, hz, [hwe ?]
+    std::vector<scalar_t> callrate;
+    std::vector<scalar_t> p;
+    std::vector<scalar_t> maf;
+    std::vector<scalar_t> hz;
+
+    size_t i = 0;
+    for (auto & snp : SNPs_) {
+      if(snp->getChrType() == chrType::Y) {
+        // compute callrate on men only
+        callrate.push_back( 1.0 - (scalar_t) (NAs[i] - NAf[i]) / (scalar_t) nb_male );
+      } else {
+        // compute callrate on all individuals
+        callrate.push_back( 1.0 - (scalar_t) NAs[i] / (scalar_t) nb_inds );
+      }
+
+      scalar_t p_, hz_;
+      if(snp->getChrType() == chrType::X) {
+        // compute p assuming genetic values are 0/2 or 0/1 for men on chr X
+        // that is 0 vs (1 or 2).
+        // we compute 1 - freq(A1) 
+        // denominator is (2N0f + N1f) + N0m where N0m = N0s - N0f, which simplifies to N0f + N1f + N0s
+        // numerator is 2*(nb_female - NAf) + (nb_male - NAm) where NAm = NAs - NAf
+        //           which simplifies to 2*nb_female - NAf + nb_male - NAs
+        p_ = 1.0 - (scalar_t) (N0f[i] + N1f[i] + N0s[i]) / (scalar_t) (2*nb_female - NAf[i] + nb_male - NAs[i]) ;
+        // compute hz on women only
+        hz_ = (scalar_t) N1f[i] / (scalar_t) (nb_female - NAf[i]);
+      } else {
+        // computation of p and hz is straightforward
+        // TODO take p from the SNPvector ?
+        p_ = (scalar_t) (N1s[i] + 2*N2s[i]) / (scalar_t) (2*(nb_inds - NAs[i]));
+        hz_ = (scalar_t) N1s[i] / (scalar_t) (nb_inds - NAs[i]);
+      }
+
+      p.push_back(p_);
+      maf.push_back( (p_ < 0.5)?p_:(1.0 - p_) );
+      hz.push_back(hz_);
+
+      i++;
+    }
+
+    snpStats_.setColumn(Column(p), "p");
+    snpStats_.setColumn(Column(maf), "maf");
+    snpStats_.setColumn(Column(callrate), "callrate");
+    snpStats_.setColumn(Column(hz), "hz");
 
     snpStatsExported_ = true;
   }

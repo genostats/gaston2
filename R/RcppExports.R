@@ -269,6 +269,10 @@ setModeDosage <- function(pM, mode) {
     invisible(.Call(`_gaston2_setModeDosage`, pM, mode))
 }
 
+set_hwere <- function(pM, test = 0L, usefloat = FALSE) {
+    invisible(.Call(`_gaston2_set_hwere`, pM, test, usefloat))
+}
+
 showColDataStruct <- function(x, colname, size_left) {
     .Call(`_gaston2_showColDataStruct`, x, colname, size_left)
 }

@@ -14,10 +14,10 @@ void computeSNPStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM) {
 
 // [[Rcpp::export]]
 void exportSNPStats(Rcpp::XPtr<SNPmatrix<SNPvector>> pM, bool force = false) {
-  pM->exportSNPStats(force);
+  pM->exportSNPStats<double>(force);
 }
 
 // [[Rcpp::export]]
 void exportSNPStatsDosage(Rcpp::XPtr<SNPmatrix<SNPdosage>> pM, bool force = false) {
-  pM->exportSNPStats(force);
+  pM->exportSNPStats<double>(force);
 }

@@ -830,6 +830,18 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// set_hwere
+void set_hwere(Rcpp::XPtr<SNPmatrix<>> pM, int test, double usefloat);
+RcppExport SEXP _gaston2_set_hwere(SEXP pMSEXP, SEXP testSEXP, SEXP usefloatSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< int >::type test(testSEXP);
+    Rcpp::traits::input_parameter< double >::type usefloat(usefloatSEXP);
+    set_hwere(pM, test, usefloat);
+    return R_NilValue;
+END_RCPP
+}
 // showColDataStruct
 std::string showColDataStruct(Rcpp::S4 x, std::string colname, int size_left);
 RcppExport SEXP _gaston2_showColDataStruct(SEXP xSEXP, SEXP colnameSEXP, SEXP size_leftSEXP) {
@@ -1227,6 +1239,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_setGastonOptions", (DL_FUNC) &_gaston2_setGastonOptions, 1},
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},
     {"_gaston2_setModeDosage", (DL_FUNC) &_gaston2_setModeDosage, 2},
+    {"_gaston2_set_hwere", (DL_FUNC) &_gaston2_set_hwere, 3},
     {"_gaston2_showColDataStruct", (DL_FUNC) &_gaston2_showColDataStruct, 3},
     {"_gaston2_test_readBedFileMemory", (DL_FUNC) &_gaston2_test_readBedFileMemory, 4},
     {"_gaston2_test_readBedFileDisk", (DL_FUNC) &_gaston2_test_readBedFileDisk, 3},
