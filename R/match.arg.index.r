@@ -18,7 +18,7 @@ match.arg.index <- function (arg, c.index = TRUE) {
 
   i <- pmatch(arg, choices, nomatch = 0L, duplicates.ok = TRUE)
   if (all(i == 0L)) 
-     stop(sprintf("'arg' should be one of %s"), paste(choices, collapse = ", "))
+     stop(sprintf("'arg' should be one of %s", paste(choices, collapse = ", ")))
 
   i <- i[i > 0L]
   if(length(i) > 1) stop("there is more than one match in 'match.arg'")

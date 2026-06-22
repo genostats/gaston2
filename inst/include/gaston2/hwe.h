@@ -72,6 +72,7 @@ template<typename scalar_t>
 class hwe_f<HWEtest::exact, scalar_t> {
   public:
   inline scalar_t operator()(unsigned int a0, unsigned int a1, unsigned int a2) const {
+
     unsigned int n = a0 + a1 + a2;
     if(n == 0)  // no data
       return std::numeric_limits<scalar_t>::quiet_NaN();
@@ -85,20 +86,29 @@ class hwe_f<HWEtest::exact, scalar_t> {
       a0 = tmp;
     }
 
-    unsigned int m = 2*a2 + a1; // rare alleles
-    unsigned int s = ((2*n - m)*m)/(2*n);
+    int m = 2*a2 + a1; // rare alleles
+    int s = ((2*n - m)*m)/(2*n);
     if(s%2 != m%2) s++;	
 
     scalar_t grand_sum(1), small_sum(0);
     scalar_t target = 0;
 
+    // principe :
+    // cf https://doi.org/10.1086/429864 et https://csg.sph.umich.edu/abecasis/Exact/
+    // on énumère le nombre d'hétérozygotes et leurs proba (à une constante multiplicative près)
+    // on part du mode et on fait une queue de distribution puis l'autre
+    // on commence par la queue de distribution qui contient les observations de façon à pouvoir
+    // calculer 'target' = la probabilité des observations
+    // on somme dans small_sum les probas des observations les plus extrêmes et dans 
+    // grand_sum les probas de toutes les observations (!= 1 car on est à une constante mult près)
+    
     if(a1 < s) { // on calcule d'abord pour b1 < s
-      // tail down and compute target
+      // left tail / compute target
       int b2 = (m - s)/2;
       int b1 = s;
       int b0 = n - b1 - b2;
       scalar_t X = 1;
-      bool over = false;
+      bool over = false; // did we pass the target probability?
       while(b1 >= 2) {
         X *= (scalar_t) (b1*(b1 - 1)) / (scalar_t) (4*(1 + b0)*(1 + b2));
         grand_sum += X;
@@ -109,7 +119,7 @@ class hwe_f<HWEtest::exact, scalar_t> {
         if(over) small_sum += X;
         b1 -= 2; b0++; b2++;
       }
-      // tail up
+      // right tail
       b2 = (m - s)/2;
       b1 = s;
       b0 = n - b1 - b2;
@@ -126,8 +136,8 @@ class hwe_f<HWEtest::exact, scalar_t> {
         }
         b1 += 2; b0--; b2--;
       }
-    } else if(a1 > s) { // dans l'autre sens
-      // tail up and compute target
+    } else if(a1 > s) { // on calcule d'abord pour b1 > s
+      // right tail / compute target
       int b2 = (m - s)/2;
       int b1 = s;
       int b0 = n - b1 - b2;
@@ -143,7 +153,7 @@ class hwe_f<HWEtest::exact, scalar_t> {
         if(over) small_sum += X;
         b1 += 2; b0--; b2--;
       }
-      // tail down
+      // left tail 
       b2 = (m - s)/2;
       b1 = s;
       b0 = n - b1 - b2;
@@ -160,7 +170,7 @@ class hwe_f<HWEtest::exact, scalar_t> {
         }
         b1 -= 2; b0++; b2++;
       }
-    } else { // a1 = s!! -> target = 1
+    } else { // a1 = s -> target = 1
       target = 1;
       // tail up
       int b2 = (m - s)/2;

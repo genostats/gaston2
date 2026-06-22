@@ -37,7 +37,12 @@ void set_hwe(DataStruct & snp_stats) {
   }
 
   // ajout de la colonne
-  snp_stats.setColumn(Column(hwe), "hwe");
+  if constexpr(test == HWEtest::chisquare) 
+    snp_stats.setColumn(Column(hwe), "hwe.chi2");
+  else if constexpr(test == HWEtest::chisquare_yates) 
+    snp_stats.setColumn(Column(hwe), "hwe.yates");
+  else if constexpr(test == HWEtest::exact) 
+    snp_stats.setColumn(Column(hwe), "hwe.exact");
 }
 
 #endif
