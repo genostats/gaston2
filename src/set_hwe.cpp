@@ -5,7 +5,12 @@
 #include <Rcpp.h>
 
 // [[Rcpp::export]]
-void set_hwere(Rcpp::XPtr<SNPmatrix<>> pM, int test = 0, double usefloat = false) {
+void set_hwe(Rcpp::XPtr<SNPmatrix<>> pM, int test = 0, double usefloat = false) {
+
+  // TODO settle this. SNPStats always in double?
+  // we really need exportSNPStats and not only computeSNPStats because of chrX...
+  pM->exportSNPStats<double>(false); 
+
   DataStruct & ds = pM->getSNPStats();
 
   if(usefloat) {

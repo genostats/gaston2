@@ -30,9 +30,19 @@ inline scalar_t hwe_chi_square(unsigned int a0, unsigned int a1, unsigned int a2
   scalar_t delta2 = (scalar_t) a2 - e2;
 
   if constexpr (yates) { // explicitely tell compiler that 'yates' is known at compile time
-    delta0 += (delta0 > 0)? (scalar_t) -0.5: (scalar_t) 0.5;
-    delta1 += (delta1 > 0)? (scalar_t) -0.5: (scalar_t) 0.5;
-    delta2 += (delta2 > 0)? (scalar_t) -0.5: (scalar_t) 0.5;
+    // we don't use 0.5 as a correction but the min of 0.5 and abs(O - E) (as in R function for 2x2 chi² test)
+    scalar_t cc = 0.5;
+    delta0 = std::abs(delta0);
+    delta1 = std::abs(delta1);
+    delta2 = std::abs(delta2);
+
+    cc = (cc < delta0)?cc:delta0;
+    cc = (cc < delta1)?cc:delta1;
+    cc = (cc < delta2)?cc:delta2;
+
+    delta0 -= cc;
+    delta1 -= cc;
+    delta2 -= cc;
   }
 
   scalar_t chi2 = delta0*delta0/e0 + delta1*delta1/e1 + delta2*delta2/e2;

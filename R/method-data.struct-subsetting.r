@@ -1,7 +1,7 @@
 
 #' @export
 setMethod("[", "data.struct",
-  function(x, i, j, ..., drop = TRUE) { browser();
+  function(x, i, j, ..., drop = TRUE) { 
     if(missing(i)) i <- seq_len(nrow(x))
     if(missing(j)) j <- seq_len(ncol(x))
     if(is.character(j)) {

@@ -11,6 +11,6 @@ as.matrix.snp.matrix <- function(x, ...) {
     return(SNPMatrixToNumericMatrix(x@ptr))
 }
 
-#' @family snp.matrix
+#' @export
 setAs("snp.matrix", "matrix", function(from) as.matrix.snp.matrix(from))
 

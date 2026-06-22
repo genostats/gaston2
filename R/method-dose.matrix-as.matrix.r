@@ -12,5 +12,5 @@ as.matrix.dose.matrix <- function(x, ...) {
   return(DoseMatrixToNumericMatrix(x@ptr))
 }
 
-#' @family dose.matrix
+#' @export
 setAs("dose.matrix", "matrix", function(from) as.matrix.dose.matrix(from))

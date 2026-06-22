@@ -1,4 +1,4 @@
-#' @family data.struct
+
 #' @exportMethod coerce
 setAs("data.frame", "data.struct", function(from) new("data.struct", ptr = DataFrameToDataStructR_(from), type = 0L))
 

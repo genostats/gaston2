@@ -17,7 +17,10 @@ class DataStruct {
     std::vector<std::string> colNames;
 
     size_t findColumn(std::string name) const {
-      for(size_t i = 0; i < colNames.size(); i++) {
+#if DEBUG_DS
+  std::cout << "find col " << name << "\n";
+#endif
+       for(size_t i = 0; i < colNames.size(); i++) {
         if(colNames[i] == name) return i;
       }
       return(colNames.size()); // out of range
@@ -126,6 +129,10 @@ class DataStruct {
 
     // ---- get column by name ----
     inline const Column & getColumn(std::string name) const {
+#if DEBUG_DS
+  std::cout << "get col " << name << "\n";
+#endif
+      
       return at(findColumn(name));
     }
 
