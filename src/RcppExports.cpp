@@ -201,9 +201,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// LD_thin_
-void LD_thin_(Rcpp::XPtr<SNPmatrix<>> pM, double threshold, int max_dist_bp, double max_dist_cM, Rcpp::LogicalVector which_keep);
-RcppExport SEXP _gaston2_LD_thin_(SEXP pMSEXP, SEXP thresholdSEXP, SEXP max_dist_bpSEXP, SEXP max_dist_cMSEXP, SEXP which_keepSEXP) {
+// LD_thin_left
+void LD_thin_left(Rcpp::XPtr<SNPmatrix<>> pM, double threshold, int max_dist_bp, double max_dist_cM, Rcpp::LogicalVector which_keep);
+RcppExport SEXP _gaston2_LD_thin_left(SEXP pMSEXP, SEXP thresholdSEXP, SEXP max_dist_bpSEXP, SEXP max_dist_cMSEXP, SEXP which_keepSEXP) {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
@@ -211,7 +211,50 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type max_dist_bp(max_dist_bpSEXP);
     Rcpp::traits::input_parameter< double >::type max_dist_cM(max_dist_cMSEXP);
     Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type which_keep(which_keepSEXP);
-    LD_thin_(pM, threshold, max_dist_bp, max_dist_cM, which_keep);
+    LD_thin_left(pM, threshold, max_dist_bp, max_dist_cM, which_keep);
+    return R_NilValue;
+END_RCPP
+}
+// LD_thin_right
+void LD_thin_right(Rcpp::XPtr<SNPmatrix<>> pM, double threshold, int max_dist_bp, double max_dist_cM, Rcpp::LogicalVector which_keep);
+RcppExport SEXP _gaston2_LD_thin_right(SEXP pMSEXP, SEXP thresholdSEXP, SEXP max_dist_bpSEXP, SEXP max_dist_cMSEXP, SEXP which_keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< int >::type max_dist_bp(max_dist_bpSEXP);
+    Rcpp::traits::input_parameter< double >::type max_dist_cM(max_dist_cMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type which_keep(which_keepSEXP);
+    LD_thin_right(pM, threshold, max_dist_bp, max_dist_cM, which_keep);
+    return R_NilValue;
+END_RCPP
+}
+// LD_thin_random
+void LD_thin_random(Rcpp::XPtr<SNPmatrix<>> pM, double threshold, int max_dist_bp, double max_dist_cM, Rcpp::LogicalVector which_keep);
+RcppExport SEXP _gaston2_LD_thin_random(SEXP pMSEXP, SEXP thresholdSEXP, SEXP max_dist_bpSEXP, SEXP max_dist_cMSEXP, SEXP which_keepSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< int >::type max_dist_bp(max_dist_bpSEXP);
+    Rcpp::traits::input_parameter< double >::type max_dist_cM(max_dist_cMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type which_keep(which_keepSEXP);
+    LD_thin_random(pM, threshold, max_dist_bp, max_dist_cM, which_keep);
+    return R_NilValue;
+END_RCPP
+}
+// LD_thin_priority
+void LD_thin_priority(Rcpp::XPtr<SNPmatrix<>> pM, double threshold, int max_dist_bp, double max_dist_cM, Rcpp::LogicalVector which_keep, Rcpp::NumericVector priority);
+RcppExport SEXP _gaston2_LD_thin_priority(SEXP pMSEXP, SEXP thresholdSEXP, SEXP max_dist_bpSEXP, SEXP max_dist_cMSEXP, SEXP which_keepSEXP, SEXP prioritySEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::XPtr<SNPmatrix<>> >::type pM(pMSEXP);
+    Rcpp::traits::input_parameter< double >::type threshold(thresholdSEXP);
+    Rcpp::traits::input_parameter< int >::type max_dist_bp(max_dist_bpSEXP);
+    Rcpp::traits::input_parameter< double >::type max_dist_cM(max_dist_cMSEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type which_keep(which_keepSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type priority(prioritySEXP);
+    LD_thin_priority(pM, threshold, max_dist_bp, max_dist_cM, which_keep, priority);
     return R_NilValue;
 END_RCPP
 }
@@ -1185,7 +1228,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_LD_chunk_moments_mmatrix", (DL_FUNC) &_gaston2_LD_chunk_moments_mmatrix, 8},
     {"_gaston2_LD_square_EM_mmatrix", (DL_FUNC) &_gaston2_LD_square_EM_mmatrix, 6},
     {"_gaston2_LD_chunk_EM_mmatrix", (DL_FUNC) &_gaston2_LD_chunk_EM_mmatrix, 8},
-    {"_gaston2_LD_thin_", (DL_FUNC) &_gaston2_LD_thin_, 5},
+    {"_gaston2_LD_thin_left", (DL_FUNC) &_gaston2_LD_thin_left, 5},
+    {"_gaston2_LD_thin_right", (DL_FUNC) &_gaston2_LD_thin_right, 5},
+    {"_gaston2_LD_thin_random", (DL_FUNC) &_gaston2_LD_thin_random, 5},
+    {"_gaston2_LD_thin_priority", (DL_FUNC) &_gaston2_LD_thin_priority, 6},
     {"_gaston2_SNPMatrixToIntegerMatrix", (DL_FUNC) &_gaston2_SNPMatrixToIntegerMatrix, 1},
     {"_gaston2_SNPMatrixToNumericMatrix", (DL_FUNC) &_gaston2_SNPMatrixToNumericMatrix, 1},
     {"_gaston2_addColDataStruct", (DL_FUNC) &_gaston2_addColDataStruct, 3},

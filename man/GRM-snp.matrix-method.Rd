@@ -9,19 +9,13 @@
 \arguments{
 \item{x}{A \code{\link{bed.matrix}}}
 
-\item{...}{extra arguments for some methods. Could be a file name or 
-a bool speciifying to use float}
+\item{...}{extra arguments for some methods.}
 }
 \value{
-A matrix or mmatrix of GRM values.
+A matrix or mmatrix.
 }
 \description{
 Compute the Genetic Relationship Matrix (GRM) between given SNPs.
-}
-\details{
-The GRM is a symmetric square matrix of dimension equal to the number of individuals.
-Each entry can be interpreted as an estimated kinship coefficient between individuals,
-although some authors might disagree. Note in particular that some entries will be negative.
 }
 \keyword{Genetic}
 \keyword{Matrix}

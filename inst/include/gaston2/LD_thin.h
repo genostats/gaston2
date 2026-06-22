@@ -59,6 +59,8 @@ void LD_thin(SNPmatrix<SNPvectorClass> & A, float threshold, unsigned int max_di
   threshold = std::sqrt(threshold); // on va calculer r, pas r^2
  
   while(i < nbSNPs) {
+    if(!which_keep[i]) continue; // skip this snp
+
     size_t j = i + 1;
     int chr_i = chr[i];
 
@@ -68,7 +70,7 @@ void LD_thin(SNPmatrix<SNPvectorClass> & A, float threshold, unsigned int max_di
     int max_pos = pos[i] + max_dist_bp;
     double max_dist = dist[i] + max_dist_cM;
 
-    // object which computed the LD
+    // object which computes the LD
     auto ldf = LD_pair_f<LDalgorithm::moments, float, SNPvectorClass>{};
 
     while(j < nbSNPs && chr[i] == chr_i) {

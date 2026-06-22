@@ -53,8 +53,20 @@ LD_chunk_EM_mmatrix <- function(pM, i1, i2, j1, j2, path, r_scale, usefloat = TR
     .Call(`_gaston2_LD_chunk_EM_mmatrix`, pM, i1, i2, j1, j2, path, r_scale, usefloat)
 }
 
-LD_thin_ <- function(pM, threshold, max_dist_bp, max_dist_cM, which_keep) {
-    invisible(.Call(`_gaston2_LD_thin_`, pM, threshold, max_dist_bp, max_dist_cM, which_keep))
+LD_thin_left <- function(pM, threshold, max_dist_bp, max_dist_cM, which_keep) {
+    invisible(.Call(`_gaston2_LD_thin_left`, pM, threshold, max_dist_bp, max_dist_cM, which_keep))
+}
+
+LD_thin_right <- function(pM, threshold, max_dist_bp, max_dist_cM, which_keep) {
+    invisible(.Call(`_gaston2_LD_thin_right`, pM, threshold, max_dist_bp, max_dist_cM, which_keep))
+}
+
+LD_thin_random <- function(pM, threshold, max_dist_bp, max_dist_cM, which_keep) {
+    invisible(.Call(`_gaston2_LD_thin_random`, pM, threshold, max_dist_bp, max_dist_cM, which_keep))
+}
+
+LD_thin_priority <- function(pM, threshold, max_dist_bp, max_dist_cM, which_keep, priority) {
+    invisible(.Call(`_gaston2_LD_thin_priority`, pM, threshold, max_dist_bp, max_dist_cM, which_keep, priority))
 }
 
 SNPMatrixToIntegerMatrix <- function(pM) {
