@@ -324,8 +324,10 @@ public:
     if(set_mu) mu_ = m;
     if(set_sigma) {
       double mu2 = m * m;
-      // sigma_ = std::sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
-      sigma_ = std::sqrt((N1s + 4 * N2s) / n - mu2);
+      // sigma_ = std::sqrt((N1s + 4 * N2s) / n - mu2);
+      // calcul de sigma en imputant les NA par mu : c'est ce qui donne les meilleurs résultats
+      // pour le calcul du LD par la méthode des moments
+      sigma_ = std::sqrt((N1s + 4 * N2s + NAs * mu2) / (N - 1) - N / (N - 1) * mu2);
     }
   }
 
@@ -523,7 +525,7 @@ public:
       g2 >>= 2;
     }
 
-    scalar_t r = LD / (v * nbi); // nbInds should be the same for both
+    scalar_t r = LD / (v * (scalar_t) (nbi - 1)); // nbInds should be the same for both
     return r;
   }
 
@@ -593,10 +595,47 @@ public:
     // if SNP is monomorphe, nothing to compute
     if(monomorphe()) return;
     
-//std::cout << v0 << ", " << v1 << ", " << v2 << "\n";
+
+    // précalcul des trois tableaux de valeurs possibles
+    scalar_t H[3*32];
+    scalar_t * H0 = H;
+    for(int i = 0; i < 4; i++) {
+      switch(i) {
+        case 0:
+        H0 = H; break;
+        case 1:
+        continue; // NA
+        case 2:
+        H0 = H + 32; break;
+        default: // ou case 3
+        H0 = H + 64;
+      }
+      const scalar_t v_g1 = (scalar_t) g_trans[i];
+      const scalar_t v_g1_v0 = v_g1*v0;
+      const scalar_t v_g1_v1 = v_g1*v1;
+      const scalar_t v_g1_v2 = v_g1*v2;
+      // le tableau H1 est construit de façon que 
+      // H1[2*x] et H1[2*x+1] sont les valeurs des g_trans[geno1] * g_trans[geno2] et g_trans[geno1] * g_trans[geno2']
+      // où x = 0 à 15 (4 bits) est la concaténation de geno2 (poids faible) et geno2' (poids fort)
+      H0[0]  = v_g1_v0;  H0[1] = v_g1_v0;  H0[2]  = 0;        H0[3]  = v_g1_v0; 
+      H0[4]  = v_g1_v1;  H0[5] = v_g1_v0;  H0[6]  = v_g1_v2;  H0[7]  = v_g1_v0; 
+      H0[8]  = v_g1_v0;  H0[9] = 0;        H0[10] = 0;        H0[11] = 0; 
+      H0[12] = v_g1_v1; H0[13] = 0;        H0[14] = v_g1_v2;  H0[15] = 0; 
+      H0[16] = v_g1_v0; H0[17] = v_g1_v1;  H0[18] = 0;        H0[19] = v_g1_v1; 
+      H0[20] = v_g1_v1; H0[21] = v_g1_v1;  H0[22] = v_g1_v2;  H0[23] = v_g1_v1; 
+      H0[24] = v_g1_v0; H0[25] = v_g1_v2;  H0[26] = 0;        H0[27] = v_g1_v2; 
+      H0[28] = v_g1_v1; H0[29] = v_g1_v2;  H0[30] = v_g1_v2;  H0[31] = v_g1_v2; 
+    }
+
+    // std::cout << v0 << ", " << v1 << ", " << v2 << "\n";
+    
     // loop j1 to nbChar - 1
-    uint8_t previous_genotype_1 = 4; // impossible value
-#pragma omp parallel for firstprivate(previous_genotype_1)
+    // dans ce pragma schedule(guided) indique à omp() que les tours de boucle
+    // on des durées différentes [pour chaque j1 on boucle j2 de 0 à j1 - 1]
+    // donc il ne peut pas distribuer les tâches aux threads une fois pour toute
+    // autre solution : schedule(dynamic, 16) ou schedule(dynamic, 4) pour que chaque thread fasse un 
+    // petit chunck...
+#pragma omp parallel for schedule(guided)
     for(size_t j1 = 0; j1 < nbc_m1; j1++) {
       // l'indice où écrire dans V : début de la ligne 4j1, on a écrit 4j1 * (4j1 + 1) / 2 éléments
       size_t k = 2*j1 * (4*j1 + 1);
@@ -604,37 +643,23 @@ public:
 
       for(unsigned int ss1 = 0; ss1 < 4; ss1++) {
         uint8_t current_genotype_1 = g1&3;
-
-        // skip if genotype is NA / all H1 = 0...
-        if(current_genotype_1 == (uint8_t) 1) {
-          k += 4*j1 + ss1 + 1;
-          g1 >>= 2;
-          continue;
-        }
-
-// TODO tester de précalculer les trois tableaux H1 possibles...
-        scalar_t v_g1 = g_trans[ current_genotype_1 ];
-        scalar_t H1[32];
-        if(current_genotype_1 != previous_genotype_1) { // update H1 only if v_g1 did change
-          const scalar_t v_g1_v0 = v_g1*v0;
-          const scalar_t v_g1_v1 = v_g1*v1;
-          const scalar_t v_g1_v2 = v_g1*v2;
-          H1[0]  = v_g1_v0;  H1[1] = v_g1_v0;  H1[2]  = 0;        H1[3]  = v_g1_v0; 
-          H1[4]  = v_g1_v1;  H1[5] = v_g1_v0;  H1[6]  = v_g1_v2;  H1[7]  = v_g1_v0; 
-          H1[8]  = v_g1_v0;  H1[9] = 0;        H1[10] = 0;        H1[11] = 0; 
-          H1[12] = v_g1_v1; H1[13] = 0;        H1[14] = v_g1_v2;  H1[15] = 0; 
-          H1[16] = v_g1_v0; H1[17] = v_g1_v1;  H1[18] = 0;        H1[19] = v_g1_v1; 
-          H1[20] = v_g1_v1; H1[21] = v_g1_v1;  H1[22] = v_g1_v2;  H1[23] = v_g1_v1; 
-          H1[24] = v_g1_v0; H1[25] = v_g1_v2;  H1[26] = 0;        H1[27] = v_g1_v2; 
-          H1[28] = v_g1_v1; H1[29] = v_g1_v2;  H1[30] = v_g1_v2;  H1[31] = v_g1_v2; 
-        }
-        // le tableau H1 est construit de façon que 
-        // H1[2*x] et H1[2*x+1] sont les valeurs des g_trans[geno1] * g_trans[geno2] et g_trans[geno1] * g_trans[geno2']
-        // où x = 0 à 15 (4 bits) est la concaténation de geno2 (poids faible) et geno2' (poids fort)
-
         g1 >>= 2;
-        previous_genotype_1 = current_genotype_1;
-        // current_genotype_1 = g1&3;
+        // on en a besoin pour la 'bordure'
+        scalar_t v_g1 = g_trans[ current_genotype_1 ];
+
+        // on sélectionne
+        scalar_t * H1 = H;  // a déclarer dans la boucle pour être privé au thread !
+        switch(current_genotype_1) {
+          case 0:
+          H1 = H; break;
+          case 1: // skip if genotype is NA / all H1 = 0...
+          k += 4*j1 + ss1 + 1;
+          continue; // On ne devrait pas se trouver là
+          case 2:
+          H1 = H + 32; break;
+          default: // ou case 3
+          H1 = H + 64;
+        }
 
         // on boucle j2 de 0 à j1 - 1
         for(size_t j2 = 0; j2 < j1; j2++) {
@@ -644,8 +669,8 @@ public:
           V[k++] += H1[ gg2 ];
           V[k++] += H1[ gg2 + 1 ];
           g2 >>= 4;
-          V[k++] += H1[ g2*2 ];
-          V[k++] += H1[ g2*2 + 1 ];
+          V[k++] += H1[ (g2<<1) ];
+          V[k++] += H1[ (g2<<1) + 1 ];
         }
         // j2 = j1 est traité à part
         uint8_t g2 = DATA[j1];
@@ -665,31 +690,23 @@ public:
 
     for(unsigned int ss1 = 0; ss1 < BitsInLastByte; ss1++) {
       uint8_t current_genotype_1 = g1&3;
-
-      // skip if genotype is NA / all H1 = 0...
-      if(current_genotype_1 == (uint8_t) 1) {
-        k += 4*nbc_m1 + ss1 + 1;
-        g1 >>= 2;
-        continue;
-      }
-
-      scalar_t v_g1 = g_trans[ current_genotype_1 ];
-      scalar_t H1[32];
-      if(current_genotype_1 != previous_genotype_1) { // update H1 only if v_g1 did change
-        const scalar_t v_g1_v0 = v_g1*v0;
-        const scalar_t v_g1_v1 = v_g1*v1;
-        const scalar_t v_g1_v2 = v_g1*v2;
-        H1[0]  = v_g1_v0;  H1[1] = v_g1_v0;  H1[2]  = 0;        H1[3]  = v_g1_v0; 
-        H1[4]  = v_g1_v1;  H1[5] = v_g1_v0;  H1[6]  = v_g1_v2;  H1[7]  = v_g1_v0; 
-        H1[8]  = v_g1_v0;  H1[9] = 0;        H1[10] = 0;        H1[11] = 0; 
-        H1[12] = v_g1_v1; H1[13] = 0;        H1[14] = v_g1_v2;  H1[15] = 0; 
-        H1[16] = v_g1_v0; H1[17] = v_g1_v1;  H1[18] = 0;        H1[19] = v_g1_v1; 
-        H1[20] = v_g1_v1; H1[21] = v_g1_v1;  H1[22] = v_g1_v2;  H1[23] = v_g1_v1; 
-        H1[24] = v_g1_v0; H1[25] = v_g1_v2;  H1[26] = 0;        H1[27] = v_g1_v2; 
-        H1[28] = v_g1_v1; H1[29] = v_g1_v2;  H1[30] = v_g1_v2;  H1[31] = v_g1_v2; 
-      }
       g1 >>= 2;
-      previous_genotype_1 = current_genotype_1;
+      // on en a besoin pour la 'bordure'
+      scalar_t v_g1 = g_trans[ current_genotype_1 ];
+
+      // on sélectionne
+      scalar_t * H1 = H; 
+      switch(current_genotype_1) {
+        case 0:
+        H1 = H; break;
+        case 1: // skip if genotype is NA / all H1 = 0...
+        k += 4*nbc_m1 + ss1 + 1;
+        continue; // On ne devrait pas se trouver là
+        case 2:
+        H1 = H + 32; break;
+        default: // ou case 3
+        H1 = H + 64;
+      }
 
       // on boucle j2 de 0 à j1 - 1 = nbc_m1 - 1
       for(size_t j2 = 0; j2 < nbc_m1; j2++) {
@@ -724,6 +741,7 @@ public:
 
   public:
     // le constructeur vide démarre à 0, et récupère l'instance qui l'appelle
+    // values est initialisé avec g_trans (renvoyé par fonction values())
     Iterator(SNPvector &it) : currentChar(0), current2bits(0), iterated(it), values(it.values()) {}
 
     Iterator(size_t ind, SNPvector &it) : currentChar(ind / 4), current2bits(ind % 4), iterated(it), values(it.values()) {

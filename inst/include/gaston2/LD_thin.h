@@ -32,7 +32,6 @@
 //
 template<typename SNPvectorClass, typename boolVector, typename FUN>
 void LD_thin(SNPmatrix<SNPvectorClass> & A, float threshold, unsigned int max_dist_bp, float max_dist_cM, boolVector which_keep, FUN keep_left) {
-
   size_t nbSNPs = A.nbSNPs();
 
   if(which_keep.size() != nbSNPs) 
@@ -60,7 +59,6 @@ void LD_thin(SNPmatrix<SNPvectorClass> & A, float threshold, unsigned int max_di
  
   while(i < nbSNPs) {
     if(!which_keep[i]) continue; // skip this snp
-
     size_t j = i + 1;
     int chr_i = chr[i];
 
@@ -73,7 +71,7 @@ void LD_thin(SNPmatrix<SNPvectorClass> & A, float threshold, unsigned int max_di
     // object which computes the LD
     auto ldf = LD_pair_f<LDalgorithm::moments, float, SNPvectorClass>{};
 
-    while(j < nbSNPs && chr[i] == chr_i) {
+    while(j < nbSNPs && chr[j] == chr_i) {
       // test dist/pos according to use_bp...
       if(use_bp) {
         if(pos[j] > max_pos) break;

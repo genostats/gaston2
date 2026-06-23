@@ -22,7 +22,7 @@
 #' 
 #' @keywords  Linkage Disequilibrium
 #' 
-#' @export LD
+#' @export 
 # thus will later be a method, and in gaston too... (likely S3 for simplicity)
 LD <- function(x, lim, lim2, measure = c("r2", "r", "D"), method = c("moments", "EM"), filename, float = TRUE) {
 

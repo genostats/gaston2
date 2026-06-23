@@ -6,7 +6,7 @@ LD.thin <- function(x, threshold, max.dist, beg, end, which.snps, dist.unit, ext
 
 #' @export
 LD.thin.snp.matrix <- function(x, threshold, max.dist, beg = 1L, end = ncol(x), which.snps, dist.unit = c("bases", "cM"), extract = TRUE, 
-                               keep = c("right", "left", "random", "priority"), ..., priority) {
+                               keep = c("left", "right", "random", "priority"), ..., priority) {
   if(missing(which.snps)) {
     which.snps <- rep(FALSE, ncol(x))
     which.snps[beg:end] <- TRUE

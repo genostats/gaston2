@@ -106,6 +106,7 @@ class SNPmatrix {
     indStats_ = other.getIndStats();
     // Still not automatically computing indStats back,
     // so c° is setting indStatsComputed_ to false by default
+    // indStatsComputed_ = false;
 
     // propagating the mode, BEWARE will change
     mode_ = other.getMode();
@@ -230,6 +231,9 @@ class SNPmatrix {
     if (!force && indStatsComputed_) { 
       return;  // stats déjà calculées, on ne recalcule pas
     }
+
+    // setting chr type before anything
+    setChrType();
 
     size_t nbSNPs = SNPs_.size();
     if (nbSNPs == 0)
