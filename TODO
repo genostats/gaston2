@@ -8,7 +8,8 @@
 - les fonctions de lecture dans DataStruct ne sont pas robustes
   à la présence de chaines de caractères dans une colonne numerique (eg 'NA')
   même strtof ne doit pas faire ce qu'on voudrait dans ce cas.
-  Pas gênant pour les .bim .fam
+  Pas gênant pour les .bim .fam "classiques" mais ne devrait pas rester silencieux.
+
 - ajouter des type "unsigned" ? autres ?
 - ajouter méthodes subset, transform
 - protéger certaines colonnes [valeurs / types]

@@ -12,3 +12,6 @@ A 'data.frame' like class of object for SNP stats etc.
 
 A constructor for data.struct from a dataframe
 }
+\details{
+Methods have been defined for usual operations.
+}

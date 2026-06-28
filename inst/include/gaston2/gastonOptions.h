@@ -4,6 +4,12 @@
 #ifndef _gaston_options_
 #define _gaston_options_
 
+
+// for values not computed (at the moment only women only stats for X/Y chr)
+// I think making it constexpr 	is better (so not really an option)
+
+constexpr int na_value = -2147483648; 
+
 class gastonOptions {
   public:
   // defaut values = human plink conventions

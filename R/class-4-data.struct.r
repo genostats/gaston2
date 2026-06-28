@@ -4,7 +4,8 @@
 #' 
 #' @description A 'data.frame' like class of object for SNP stats etc.
 #' 
-#' @details 
+#' @details Methods have been defined for usual operations.
+#'
 #' @exportClass data.struct
 setClass("data.struct", slots = c(ptr = "externalptr", type = "integer")) # equivalent to nullptr
 # type = 0 pour des data struct autonomes,
@@ -16,23 +17,22 @@ setMethod("show", "data.struct",
     if(isnullptr(object@ptr)) {
       cat("A data.struct with a broken external ptr\n")
     } else {
+      short_type <- c(INT = "int", DOUBLE = "dbl", FLOAT = "ftl", STRING = "str", BOOL = "boo")
       dd <- dimDataStruct(object)
       cat("A", dd[1], "x", dd[2], "data.struct\n")
       # list all Columns present
       vecNames <- colNamesDataStruct(object)
+      le.vn <- max(nchar(vecNames))
       for (name in vecNames) {  # for every col
-        cat("$ ", name, ": ")
+        cat(sprintf(" $ %*s: ", le.vn, name))
         type <- colTypeDataStruct(object, name)
-        cat(tolower(type), " ")
-        chartaken = 5 + nchar(name) + nchar(type)
-        # also cat beginning of columns... with a threshold of end of line 
-        # je voulais aller que aux 3/4 mais peut etre que c'est nul en fait
-        maxcharleft <- signif((getOption("width") * 0.75) - chartaken, digits=2) - 1 # to have room for \n 
-          cat(showColDataStruct(object, name, maxcharleft))
+        cat(short_type[type])
+        chartaken <- le.vn + 9L
+        charleft <- floor(getOption("width") - chartaken - 4) # to have room for ...\n 
+        cat(showColDataStruct(object, name, charleft))
         cat("\n")
       }
     }
-    # TODO : maybe add a way to show the parent matrix if it exists ? 
   } 
 )
 

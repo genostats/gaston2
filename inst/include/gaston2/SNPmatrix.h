@@ -325,9 +325,6 @@ class SNPmatrix {
   // Adds N0s... Columns in the snpStats_ DataStruct
   template<typename scalar_t = float>
   void exportSNPStats(bool force) {
-    // for values not computed (women only stats for X/Y chr)
-    constexpr int na_value = -2147483648; // I can't find of a better solution for the moment
-
     size_t nb_inds = nbInds();
 
     // Add a check on if snpStats were computed already, 

@@ -8,6 +8,8 @@
 #include "Column.h"
 #include "datatype.h"
 
+#include "gastonOptions.h" // definition of na_value
+
 /* Function to help showing the first values of given (by name) Column in a 
 DataStruct. 
 Takes the number of characters left on the console line (I want it to fit into a single one)
@@ -24,10 +26,14 @@ std::string showColDataStruct(Rcpp::S4 x, std::string colname, int size_left) {
   auto type = col.type();
 
   for (size_t i = 0; i < nvals; i++) {
-    std::string newval = ""; // make sure it IS resetted at every loop
+    std::string newval = "";
     switch (type) {
       case datatype::INT: {
-        newval = std::to_string(col.at<int>(i));
+        int v = col.at<int>(i);
+        if(v == na_value) 
+          newval = "NA";
+        else
+          newval = std::to_string(col.at<int>(i));
         break;
       }
       case datatype::FLOAT: {
@@ -56,8 +62,8 @@ std::string showColDataStruct(Rcpp::S4 x, std::string colname, int size_left) {
       vals += "...";
       return vals;
     } else {
-    vals += " ";
-    vals += newval;
+      vals += " ";
+      vals += newval;
     }
 
   }
