@@ -498,7 +498,7 @@ class SNPmatrix {
     std::ifstream in(famFile);
     if (!in.good())
       throw std::runtime_error("Can't open fam file");
-    std::vector<datatype> colTypes = {datatype::STRING, datatype::STRING, datatype::STRING, datatype::STRING, datatype::INT, datatype::INT};
+    std::vector<datatype> colTypes = {datatype::STRING, datatype::STRING, datatype::STRING, datatype::STRING, datatype::INT, datatype::DOUBLE};
     std::vector<std::string> colNames = {"famid", "id", "father", "mother", "sex", "pheno"};
     indStats_ = DataStruct(colTypes, colNames);
     indStats_.readFile(in);
