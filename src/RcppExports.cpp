@@ -630,6 +630,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// get_max_threads
+int get_max_threads();
+RcppExport SEXP _gaston2_get_max_threads() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(get_max_threads());
+    return rcpp_result_gen;
+END_RCPP
+}
+// get_num_procs
+int get_num_procs();
+RcppExport SEXP _gaston2_get_num_procs() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(get_num_procs());
+    return rcpp_result_gen;
+END_RCPP
+}
 // grm_
 Rcpp::NumericMatrix grm_(Rcpp::XPtr<SNPmatrix<>> pM);
 RcppExport SEXP _gaston2_grm_(SEXP pMSEXP) {
@@ -882,6 +902,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type test(testSEXP);
     Rcpp::traits::input_parameter< double >::type usefloat(usefloatSEXP);
     set_hwe(pM, test, usefloat);
+    return R_NilValue;
+END_RCPP
+}
+// set_num_threads
+void set_num_threads(int num);
+RcppExport SEXP _gaston2_set_num_threads(SEXP numSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type num(numSEXP);
+    set_num_threads(num);
     return R_NilValue;
 END_RCPP
 }
@@ -1147,16 +1177,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// set_num_thread
-void set_num_thread(int num);
-RcppExport SEXP _gaston2_set_num_thread(SEXP numSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type num(numSEXP);
-    set_num_thread(num);
-    return R_NilValue;
-END_RCPP
-}
 // testsuite
 void testsuite(bool verbose);
 RcppExport SEXP _gaston2_testsuite(SEXP verboseSEXP) {
@@ -1264,6 +1284,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_getGastonOptions_", (DL_FUNC) &_gaston2_getGastonOptions_, 0},
     {"_gaston2_getMode", (DL_FUNC) &_gaston2_getMode, 1},
     {"_gaston2_getModeDosage", (DL_FUNC) &_gaston2_getModeDosage, 1},
+    {"_gaston2_get_max_threads", (DL_FUNC) &_gaston2_get_max_threads, 0},
+    {"_gaston2_get_num_procs", (DL_FUNC) &_gaston2_get_num_procs, 0},
     {"_gaston2_grm_", (DL_FUNC) &_gaston2_grm_, 1},
     {"_gaston2_grm_mmatrix", (DL_FUNC) &_gaston2_grm_mmatrix, 3},
     {"_gaston2_isAutosome_", (DL_FUNC) &_gaston2_isAutosome_, 1},
@@ -1286,6 +1308,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_setMode", (DL_FUNC) &_gaston2_setMode, 2},
     {"_gaston2_setModeDosage", (DL_FUNC) &_gaston2_setModeDosage, 2},
     {"_gaston2_set_hwe", (DL_FUNC) &_gaston2_set_hwe, 3},
+    {"_gaston2_set_num_threads", (DL_FUNC) &_gaston2_set_num_threads, 1},
     {"_gaston2_showColDataStruct", (DL_FUNC) &_gaston2_showColDataStruct, 3},
     {"_gaston2_test_readBedFileMemory", (DL_FUNC) &_gaston2_test_readBedFileMemory, 4},
     {"_gaston2_test_readBedFileDisk", (DL_FUNC) &_gaston2_test_readBedFileDisk, 3},
@@ -1309,7 +1332,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gaston2_get_matrix_from_file", (DL_FUNC) &_gaston2_get_matrix_from_file, 3},
     {"_gaston2_test_copyConstructor", (DL_FUNC) &_gaston2_test_copyConstructor, 0},
     {"_gaston2_test_first_scnd_ind", (DL_FUNC) &_gaston2_test_first_scnd_ind, 0},
-    {"_gaston2_set_num_thread", (DL_FUNC) &_gaston2_set_num_thread, 1},
     {"_gaston2_testsuite", (DL_FUNC) &_gaston2_testsuite, 1},
     {"_gaston2_ToDosagematrixDisk_", (DL_FUNC) &_gaston2_ToDosagematrixDisk_, 2},
     {"_gaston2_ToDosagematrixMemory_", (DL_FUNC) &_gaston2_ToDosagematrixMemory_, 1},

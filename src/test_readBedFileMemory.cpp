@@ -741,14 +741,6 @@ IntegerMatrix test_first_scnd_ind()
   return m;
 }
 
-//[[Rcpp::export]]
-void set_num_thread(int num)
-{
-  omp_set_num_threads(num);
-}
-
-
-
 
 
 
@@ -792,7 +784,7 @@ void testsuite(bool verbose = true)
 {
 
   // if using valgrind, important
-  set_num_thread(1);
+  omp_set_num_threads(1);
 
   if (verbose) std::cout << "Using " << omp_get_max_threads() << " thread(s).\n";
 

@@ -197,6 +197,14 @@ getModeDosage <- function(pM) {
     .Call(`_gaston2_getModeDosage`, pM)
 }
 
+get_max_threads <- function() {
+    .Call(`_gaston2_get_max_threads`)
+}
+
+get_num_procs <- function() {
+    .Call(`_gaston2_get_num_procs`)
+}
+
 grm_ <- function(pM) {
     .Call(`_gaston2_grm_`, pM)
 }
@@ -283,6 +291,10 @@ setModeDosage <- function(pM, mode) {
 
 set_hwe <- function(pM, test = 0L, usefloat = FALSE) {
     invisible(.Call(`_gaston2_set_hwe`, pM, test, usefloat))
+}
+
+set_num_threads <- function(num) {
+    invisible(.Call(`_gaston2_set_num_threads`, num))
 }
 
 showColDataStruct <- function(x, colname, size_left) {
@@ -375,10 +387,6 @@ test_copyConstructor <- function() {
 
 test_first_scnd_ind <- function() {
     .Call(`_gaston2_test_first_scnd_ind`)
-}
-
-set_num_thread <- function(num) {
-    invisible(.Call(`_gaston2_set_num_thread`, num))
 }
 
 testsuite <- function(verbose = TRUE) {
